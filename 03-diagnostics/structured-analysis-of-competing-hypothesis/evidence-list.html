@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACH</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+    .layout {
+      max-width: none;
+      margin: 0;
+      padding: 0.5rem 1rem 1rem 1rem;
+      width: 100%;
+    }
+    .events-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 6px;
+    }
+    .events-header .events-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      flex: 1;
+      text-align: center;
+    }
+    .events-header .events-header-left { flex-shrink: 0; }
+    .events-header .panel-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-back-to-hub {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      font: inherit;
+      font-size: 0.85rem;
+      color: #888;
+      background: transparent;
+      border: 1px solid #444;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn-back-to-hub:hover {
+      color: #e0e0e0;
+      border-color: #666;
+    }
+    .btn-back-icon {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+    .update-file-hint {
+      margin: 0.25rem 0 0.75rem 0;
+      font-size: 0.8rem;
+      color: #888;
+    }
+    .update-file-hint strong { color: #999; }
+    .update-file-hint.hidden { display: none; }
+    .update-file-wrap { display: flex; flex-direction: column; align-items: flex-start; }
+    .link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+      color: #7eb8da;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .link-btn:hover { color: #9ed4f0; }
+    .dropdown-wrap { position: relative; display: inline-block; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 0.25rem;
+      min-width: 160px;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 100;
+      padding: 0.25rem 0;
+    }
+    .dropdown-menu.open { display: block; }
+    .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 0.4rem 0.75rem;
+      text-align: left;
+      border: none;
+      background: none;
+      color: #e0e0e0;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .dropdown-menu button:hover { background: #333; color: #7eb8da; }
+    .ach-matrix-wrap {
+      overflow: auto;
+      width: 100%;
+    }
+    .ach-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .ach-matrix th,
+    .ach-matrix td {
+      border: 1px solid #444;
+      padding: 0.5rem 0.6rem;
+      vertical-align: top;
+      background: #1a1a1a;
+    }
+    .ach-matrix th {
+      background: #252525;
+      color: #b0b0b0;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .ach-matrix .ach-th.ach-analysis { text-align: left; min-width: 180px; }
+    .ach-matrix .ach-th.ach-event { text-align: left; min-width: 280px; }
+    .ach-evidence-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .ach-evidence-header-label { margin-right: 0.25rem; }
+    .ach-evidence-import-btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; white-space: nowrap; }
+    .ach-matrix td.ach-cell-event { vertical-align: top; min-width: 280px; padding: 0.5rem 0.6rem; }
+    .ach-matrix td.ach-cell-event:has(.evidence-item.collapsed) { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .ach-matrix td.ach-cell-event .evidence-item { margin: 0; border: none; padding: 0.35rem 0; }
+    .ach-matrix td.ach-cell-event .evidence-item-header { gap: 0.5rem; }
+    .ach-matrix td.ach-cell-h {
+      text-align: center;
+      min-width: 3em;
+      white-space: nowrap;
+      color: #e0e0e0;
+      vertical-align: top;
+    }
+    .ach-matrix td.ach-cell-analysis {
+      text-align: left;
+      min-width: 180px;
+      white-space: normal;
+      word-wrap: break-word;
+      vertical-align: top;
+    }
+    .ach-matrix td .ach-empty { color: #555; }
+    .ach-analysis-view {
+      min-height: 2em;
+      cursor: text;
+      padding: 0.25rem;
+      border-radius: 3px;
+    }
+    .ach-analysis-view:hover { background: #2a2a2a; }
+    .ach-analysis-wrap { position: relative; }
+    .ach-analysis-edit-wrap { display: flex; flex-direction: column; gap: 0.35rem; }
+    .ach-analysis-edit-wrap textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: 0.35rem;
+      font-size: inherit;
+      font-family: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 3px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .ach-analysis-save-btn {
+      align-self: flex-start;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+      background: #40916c;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .ach-analysis-save-btn:hover { background: #5cb87a; }
+    .evidence-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .evidence-item {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #333;
+      font-size: 0.9rem;
+      min-height: 72px;
+    }
+    .evidence-item:last-child { border-bottom: none; }
+    .evidence-card-title { font-weight: 600; color: #e0e0e0; margin-bottom: 0.2rem; }
+    .evidence-card-title .evidence-edit-input { width: 100%; box-sizing: border-box; }
+    .evidence-card-desc { font-size: 0.8rem; color: #999; margin-bottom: 0.25rem; line-height: 1.3; }
+    .evidence-card-source { font-size: 0.8rem; }
+    .evidence-card-source a { color: #7eb8da; }
+    .evidence-card-badges { display: flex; gap: 0.2rem; flex-shrink: 0; }
+    .evidence-card-content { flex: 1; min-width: 0; }
+    .evidence-card-right { display: flex; align-items: flex-start; gap: 0.35rem; flex-shrink: 0; }
+    .evidence-item-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+    .evidence-item-header button { cursor: pointer; }
+    .evidence-item-header .evidence-datetime {
+      flex-shrink: 0;
+      font-weight: 600;
+      color: #7eb8da;
+      margin-bottom: 0;
+    }
+    .evidence-title-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+    }
+    .evidence-title-group .evidence-name-wrap,
+    .evidence-title-group .evidence-edit-input { flex: 1; min-width: 0; }
+    .evidence-title-group .evidence-name { margin-bottom: 0; }
+    .evidence-item-header .evidence-name {
+      color: #e0e0e0;
+      margin-bottom: 0;
+    }
+    .evidence-actions {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      margin-left: auto;
+    }
+    .evidence-rel,
+    .evidence-cred {
+      flex-shrink: 0;
+      width: 22px;
+      min-width: 22px;
+      padding: 0.15rem 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-align: center;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 3px;
+      color: #b0b0b0;
+    }
+    .evidence-save-btn,
+    .evidence-toggle,
+    .evidence-trash-btn {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .evidence-save-btn:hover,
+    .evidence-toggle:hover,
+    .evidence-trash-btn:hover { color: #e0e0e0; }
+    .evidence-trash-btn:hover { color: #c66; }
+    .evidence-save-btn { color: #40916c; }
+    .evidence-save-btn:hover { color: #5cb87a; }
+    .evidence-item .evidence-edit-input,
+    .evidence-item .evidence-edit-desc-wrap { display: none; }
+    .evidence-item.editing .evidence-name-wrap { display: none; }
+    .evidence-item.editing .evidence-edit-input { display: block; }
+    .evidence-item.editing .evidence-meta-wrap { display: none; }
+    .evidence-item.editing .evidence-edit-desc-wrap { display: block; }
+    .evidence-item.editing .evidence-detail { display: block !important; }
+    .evidence-item.editing .evidence-save-btn { display: inline-flex; }
+    .evidence-item.editing .evidence-trash-btn { display: none; }
+    .evidence-edit-input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.2rem 0.35rem;
+      font-size: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 3px;
+    }
+    .evidence-edit-desc {
+      width: 100%;
+      min-height: 60px;
+      padding: 0.35rem;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 3px;
+      resize: vertical;
+    }
+    .evidence-source-line { font-size: 0.8rem; color: #666; margin-top: 0.25rem; }
+    .evidence-toggle svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+    .evidence-item.collapsed .evidence-toggle svg { transform: rotate(-90deg); }
+    .evidence-item.collapsed {
+      min-height: 0;
+      padding: 0.25rem 0;
+    }
+    .evidence-detail {
+      margin-top: 0.35rem;
+      margin-left: 0;
+      overflow: hidden;
+    }
+    .evidence-item.collapsed .evidence-detail {
+      display: none;
+    }
+    .evidence-item.collapsed .evidence-card-desc {
+      display: none;
+    }
+    .evidence-datetime {
+      font-weight: 600;
+      color: #7eb8da;
+      margin-bottom: 0.2rem;
+    }
+    .evidence-name {
+      color: #e0e0e0;
+    }
+    .evidence-meta {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.15rem;
+    }
+    .loading, .error {
+      padding: 1rem;
+      color: #888;
+    }
+    .error { color: #c66; }
+    .filter-panel {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .filter-panel.hidden { display: none; }
+    .filter-panel h3 { margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #b0b0b0; }
+    .filter-option-buttons { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.5rem; }
+    .filter-option-btn {
+      display: block;
+      width: 100%;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.875rem;
+      text-align: left;
+      background: #333;
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: #e0e0e0;
+      cursor: pointer;
+    }
+    .filter-option-btn:hover { background: #3a3a3a; border-color: #7eb8da; color: #7eb8da; }
+    .filter-entity { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #444; }
+    .filter-entity.hidden { display: none; }
+    .filter-entity strong { display: block; margin-bottom: 0.35rem; font-size: 0.85rem; color: #b0b0b0; }
+    .filter-entity label { display: inline-block; margin-right: 0.75rem; margin-bottom: 0.25rem; cursor: pointer; }
+    .filter-entity input[type="checkbox"] { margin-right: 0.35rem; accent-color: #7eb8da; }
+    .btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.875rem;
+      background: #3a3a3a;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn:hover { background: #4a4a4a; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .evidence-item .evidence-save-btn { display: none; }
+    .hypothesis-and-counters {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .hypothesis-and-counters .flex-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .intelligence-requirement-box {
+      padding: 0.5rem 0.75rem;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .intelligence-requirement-box label {
+      display: block;
+      font-size: 0.8rem;
+      color: #b0b0b0;
+      margin-bottom: 0.25rem;
+    }
+    .intelligence-requirement-box input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.35rem 0.5rem;
+      font-size: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+    }
+    .intelligence-requirement-box input::placeholder { color: #666; }
+    .intelligence-requirement-box input[readonly] { cursor: default; opacity: 0.95; }
+    .intelligence-requirement-box-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .intelligence-requirement-box-row input { flex: 1; min-width: 0; }
+    .intelligence-requirement-box-row .btn { flex-shrink: 0; padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+    .hypothesis-box {
+      max-width: 25vw;
+      padding: 0.75rem;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 6px;
+    }
+    .counter-box {
+      padding: 0.75rem;
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 6px;
+      min-width: 140px;
+    }
+    .counter-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .counter-box h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #b0b0b0;
+    }
+    .counter-box.collapsed .counter-box-content { display: none; }
+    .counter-box table { width: 100%; font-size: 0.85rem; border-collapse: collapse; }
+    .counter-box th, .counter-box td { text-align: left; padding: 0.2rem 0.35rem 0.2rem 0; }
+    .counter-box th { color: #888; font-weight: 500; }
+    .counter-box td { color: #e0e0e0; }
+    .hypothesis-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .hypothesis-box h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #b0b0b0;
+    }
+    .hypothesis-update-btn,
+    .hypothesis-clear-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      margin-right: 0.35rem;
+    }
+    .hypothesis-toggle-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.8rem;
+      background: #333;
+      color: #b0b0b0;
+      border: 1px solid #555;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .hypothesis-toggle-btn:hover { background: #3a3a3a; color: #e0e0e0; }
+    .hypothesis-box.collapsed .hypothesis-box-content { display: none; }
+    .hypothesis-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .hypothesis-item {
+      padding: 0.35rem 0;
+      font-size: 0.875rem;
+      color: #7eb8da;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      border-radius: 3px;
+    }
+    .hypothesis-item:hover { color: #9ed4f0; text-decoration: underline; }
+    .hypothesis-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .hypothesis-modal.open { display: flex; }
+    .hypothesis-modal-content {
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+      max-height: 80vh;
+      overflow: auto;
+      padding: 1rem 1.25rem;
+      position: relative;
+    }
+    .hypothesis-modal-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #888;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .hypothesis-modal-close:hover { color: #e0e0e0; background: #333; }
+    .hypothesis-modal h3 { margin: 0 0 0.75rem 0; font-size: 1rem; color: #7eb8da; }
+    .hypothesis-modal-detail { margin-bottom: 0.75rem; font-size: 0.875rem; }
+    .hypothesis-modal-detail strong { display: inline-block; min-width: 4.5em; color: #888; }
+    .hypothesis-modal-actions { display: flex; gap: 0.5rem; }
+    .hypothesis-modal .hypothesis-edit-row { margin-bottom: 0.6rem; }
+    .hypothesis-modal .hypothesis-edit-row label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 0.2rem; }
+    .hypothesis-modal .hypothesis-edit-row input,
+    .hypothesis-modal .hypothesis-edit-row textarea {
+      width: 100%; padding: 0.35rem 0.5rem; font-size: 0.875rem;
+      background: #2a2a2a; border: 1px solid #444; color: #e0e0e0; border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .hypothesis-modal .hypothesis-edit-row textarea { min-height: 80px; resize: vertical; }
+    .hypothesis-modal .hypothesis-id-locked { cursor: not-allowed; opacity: 0.85; }
+    .event-detail-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1001;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .event-detail-modal.open { display: flex; }
+    .event-detail-content {
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .event-detail-content h3 { margin: 0 0 0.75rem 0; font-size: 1rem; color: #7eb8da; padding-right: 2rem; }
+    .event-detail-body {
+      overflow: auto;
+      padding: 1rem 1.25rem;
+      flex: 1;
+    }
+    .event-detail-row { margin-bottom: 0.6rem; }
+    .event-detail-row label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 0.2rem; }
+    .event-detail-row input[type="text"],
+    .event-detail-row input[type="number"],
+    .event-detail-row select,
+    .event-detail-row textarea {
+      width: 100%;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.875rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .event-detail-row textarea { min-height: 60px; resize: vertical; }
+    .event-detail-row textarea.event-detail-name { min-height: 80px; }
+    .event-detail-row textarea.event-detail-description { min-height: 200px; }
+    .event-detail-row input[readonly] { color: #888; }
+    .event-detail-color-wrap { display: flex; align-items: center; gap: 0.5rem; }
+    .event-detail-color-picker { width: 40px; height: 32px; padding: 0; border: 1px solid #444; border-radius: 4px; cursor: pointer; background: #2a2a2a; }
+    .event-detail-color-hex { flex: 1; min-width: 6em; }
+    .event-detail-actions {
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid #444;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    .event-detail-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #888;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .event-detail-close:hover { color: #e0e0e0; background: #333; }
+
+    .row-edit-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 1002;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .row-edit-modal.open { display: flex; }
+    .row-edit-content {
+      background: #252525;
+      border: 1px solid #555;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      max-width: 95vw;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      padding: 1rem;
+      position: relative;
+    }
+    .row-edit-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #888;
+      font-size: 1.25rem;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .row-edit-close:hover { color: #e0e0e0; background: #333; }
+    .row-edit-modal .ach-matrix { margin: 0; }
+    .row-edit-modal .ach-cell-event { background: #1e1e1e; }
+    .row-edit-modal .ach-cell-h select {
+      width: 100%;
+      padding: 0.35rem;
+      font-size: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .row-edit-modal .ach-cell-analysis textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.35rem;
+      font-size: inherit;
+      font-family: inherit;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 3px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .row-edit-actions { margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem; }
+    .ach-cell-h { cursor: default; }
+    .ach-inline-select {
+      background: #1a1a1a;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 3px;
+      padding: 0.2rem 0.1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .ach-inline-select:hover { border-color: #7eb8da; }
+    .add-evidence-bar { margin-top: 1rem; padding: 0.5rem 0; }
+    .add-evidence-btn { font-size: 0.95rem; }
+    #add-evidence-modal { z-index: 1003; }
+    .add-evidence-content { max-width: 520px; }
+    .sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .sort-bar label { font-size: 0.9rem; color: #b0b0b0; }
+    .sort-bar select {
+      padding: 0.35rem 0.6rem;
+      font-size: 0.875rem;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .ach-matrix tbody tr[draggable="true"] { cursor: grab; }
+    .ach-matrix tbody tr[draggable="true"]:active { cursor: grabbing; }
+    .ach-matrix tbody tr.ach-drag-over { background: #2a2a2a; }
+  </style>
+</head>
+<body>
+  <div id="hypothesis-modal" class="hypothesis-modal" aria-hidden="true">
+    <div class="hypothesis-modal-content">
+      <button type="button" class="hypothesis-modal-close" id="hypothesis-modal-close" aria-label="Close">&times;</button>
+      <div id="hypothesis-modal-body"></div>
+      <div class="hypothesis-modal-actions" id="hypothesis-modal-actions" style="display:none; margin-top:1rem; justify-content:flex-end;">
+        <button type="button" class="btn" id="hypothesis-save-btn">Save</button>
+      </div>
+    </div>
+  </div>
+  <div id="event-detail-modal" class="event-detail-modal" aria-hidden="true">
+    <div class="event-detail-content">
+      <button type="button" class="event-detail-close" id="event-detail-close" aria-label="Close">&times;</button>
+      <h3 id="event-detail-title">Evidence details</h3>
+      <div class="event-detail-body" id="event-detail-body"></div>
+      <div class="event-detail-actions">
+        <button type="button" class="btn" id="event-detail-save">Save</button>
+      </div>
+    </div>
+  </div>
+  <div id="row-edit-modal" class="row-edit-modal" aria-hidden="true">
+    <div class="row-edit-content" id="row-edit-content">
+      <button type="button" class="row-edit-close" id="row-edit-close" aria-label="Close">&times;</button>
+      <div id="row-edit-body"></div>
+      <div class="row-edit-actions">
+        <button type="button" class="btn" id="row-edit-save">Save</button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="import-json-input" accept=".json,application/json" style="display:none">
+  <input type="file" id="import-hypothesis-input" accept=".json,application/json" style="display:none">
+
+  <div class="layout">
+    <div class="events-header">
+      <div class="events-header-left">
+        <a href="http://localhost:3000/" target="_self" class="btn-back-to-hub" aria-label="Back to main screen" title="Back to SAT Tools hub">
+          <svg class="btn-back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+          Back to Main Screen
+        </a>
+      </div>
+      <h2 class="events-title">Analysis of Competing Hypothesis for Structured Analysis Techniques</h2>
+    </div>
+    <div class="hypothesis-and-counters">
+      <div class="intelligence-requirement-box">
+        <label for="intelligence-requirement-input">Intelligence Requirement:</label>
+        <div class="intelligence-requirement-box-row">
+          <input type="text" id="intelligence-requirement-input" placeholder="Brief title of the analysis" aria-label="Intelligence requirement title" readonly>
+          <button type="button" class="btn" id="intelligence-requirement-save-btn">Save</button>
+        </div>
+      </div>
+      <div class="flex-row">
+      <div class="hypothesis-box" id="hypothesis-box">
+        <div class="hypothesis-box-header">
+          <h2>Hypothesis</h2>
+          <button type="button" class="btn hypothesis-update-btn" id="hypothesis-update-btn" aria-label="Update from file" title="Update from data/hypothesis.json">Update</button>
+          <button type="button" class="btn hypothesis-clear-btn" id="hypothesis-clear-btn" aria-label="Clear hypothesis list" title="Clear the list (does not save)">Clear hypothesis</button>
+          <button type="button" class="hypothesis-toggle-btn" id="hypothesis-toggle-btn" aria-label="Hide hypothesis" title="Hide hypothesis">▼ Hide</button>
+        </div>
+        <div class="hypothesis-box-content" id="hypothesis-box-content">
+          <ul class="hypothesis-list" id="hypothesis-list"></ul>
+          <p class="loading" id="hypothesis-status" style="margin:0;padding:0.25rem 0;font-size:0.85rem;"></p>
+        </div>
+      </div>
+      <div class="counter-box" id="counter-box">
+        <div class="counter-box-header">
+          <h2>Evidence against hypothesis</h2>
+          <button type="button" class="hypothesis-toggle-btn" id="counter-toggle-btn" aria-label="Hide" title="Hide">▼ Hide</button>
+        </div>
+        <div class="counter-box-content" id="counter-box-content">
+          <div id="counter-box-body"></div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <div class="sort-bar">
+      <button type="button" class="btn" id="filter-btn">Filter</button>
+      <label for="sort-by">Sort by:</label>
+      <select id="sort-by">
+        <option value="date_asc">Date (Ascending)</option>
+        <option value="date_desc">Date (Descending)</option>
+        <option value="reliability">Reliability</option>
+        <option value="credibility">Credibility</option>
+      </select>
+    </div>
+    <div class="filter-panel hidden" id="filter-panel">
+      <h3>Filter by</h3>
+      <div class="filter-option-buttons">
+        <button type="button" class="filter-option-btn" data-entity="source_reliability">Source reliability</button>
+        <button type="button" class="filter-option-btn" data-entity="source_credibility">Source credibility</button>
+      </div>
+      <div class="filter-entity hidden" id="filter-entity-source_reliability">
+        <strong>Source reliability</strong>
+        <span id="filter-source-reliability-options"></span>
+      </div>
+      <div class="filter-entity hidden" id="filter-entity-source_credibility">
+        <strong>Source credibility</strong>
+        <span id="filter-source-credibility-options"></span>
+      </div>
+    </div>
+    <div class="ach-matrix-wrap" id="ach-matrix-wrap">
+      <table class="ach-matrix" id="ach-matrix">
+        <thead>
+          <tr>
+            <th class="ach-th ach-event"><span class="ach-evidence-header"><span class="ach-evidence-header-label">Evidence</span><button type="button" class="btn ach-evidence-import-btn" id="evidence-header-read-btn">Read Evidence from File</button></span></th>
+            <th class="ach-th ach-h1" id="ach-th-h1">H1</th>
+            <th class="ach-th ach-h2" id="ach-th-h2">H2</th>
+            <th class="ach-th ach-h3" id="ach-th-h3">H3</th>
+            <th class="ach-th ach-h4" id="ach-th-h4">H4</th>
+            <th class="ach-th ach-h5" id="ach-th-h5">H5</th>
+            <th class="ach-th ach-analysis">Analysis</th>
+          </tr>
+        </thead>
+        <tbody id="ach-matrix-body"></tbody>
+      </table>
+    </div>
+    <div class="add-evidence-bar">
+      <button type="button" class="btn add-evidence-btn" id="add-evidence-btn">Add new evidence</button>
+    </div>
+    <p class="loading" id="status">Loading evidence…</p>
+  </div>
+
+  <div id="add-evidence-modal" class="event-detail-modal" aria-hidden="true">
+    <div class="event-detail-content add-evidence-content">
+      <button type="button" class="event-detail-close" id="add-evidence-close" aria-label="Close">&times;</button>
+      <h3 id="add-evidence-title">Add new evidence</h3>
+      <div class="event-detail-body" id="add-evidence-body"></div>
+      <div class="event-detail-actions">
+        <button type="button" class="btn" id="add-evidence-create">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" id="evidence-data">{"id":"n_mlff19mc_cylgwc7","name":"Level 0","depth":0,"evidence":"","children":[{"id":"n_mlfggylv_hfqxiqa","name":"Level 1","depth":1,"evidence":"Yes","children":[{"id":"n_mlfgkjiz_fqe7d31","name":"Level 2","depth":2,"evidence":"","children":[{"id":"n_mlfi73wz_u2garnd","name":"Level 3","depth":3,"evidence":"Yes","children":[{"id":"n_mlfi7vg0_ho4k14t","name":"Level 4","depth":4,"evidence":"","children":[],"color":"#6a4c93","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2022-02-18","time":"12:34"},{"id":"n_mlfi7zz4_eofnh82","name":"Level 4","depth":4,"evidence":"Yes","children":[],"color":"#6a4c93","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2022-09-27","time":"12:34"}],"color":"#6c757d","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2021-11-05","time":"12:34"}],"color":"#40916c","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2021-03-12","time":"12:34"}],"color":"#8b5a2b","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2020-10-20","time":"12:34"},{"id":"n_mlfgh90o_f5ol3bw","name":"Level 1","depth":1,"evidence":"","children":[{"id":"n_mlfgk9yf_gq4wr89","name":"Level 2","depth":2,"evidence":"Yes","children":[{"id":"n_mlfgky1i_z4t1hom","name":"Level 3","depth":3,"evidence":"","children":[{"id":"n_mlfi9pw5_fj651xe","name":"Level 4","depth":4,"evidence":"Yes","children":[],"color":"#6a4c93","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2024-04-14","time":"12:34"}],"color":"#6c757d","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2023-12-02","time":"12:34"}],"color":"#40916c","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2023-06-16","time":"12:34"}],"color":"#8b5a2b","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2023-01-08","time":"12:34"},{"id":"n_mlfghwx9_ntovfho","name":"Level 1","depth":1,"evidence":"Yes","children":[{"id":"n_mlfgiddw_0a1sna0","name":"Level 2","depth":2,"evidence":"","children":[{"id":"n_mlfgj382_yqnvb1e","name":"Level 3","depth":3,"evidence":"Yes","children":[{"id":"n_mlfgjtpw_2n37bn3","name":"Level 4","depth":4,"evidence":"","children":[],"color":"#6a4c93","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2025-08-22","time":"12:34"},{"id":"n_mlfgjyrg_ttsc6s7","name":"Level 4","depth":4,"evidence":"Yes","children":[],"color":"#6a4c93","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2026-01-11","time":"12:34"}],"color":"#6c757d","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2025-05-09","time":"12:34"},{"id":"n_mlfgjhdq_n3gr58k","name":"Level 3","depth":3,"evidence":"","children":[],"color":"#6c757d","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2026-06-07","time":"12:34"}],"color":"#40916c","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2025-01-19","time":"12:34"},{"id":"n_mlfgiliy_rfw7pzm","name":"Level 2","depth":2,"evidence":"Yes","children":[],"color":"#40916c","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2026-11-23","time":"12:34"}],"color":"#8b5a2b","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2024-10-30","time":"12:34"}],"color":"#e76f51","description":"Lorem Ipsum","source":"Lorem Ipsum","date":"2020-01-15","time":"12:34"}</script>
+  <script>
+    (function () {
+      const achTbody = document.getElementById('ach-matrix-body');
+      const statusEl = document.getElementById('status');
+      const updateBtn = document.getElementById('update-btn');
+      const importBtn = document.getElementById('import-btn');
+      const importDropdown = document.getElementById('import-dropdown');
+      const importJsonInput = document.getElementById('import-json-input');
+      const importHypothesisInput = document.getElementById('import-hypothesis-input');
+      const exportBtn = document.getElementById('export-btn');
+      const exportDropdown = document.getElementById('export-dropdown');
+      const filterBtn = document.getElementById('filter-btn');
+      const filterPanel = document.getElementById('filter-panel');
+      const hypothesisListEl = document.getElementById('hypothesis-list');
+      const hypothesisStatusEl = document.getElementById('hypothesis-status');
+      const hypothesisModal = document.getElementById('hypothesis-modal');
+      const hypothesisModalClose = document.getElementById('hypothesis-modal-close');
+      const hypothesisModalBody = document.getElementById('hypothesis-modal-body');
+      const eventDetailModal = document.getElementById('event-detail-modal');
+      const eventDetailClose = document.getElementById('event-detail-close');
+      const eventDetailBody = document.getElementById('event-detail-body');
+      const eventDetailSave = document.getElementById('event-detail-save');
+      var currentRoot = null;
+      var hypothesisData = [];
+      var eventDetailNodeId = null;
+      var rowEditNodeId = null;
+      var hypothesisEditIndex = -1;
+      var activeFilters = { source_reliability: [], source_credibility: [] };
+      var currentSort = 'date_asc';
+      var customOrder = null;
+      var updateFromFileName = null;
+      try {
+        var stored = localStorage.getItem('ach-update-filename');
+        if (stored && stored.trim() !== '') updateFromFileName = stored.trim();
+      } catch (e) {}
+
+      function findNodeById(node, id) {
+        if (!node) return null;
+        if (node.id === id) return node;
+        var children = node.children;
+        if (Array.isArray(children)) {
+          for (var i = 0; i < children.length; i++) {
+            var found = findNodeById(children[i], id);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      // Persists evidence tree to data/evidence.json. Every evidence Save (modal, inline, add) must call this.
+      function saveEvidenceTree(root, onDone) {
+        if (!root) {
+          statusEl.textContent = 'No data to save.';
+          if (onDone) onDone();
+          return;
+        }
+        if (customOrder && customOrder.length) root.evidenceOrder = customOrder;
+        fetch('api/save-evidence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(root)
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.ok) {
+              if (onDone) onDone();
+            } else {
+              statusEl.textContent = 'Save failed: ' + (data && data.error ? data.error : 'Unknown error');
+              statusEl.classList.add('error');
+            }
+          })
+          .catch(function (err) {
+            statusEl.textContent = 'Save failed: ' + (err.message || err);
+            statusEl.classList.add('error');
+          });
+      }
+
+      function collectEvidenceNodes(node, out) {
+        if (!node) return;
+        const evidence = (node.evidence || '').toString().trim();
+        if (evidence.toLowerCase() === 'yes') {
+          out.push({
+            id: node.id,
+            name: node.name || '',
+            description: node.description || '',
+            source: node.source || '',
+            date: node.date || '',
+            time: node.time || '',
+            color: node.color || '',
+            depth: node.depth,
+            source_reliability: (node.source_reliability != null && node.source_reliability !== '') ? String(node.source_reliability) : '',
+            source_credibility: (node.source_credibility != null && node.source_credibility !== '') ? String(node.source_credibility) : '',
+            H1: node.H1 != null && node.H1 !== '' ? String(node.H1).trim() : '',
+            H2: node.H2 != null && node.H2 !== '' ? String(node.H2).trim() : '',
+            H3: node.H3 != null && node.H3 !== '' ? String(node.H3).trim() : '',
+            H4: node.H4 != null && node.H4 !== '' ? String(node.H4).trim() : '',
+            H5: node.H5 != null && node.H5 !== '' ? String(node.H5).trim() : '',
+            analysis_description: node.analysis_description != null && node.analysis_description !== '' ? String(node.analysis_description) : ''
+          });
+        }
+        const children = node.children;
+        if (Array.isArray(children)) {
+          for (let i = 0; i < children.length; i++) {
+            collectEvidenceNodes(children[i], out);
+          }
+        }
+      }
+
+      function parseDate(dateStr, timeStr) {
+        if (!dateStr) return new Date(0);
+        const parts = String(dateStr).trim().split('-');
+        const y = parseInt(parts[0], 10) || 0;
+        const m = (parseInt(parts[1], 10) || 1) - 1;
+        const d = parseInt(parts[2], 10) || 1;
+        let h = 0, min = 0, s = 0;
+        if (timeStr) {
+          const t = String(timeStr).trim().split(':');
+          h = parseInt(t[0], 10) || 0;
+          min = parseInt(t[1], 10) || 0;
+          s = parseInt(t[2], 10) || 0;
+        }
+        return new Date(y, m, d, h, min, s);
+      }
+
+      function filterItemsByActive(items) {
+        return items.filter(function (item) {
+          var rel = item.source_reliability || '';
+          if (activeFilters.source_reliability.length && activeFilters.source_reliability.indexOf(rel) === -1) return false;
+          var cred = item.source_credibility || '';
+          if (activeFilters.source_credibility.length && activeFilters.source_credibility.indexOf(cred) === -1) return false;
+          return true;
+        });
+      }
+
+      function sortItems(items, sortBy) {
+        var copy = items.slice();
+        if (sortBy === 'date_asc') {
+          copy.sort(function (a, b) {
+            var da = parseDate(a.date, a.time).getTime();
+            var db = parseDate(b.date, b.time).getTime();
+            return da - db;
+          });
+        } else if (sortBy === 'date_desc') {
+          copy.sort(function (a, b) {
+            var da = parseDate(a.date, a.time).getTime();
+            var db = parseDate(b.date, b.time).getTime();
+            return db - da;
+          });
+        } else if (sortBy === 'reliability') {
+          var relOrder = { 'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6 };
+          copy.sort(function (a, b) {
+            var ra = (a.source_reliability || '').toString().trim().toUpperCase();
+            var rb = (b.source_reliability || '').toString().trim().toUpperCase();
+            var va = ra ? (relOrder[ra] || 99) : 100;
+            var vb = rb ? (relOrder[rb] || 99) : 100;
+            return va - vb;
+          });
+        } else if (sortBy === 'credibility') {
+          copy.sort(function (a, b) {
+            var ca = parseInt((a.source_credibility || '').toString().trim(), 10);
+            var cb = parseInt((b.source_credibility || '').toString().trim(), 10);
+            if (isNaN(ca)) ca = 99;
+            if (isNaN(cb)) cb = 99;
+            return ca - cb;
+          });
+        }
+        return copy;
+      }
+
+      function applyCustomOrder(items, order) {
+        if (!order || order.length === 0) return items;
+        var byId = {};
+        items.forEach(function (item) { byId[item.id] = item; });
+        var result = [];
+        order.forEach(function (id) {
+          if (byId[id]) { result.push(byId[id]); delete byId[id]; }
+        });
+        items.forEach(function (item) {
+          if (byId[item.id]) result.push(item);
+        });
+        return result;
+      }
+
+      function updateHypothesisCounters(items) {
+        var el = document.getElementById('counter-box-body');
+        if (!el) return;
+        var keys = ['H1', 'H2', 'H3', 'H4', 'H5'];
+        var rows = keys.map(function (k) {
+          var sum = 0;
+          items.forEach(function (item) {
+            var v = (item[k] != null ? String(item[k]) : '').trim();
+            if (v === '--') sum += 2;
+            else if (v === '-') sum += 1;
+          });
+          return '<tr><th>' + escapeHtml(k) + '</th><td><strong>' + sum + '</strong></td></tr>';
+        }).join('');
+        el.innerHTML = '<table><thead><tr><th></th><th>Count</th></tr></thead><tbody>' + rows + '</tbody></table>';
+      }
+
+      function buildFilterOptionsForEntity(key, values) {
+        var containerId = key === 'source_reliability' ? 'filter-source-reliability-options' : 'filter-source-credibility-options';
+        var labelFn = function (v) { return v === '' ? '(empty)' : v; };
+        var el = document.getElementById(containerId);
+        if (!el) return;
+        el.innerHTML = values.map(function (v) {
+          var lab = labelFn(v);
+          var checked = activeFilters[key].indexOf(v) !== -1 ? ' checked' : '';
+          return '<label><input type="checkbox" data-filter="' + escapeHtml(key) + '" data-value="' + escapeHtml(String(v)) + '"' + checked + '> ' + escapeHtml(lab) + '</label>';
+        }).join('');
+        var entityEl = el.closest('.filter-entity');
+        if (entityEl) {
+          entityEl.querySelectorAll('input[data-filter]').forEach(function (cb) {
+            var key = cb.getAttribute('data-filter');
+            cb.onchange = function () {
+              var val = cb.getAttribute('data-value');
+              if (cb.checked) {
+                if (activeFilters[key].indexOf(val) === -1) activeFilters[key].push(val);
+              } else {
+                activeFilters[key] = activeFilters[key].filter(function (x) { return x !== val; });
+              }
+              applyFilters();
+            };
+          });
+        }
+      }
+
+      function renderAchRows(items) {
+        if (!achTbody) return;
+        ['H1', 'H2', 'H3', 'H4', 'H5'].forEach(function (k) {
+          var th = document.getElementById('ach-th-' + k.toLowerCase());
+          if (th) th.textContent = k;
+        });
+        function cellVal(v) {
+          if (v === undefined || v === null || String(v).trim() === '') return '<span class="ach-empty">·</span>';
+          return escapeHtml(String(v).trim());
+        }
+        function inlineSelect(nodeId, key, currentVal) {
+          var val = (currentVal != null && currentVal !== '') ? String(currentVal).trim() : '';
+          var opts = ['', '++', '+', '0', '-', '--'];
+          return '<select class="ach-inline-select" data-node-id="' + escapeHtml(nodeId) + '" data-key="' + escapeHtml(key) + '">' +
+            opts.map(function (o) {
+              return '<option value="' + escapeHtml(o) + '"' + (val === o ? ' selected' : '') + '>' + (o || '—') + '</option>';
+            }).join('') + '</select>';
+        }
+        function validRowColor(c) {
+          if (!c || typeof c !== 'string') return '';
+          var s = c.trim();
+          if (/^#[0-9A-Fa-f]{3,6}$/.test(s)) return s;
+          if (/^[0-9A-Fa-f]{3,6}$/.test(s)) return '#' + s;
+          return '';
+        }
+        achTbody.innerHTML = items.map(function (item) {
+          var desc = item.description || '';
+          var rel = item.source_reliability || '';
+          var cred = item.source_credibility || '';
+          var rowColor = validRowColor(item.color);
+          var rowStyle = rowColor ? ' style="border-left: 4px solid ' + rowColor + '; background: linear-gradient(90deg, ' + rowColor + '12 0%, transparent 15%);"' : '';
+          var cardHtml =
+            '<div class="evidence-item" data-id="' + escapeHtml(item.id) + '">' +
+            '<div class="evidence-item-header">' +
+            '<div class="evidence-card-content">' +
+            '<div class="evidence-card-title"><span class="evidence-name-wrap"><span class="evidence-name">' + escapeHtml(item.name) + '</span></span><input type="text" class="evidence-edit-input" value="' + escapeHtml(item.name) + '" placeholder="Title" style="display:none"></div>' +
+            (desc ? '<div class="evidence-card-desc evidence-meta-wrap">' + escapeHtml(desc) + '</div>' : '') +
+            '</div>' +
+            '<div class="evidence-card-right">' +
+            '<div class="evidence-card-badges">' +
+            '<span class="evidence-rel" title="Source reliability (A–F)">' + (rel ? escapeHtml(rel) : '<span class="ach-empty">—</span>') + '</span>' +
+            '<span class="evidence-cred" title="Source credibility (1–6)">' + (cred ? escapeHtml(cred) : '<span class="ach-empty">—</span>') + '</span>' +
+            '</div>' +
+            '<span class="evidence-actions">' +
+            '<button type="button" class="evidence-toggle" aria-label="Hide description" title="Hide description">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+            '</button>' +
+            '<button type="button" class="evidence-save-btn" aria-label="Save" title="Save">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>' +
+            '</button>' +
+            '<button type="button" class="evidence-trash-btn" aria-label="Remove from evidence" title="Remove from evidence">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>' +
+            '</button>' +
+            '</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="evidence-detail" style="display:none">' +
+            '<div class="evidence-edit-desc-wrap"><textarea class="evidence-edit-desc" placeholder="Description">' + escapeHtml(desc) + '</textarea></div>' +
+            '</div>' +
+            '</div>';
+          return (
+            '<tr data-id="' + escapeHtml(item.id) + '" draggable="true"' + rowStyle + '>' +
+            '<td class="ach-cell-event">' + cardHtml + '</td>' +
+            '<td class="ach-cell-h">' + inlineSelect(item.id, 'H1', item.H1) + '</td>' +
+            '<td class="ach-cell-h">' + inlineSelect(item.id, 'H2', item.H2) + '</td>' +
+            '<td class="ach-cell-h">' + inlineSelect(item.id, 'H3', item.H3) + '</td>' +
+            '<td class="ach-cell-h">' + inlineSelect(item.id, 'H4', item.H4) + '</td>' +
+            '<td class="ach-cell-h">' + inlineSelect(item.id, 'H5', item.H5) + '</td>' +
+            '<td class="ach-cell-analysis"><div class="ach-analysis-wrap" data-id="' + escapeHtml(item.id) + '"><div class="ach-analysis-view">' + (item.analysis_description ? escapeHtml(item.analysis_description) : '<span class="ach-empty">Click to add analysis</span>') + '</div></div></td>' +
+            '</tr>'
+          );
+        }).join('');
+      }
+
+      function applyFilters() {
+        if (!currentRoot) return;
+        var items = [];
+        collectEvidenceNodes(currentRoot, items);
+        items = filterItemsByActive(items);
+        items = customOrder && customOrder.length ? applyCustomOrder(items, customOrder) : sortItems(items, currentSort);
+        updateHypothesisCounters(items);
+        if (items.length === 0) {
+          statusEl.textContent = 'No events match the current filters.';
+          statusEl.classList.add('loading');
+          if (achTbody) achTbody.innerHTML = '';
+        } else {
+          statusEl.textContent = '';
+          statusEl.classList.remove('loading', 'error');
+          renderAchRows(items);
+        }
+      }
+
+      function renderWithData(root) {
+        currentRoot = root;
+        statusEl.textContent = '';
+        statusEl.classList.remove('loading', 'error');
+
+        var items = [];
+        collectEvidenceNodes(root, items);
+
+        if (items.length === 0) {
+          statusEl.textContent = 'No events with evidence = Yes.';
+          statusEl.classList.add('loading');
+          if (achTbody) achTbody.innerHTML = '';
+          return;
+        }
+
+        items = filterItemsByActive(items);
+        items = customOrder && customOrder.length ? applyCustomOrder(items, customOrder) : sortItems(items, currentSort);
+
+        updateHypothesisCounters(items);
+        if (items.length === 0) {
+          statusEl.textContent = 'No events match the current filters.';
+          statusEl.classList.add('loading');
+          if (achTbody) achTbody.innerHTML = '';
+          return;
+        }
+
+        renderAchRows(items);
+      }
+
+      function loadAndRender(isUpdate) {
+        var fileName = 'api/evidence';
+        var msg = isUpdate ? 'Updating…' : 'Loading evidence…';
+        statusEl.textContent = msg;
+        statusEl.classList.remove('error');
+        if (updateBtn) updateBtn.disabled = true;
+
+        function done() {
+          if (updateBtn) updateBtn.disabled = false;
+        }
+
+        var isFilePage = window.location.protocol === 'file:';
+
+        fetch(fileName + '?t=' + Date.now(), { cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+            return r.json();
+          })
+          .then(function (root) {
+            customOrder = Array.isArray(root.evidenceOrder) ? root.evidenceOrder.slice() : null;
+            renderWithData(root);
+            done();
+          })
+          .catch(function (err) {
+            if (isFilePage) {
+              var el = document.getElementById('evidence-data');
+              if (el) {
+                try {
+                  var root = JSON.parse(el.textContent);
+                  customOrder = Array.isArray(root.evidenceOrder) ? root.evidenceOrder.slice() : null;
+                  renderWithData(root);
+                  done();
+                  return;
+                } catch (e) {}
+              }
+            }
+            statusEl.textContent = 'Could not load evidence data. ' + (err && err.message ? err.message : '');
+            statusEl.classList.add('error');
+            done();
+          });
+      }
+
+      function loadFromFile(fileName, isUpdate) {
+        var msg = (isUpdate ? 'Updating from ' : 'Loading ') + fileName + '…';
+        statusEl.textContent = msg;
+        statusEl.classList.remove('error');
+        if (updateBtn) updateBtn.disabled = true;
+        function done() {
+          if (updateBtn) updateBtn.disabled = false;
+        }
+        fetch(fileName + '?t=' + Date.now(), { cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+            return r.json();
+          })
+          .then(function (root) {
+            customOrder = Array.isArray(root.evidenceOrder) ? root.evidenceOrder.slice() : null;
+            renderWithData(root);
+            statusEl.textContent = '';
+            done();
+          })
+          .catch(function (err) {
+            statusEl.textContent = 'Could not load ' + fileName + ': ' + (err && err.message ? err.message : '');
+            statusEl.classList.add('error');
+            done();
+          });
+      }
+
+      var updateFileHint = document.getElementById('update-file-hint');
+      if (updateBtn) {
+        updateBtn.addEventListener('click', function () {
+          if (updateFileHint) updateFileHint.classList.toggle('hidden');
+          if (updateFromFileName === null || updateFromFileName === '') {
+            var entered = prompt('Enter the JSON file name to update from (leave empty for data/evidence.json):', '');
+            if (entered === null) return;
+            updateFromFileName = (entered && entered.trim()) ? entered.trim() : '';
+            try { localStorage.setItem('ach-update-filename', updateFromFileName); } catch (e) {}
+          }
+          if (!updateFromFileName) {
+            loadAndRender(true);
+          } else {
+            loadFromFile(updateFromFileName, true);
+          }
+        });
+      }
+      var resetUpdateFileBtn = document.getElementById('reset-update-file-btn');
+      if (resetUpdateFileBtn) {
+        resetUpdateFileBtn.addEventListener('click', function () {
+          updateFromFileName = '';
+          try { localStorage.removeItem('ach-update-filename'); } catch (e) {}
+          statusEl.textContent = 'Using default file (data/evidence.json) for next Update from file.';
+          statusEl.classList.remove('error');
+        });
+      }
+
+      var exportEvidenceBtn = document.getElementById('export-evidence-btn');
+      if (exportEvidenceBtn) {
+        exportEvidenceBtn.addEventListener('click', function () {
+          exportDropdown.classList.remove('open');
+          if (!currentRoot) {
+            statusEl.textContent = 'No data to export.';
+            statusEl.classList.add('error');
+            return;
+          }
+          var toExport = JSON.parse(JSON.stringify(currentRoot));
+          if (customOrder && customOrder.length) toExport.evidenceOrder = customOrder;
+          var json = JSON.stringify(toExport, null, 2);
+          var blob = new Blob([json], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'evidence_export.json';
+          a.click();
+          URL.revokeObjectURL(url);
+          statusEl.textContent = 'Exported evidence_export.json';
+          statusEl.classList.remove('error');
+        });
+      }
+      var exportHypothesisBtn = document.getElementById('export-hypothesis-btn');
+      if (exportHypothesisBtn) {
+        exportHypothesisBtn.addEventListener('click', function () {
+          exportDropdown.classList.remove('open');
+          var payload = {};
+          hypothesisData.forEach(function (h) {
+            payload[h.id] = { id: h.id, title: h.title || '', description: h.description || '' };
+          });
+          var json = JSON.stringify(payload, null, 2);
+          var blob = new Blob([json], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'hypothesis_export.json';
+          a.click();
+          URL.revokeObjectURL(url);
+          statusEl.textContent = 'Exported hypothesis_export.json';
+          statusEl.classList.remove('error');
+        });
+      }
+
+      var sortByEl = document.getElementById('sort-by');
+      if (sortByEl) {
+        sortByEl.value = currentSort;
+        sortByEl.addEventListener('change', function () {
+          currentSort = sortByEl.value;
+          customOrder = null;
+          if (currentRoot) currentRoot.evidenceOrder = undefined;
+          applyFilters();
+        });
+      }
+
+      var hypothesisBox = document.getElementById('hypothesis-box');
+      var hypothesisToggleBtn = document.getElementById('hypothesis-toggle-btn');
+      if (hypothesisBox && hypothesisToggleBtn) {
+        hypothesisToggleBtn.addEventListener('click', function () {
+          hypothesisBox.classList.toggle('collapsed');
+          var isCollapsed = hypothesisBox.classList.contains('collapsed');
+          hypothesisToggleBtn.textContent = isCollapsed ? '▶ Show' : '▼ Hide';
+          hypothesisToggleBtn.setAttribute('aria-label', isCollapsed ? 'Show hypothesis' : 'Hide hypothesis');
+          hypothesisToggleBtn.setAttribute('title', isCollapsed ? 'Show hypothesis' : 'Hide hypothesis');
+        });
+      }
+      var counterBox = document.getElementById('counter-box');
+      var counterToggleBtn = document.getElementById('counter-toggle-btn');
+      if (counterBox && counterToggleBtn) {
+        counterToggleBtn.addEventListener('click', function () {
+          counterBox.classList.toggle('collapsed');
+          var isCollapsed = counterBox.classList.contains('collapsed');
+          counterToggleBtn.textContent = isCollapsed ? '▶ Show' : '▼ Hide';
+          counterToggleBtn.setAttribute('aria-label', isCollapsed ? 'Show evidence against' : 'Hide evidence against');
+          counterToggleBtn.setAttribute('title', isCollapsed ? 'Show evidence against hypothesis' : 'Hide evidence against hypothesis');
+        });
+      }
+
+      if (filterBtn && filterPanel) {
+        filterBtn.addEventListener('click', function () {
+          filterPanel.classList.toggle('hidden');
+        });
+        filterPanel.querySelectorAll('.filter-option-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var entity = btn.getAttribute('data-entity');
+            if (!entity) return;
+            var entityEl = document.getElementById('filter-entity-' + entity);
+            if (entityEl) {
+              entityEl.classList.toggle('hidden');
+              if (!entityEl.classList.contains('hidden')) {
+                var items = [];
+                if (currentRoot) collectEvidenceNodes(currentRoot, items);
+                var values = [];
+                var key = entity;
+                items.forEach(function (item) {
+                  var v = key === 'source_reliability' ? (item.source_reliability || '') : (item.source_credibility || '');
+                  if (values.indexOf(v) === -1) values.push(v);
+                });
+                values.sort();
+                buildFilterOptionsForEntity(key, values);
+              }
+            }
+          });
+        });
+      }
+
+      if (importBtn && importDropdown) {
+        importBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          exportDropdown.classList.remove('open');
+          importDropdown.classList.toggle('open');
+        });
+      }
+      if (exportBtn && exportDropdown) {
+        exportBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          importDropdown.classList.remove('open');
+          exportDropdown.classList.toggle('open');
+        });
+      }
+      document.addEventListener('click', function () {
+        if (importDropdown) importDropdown.classList.remove('open');
+        if (exportDropdown) exportDropdown.classList.remove('open');
+      });
+      if (importDropdown) importDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
+      if (exportDropdown) exportDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
+      var importEvidenceBtn = document.getElementById('import-evidence-btn');
+      if (importEvidenceBtn && importJsonInput) {
+        importEvidenceBtn.addEventListener('click', function () {
+          importDropdown.classList.remove('open');
+          importJsonInput.value = '';
+          importJsonInput.click();
+        });
+      }
+      var evidenceHeaderReadBtn = document.getElementById('evidence-header-read-btn');
+      if (evidenceHeaderReadBtn) {
+        evidenceHeaderReadBtn.addEventListener('click', function () {
+          statusEl.textContent = 'Reading evidence from file…';
+          statusEl.classList.remove('error');
+          loadAndRender(true);
+        });
+      }
+      importJsonInput.addEventListener('change', function () {
+        var file = importJsonInput.files && importJsonInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var root = JSON.parse(reader.result);
+            currentRoot = root;
+            renderWithData(root);
+            statusEl.textContent = 'Imported evidence: ' + file.name;
+            statusEl.classList.remove('error');
+          } catch (err) {
+            statusEl.textContent = 'Invalid JSON: ' + (err.message || err);
+            statusEl.classList.add('error');
+          }
+        };
+        reader.readAsText(file, 'utf8');
+      });
+      var importHypothesisBtn = document.getElementById('import-hypothesis-btn');
+      if (importHypothesisBtn && importHypothesisInput) {
+        importHypothesisBtn.addEventListener('click', function () {
+          importDropdown.classList.remove('open');
+          importHypothesisInput.value = '';
+          importHypothesisInput.click();
+        });
+      }
+      if (importHypothesisInput) {
+        importHypothesisInput.addEventListener('change', function () {
+          var file = importHypothesisInput.files && importHypothesisInput.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function () {
+            try {
+              var data = JSON.parse(reader.result);
+              if (typeof data !== 'object' || data === null || Array.isArray(data)) throw new Error('Expected JSON object');
+              statusEl.textContent = 'Saving hypotheses…';
+              statusEl.classList.remove('error');
+              fetch('api/save-hypothesis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              })
+                .then(function (r) {
+                  if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+                  return r.json();
+                })
+                .then(function (res) {
+                  if (res && res.ok) {
+                    statusEl.textContent = 'Imported hypothesis: ' + file.name;
+                    loadHypotheses();
+                  } else {
+                    statusEl.textContent = 'Save failed: ' + (res && res.error ? res.error : 'Unknown error');
+                    statusEl.classList.add('error');
+                  }
+                })
+                .catch(function (err) {
+                  statusEl.textContent = 'Import failed: ' + (err.message || err);
+                  statusEl.classList.add('error');
+                });
+            } catch (err) {
+              statusEl.textContent = 'Invalid JSON: ' + (err.message || err);
+              statusEl.classList.add('error');
+            }
+          };
+          reader.readAsText(file, 'utf8');
+        });
+      }
+
+      achTbody.addEventListener('change', function (e) {
+        var sel = e.target.closest('.ach-inline-select');
+        if (sel && currentRoot) {
+          var nodeId = sel.getAttribute('data-node-id');
+          var key = sel.getAttribute('data-key');
+          var node = findNodeById(currentRoot, nodeId);
+          if (node && key) {
+            node[key] = sel.value;
+            saveEvidenceTree(currentRoot, function () { statusEl.textContent = ''; });
+            var items = [];
+            collectEvidenceNodes(currentRoot, items);
+            updateHypothesisCounters(items);
+          }
+        }
+      });
+
+      achTbody.addEventListener('click', function (e) {
+        if (e.target.closest('.ach-analysis-view')) {
+          var wrap = e.target.closest('.ach-analysis-wrap');
+          if (!wrap || wrap.querySelector('textarea')) return;
+          if (!currentRoot) return;
+          var id = wrap.getAttribute('data-id');
+          var node = findNodeById(currentRoot, id);
+          var current = (node && node.analysis_description != null) ? String(node.analysis_description) : '';
+          wrap.innerHTML = '<div class="ach-analysis-edit-wrap"><textarea class="ach-analysis-ta" placeholder="Analysis…">' + escapeHtml(current) + '</textarea></div>';
+          var ta = wrap.querySelector('textarea');
+          if (ta) {
+            ta.focus();
+            ta.addEventListener('blur', function () {
+              var val = ta.value;
+              if (node) {
+                node.analysis_description = val;
+                saveEvidenceTree(currentRoot, function () { statusEl.textContent = ''; });
+              }
+              wrap.innerHTML = '<div class="ach-analysis-view">' + (val ? escapeHtml(val) : '<span class="ach-empty">Click to add analysis</span>') + '</div>';
+            });
+          }
+          return;
+        }
+
+        var item = e.target.closest('.evidence-item');
+        if (!item) return;
+
+        var toggleBtn = e.target.closest('.evidence-toggle');
+        if (toggleBtn) {
+          item.classList.toggle('collapsed');
+          toggleBtn.setAttribute('aria-label', item.classList.contains('collapsed') ? 'Show description' : 'Hide description');
+          toggleBtn.setAttribute('title', item.classList.contains('collapsed') ? 'Show description' : 'Hide description');
+          return;
+        }
+
+        var saveBtn = e.target.closest('.evidence-save-btn');
+        if (saveBtn && currentRoot) {
+          var id = item.getAttribute('data-id');
+          var nameInp = item.querySelector('.evidence-edit-input');
+          var descTa = item.querySelector('.evidence-edit-desc');
+          var name = nameInp ? nameInp.value.trim() : '';
+          var description = descTa ? descTa.value.trim() : '';
+          var node = findNodeById(currentRoot, id);
+          if (node) {
+            node.name = name || node.name;
+            node.description = description;
+            statusEl.textContent = 'Saving…';
+            statusEl.classList.remove('error');
+            renderWithData(currentRoot);
+            saveEvidenceTree(currentRoot, function () {
+              statusEl.textContent = '';
+            });
+          }
+          return;
+        }
+
+        var trashBtn = e.target.closest('.evidence-trash-btn');
+        if (trashBtn) {
+          if (!confirm('Are you sure? This will remove the evidence from the matrix.')) return;
+          if (!currentRoot) return;
+          var id = item.getAttribute('data-id');
+          var node = findNodeById(currentRoot, id);
+          if (node) {
+            node.evidence = '';
+            saveEvidenceTree(currentRoot, function () {
+              renderWithData(currentRoot);
+            });
+          }
+          return;
+        }
+
+        if (!currentRoot) return;
+        var id = item.getAttribute('data-id');
+        var node = findNodeById(currentRoot, id);
+        if (node) openEventDetailModal(node);
+      });
+
+      if (achTbody) {
+        achTbody.addEventListener('dragstart', function (e) {
+          var tr = e.target.closest('tr');
+          if (!tr || tr.getAttribute('draggable') !== 'true') return;
+          if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('select')) return;
+          var id = tr.getAttribute('data-id');
+          if (id) {
+            e.dataTransfer.setData('text/plain', id);
+            e.dataTransfer.effectAllowed = 'move';
+          }
+        });
+        achTbody.addEventListener('dragover', function (e) {
+          var tr = e.target.closest('tr');
+          if (!tr || tr.getAttribute('draggable') !== 'true') return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          achTbody.querySelectorAll('tr.ach-drag-over').forEach(function (r) { r.classList.remove('ach-drag-over'); });
+          tr.classList.add('ach-drag-over');
+        });
+        achTbody.addEventListener('dragleave', function (e) {
+          var tr = e.target.closest('tr');
+          if (tr) tr.classList.remove('ach-drag-over');
+        });
+        achTbody.addEventListener('drop', function (e) {
+          e.preventDefault();
+          achTbody.querySelectorAll('tr.ach-drag-over').forEach(function (r) { r.classList.remove('ach-drag-over'); });
+          if (!currentRoot) return;
+          var draggedId = e.dataTransfer.getData('text/plain');
+          var targetTr = e.target.closest('tr');
+          if (!draggedId || !targetTr || targetTr.getAttribute('draggable') !== 'true') return;
+          var rows = achTbody.querySelectorAll('tr[data-id]');
+          var currentOrder = [];
+          for (var i = 0; i < rows.length; i++) currentOrder.push(rows[i].getAttribute('data-id'));
+          var fromIndex = currentOrder.indexOf(draggedId);
+          var toIndex = currentOrder.indexOf(targetTr.getAttribute('data-id'));
+          if (fromIndex === -1 || toIndex === -1) return;
+          currentOrder.splice(fromIndex, 1);
+          toIndex = currentOrder.indexOf(targetTr.getAttribute('data-id'));
+          if (toIndex === -1) toIndex = currentOrder.length;
+          currentOrder.splice(toIndex, 0, draggedId);
+          customOrder = currentOrder;
+          currentRoot.evidenceOrder = customOrder;
+          renderWithData(currentRoot);
+          statusEl.textContent = 'Saving order…';
+          saveEvidenceTree(currentRoot, function () { statusEl.textContent = ''; });
+        });
+        achTbody.addEventListener('dragend', function (e) {
+          achTbody.querySelectorAll('tr.ach-drag-over').forEach(function (r) { r.classList.remove('ach-drag-over'); });
+        });
+      }
+
+      function openRowEditModal(id) {
+        var node = findNodeById(currentRoot, id);
+        if (!node) return;
+        rowEditNodeId = id;
+        var rowEditBody = document.getElementById('row-edit-body');
+        var rowEditModal = document.getElementById('row-edit-modal');
+        if (!rowEditBody || !rowEditModal) return;
+        var desc = (node.description || '').trim();
+        var rel = node.source_reliability || '';
+        var cred = node.source_credibility || '';
+        var evidenceCard = '<div class="evidence-item row-edit-evidence" style="border:none;padding:0.35rem 0;">' +
+          '<div class="evidence-card-content">' +
+          '<div class="evidence-card-title">' + escapeHtml(node.name || '') + '</div>' +
+          (desc ? '<div class="evidence-card-desc">' + escapeHtml(desc) + '</div>' : '') +
+          '<div class="evidence-card-badges" style="margin-top:0.35rem;">' +
+          '<span class="evidence-rel" title="Source reliability">' + (rel ? escapeHtml(rel) : '—') + '</span> ' +
+          '<span class="evidence-cred" title="Source credibility">' + (cred ? escapeHtml(cred) : '—') + '</span>' +
+          '</div></div></div>';
+        function selectHtml(key) {
+          var val = (node[key] != null && node[key] !== '') ? String(node[key]).trim() : '';
+          var opts = ['', '++', '+', '0', '-', '--'];
+          return '<select data-key="' + escapeHtml(key) + '">' + opts.map(function (o) {
+            return '<option value="' + escapeHtml(o) + '"' + (val === o ? ' selected' : '') + '>' + (o || '—') + '</option>';
+          }).join('') + '</select>';
+        }
+        var analysisVal = (node.analysis_description != null) ? String(node.analysis_description) : '';
+        rowEditBody.innerHTML =
+          '<table class="ach-matrix"><thead><tr><th class="ach-th ach-event">Evidence</th><th class="ach-th ach-h1">H1</th><th class="ach-th ach-h2">H2</th><th class="ach-th ach-h3">H3</th><th class="ach-th ach-h4">H4</th><th class="ach-th ach-h5">H5</th><th class="ach-th ach-analysis">Analysis</th></tr></thead><tbody><tr>' +
+          '<td class="ach-cell-event">' + evidenceCard + '</td>' +
+          '<td class="ach-cell-h">' + selectHtml('H1') + '</td>' +
+          '<td class="ach-cell-h">' + selectHtml('H2') + '</td>' +
+          '<td class="ach-cell-h">' + selectHtml('H3') + '</td>' +
+          '<td class="ach-cell-h">' + selectHtml('H4') + '</td>' +
+          '<td class="ach-cell-h">' + selectHtml('H5') + '</td>' +
+          '<td class="ach-cell-analysis"><textarea id="row-edit-analysis-ta" placeholder="Analysis…">' + escapeHtml(analysisVal) + '</textarea></td>' +
+          '</tr></tbody></table>';
+        rowEditModal.classList.add('open');
+        rowEditModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeRowEditModal() {
+        rowEditNodeId = null;
+        var rowEditModal = document.getElementById('row-edit-modal');
+        if (rowEditModal) {
+          rowEditModal.classList.remove('open');
+          rowEditModal.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      function openEventDetailModal(node) {
+        eventDetailNodeId = node.id;
+        eventDetailBody.innerHTML = '';
+        var skipKeys = { children: 1, id: 1, depth: 1, evidence: 1, H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, analysis_description: 1 };
+        var keys = Object.keys(node).filter(function (k) { return !skipKeys[k]; });
+        if (keys.indexOf('color') === -1) keys.push('color');
+        keys.forEach(function (key) {
+          var val = node[key];
+          var row = document.createElement('div');
+          row.className = 'event-detail-row';
+          var isReadonly = key === 'id';
+          var isComplex = val !== null && typeof val === 'object';
+          var label = document.createElement('label');
+          var labelText = key;
+          if (key === 'source_reliability') labelText += ' (A–F)';
+          else if (key === 'source_credibility') labelText += ' (1–6)';
+          label.textContent = labelText;
+          row.appendChild(label);
+          if (key === 'color') {
+            var colorWrap = document.createElement('div');
+            colorWrap.className = 'event-detail-color-wrap';
+            var hexInp = document.createElement('input');
+            hexInp.setAttribute('data-key', 'color');
+            hexInp.type = 'text';
+            hexInp.value = (val === undefined || val === null ? '' : String(val)).trim();
+            hexInp.placeholder = '#rrggbb';
+            hexInp.className = 'event-detail-color-hex';
+            var picker = document.createElement('input');
+            picker.type = 'color';
+            picker.className = 'event-detail-color-picker';
+            picker.value = /^#?[0-9A-Fa-f]{6}$/.test(hexInp.value) ? (hexInp.value.charAt(0) === '#' ? hexInp.value : '#' + hexInp.value) : '#6a4c93';
+            picker.addEventListener('input', function () { hexInp.value = picker.value; });
+            hexInp.addEventListener('input', function () { if (/^#?[0-9A-Fa-f]{6}$/.test(hexInp.value)) picker.value = hexInp.value.charAt(0) === '#' ? hexInp.value : '#' + hexInp.value; });
+            colorWrap.appendChild(picker);
+            colorWrap.appendChild(hexInp);
+            row.appendChild(colorWrap);
+          } else if (isComplex) {
+            var ta = document.createElement('textarea');
+            ta.setAttribute('data-key', key);
+            ta.value = JSON.stringify(val, null, 2);
+            ta.rows = 4;
+            row.appendChild(ta);
+          } else if (key === 'name' || key === 'description') {
+            var ta = document.createElement('textarea');
+            ta.setAttribute('data-key', key);
+            ta.value = val === undefined || val === null ? '' : String(val);
+            if (key === 'name') ta.className = 'event-detail-name';
+            else ta.className = 'event-detail-description';
+            row.appendChild(ta);
+          } else {
+            var inp = document.createElement('input');
+            inp.setAttribute('data-key', key);
+            inp.type = typeof val === 'number' ? 'number' : 'text';
+            inp.value = val === undefined || val === null ? '' : String(val);
+            if (key === 'date') inp.placeholder = 'YYYY-MM-DD';
+            else if (key === 'time') inp.placeholder = 'HH:MM';
+            if (isReadonly) inp.readOnly = true;
+            row.appendChild(inp);
+          }
+          eventDetailBody.appendChild(row);
+        });
+        eventDetailModal.classList.add('open');
+        eventDetailModal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeEventDetailModal() {
+        eventDetailModal.classList.remove('open');
+        eventDetailModal.setAttribute('aria-hidden', 'true');
+        eventDetailNodeId = null;
+      }
+
+      if (eventDetailClose) eventDetailClose.addEventListener('click', closeEventDetailModal);
+      if (eventDetailModal) {
+        eventDetailModal.addEventListener('click', function (e) {
+          if (e.target === eventDetailModal) closeEventDetailModal();
+        });
+      }
+
+      if (eventDetailSave) {
+        eventDetailSave.addEventListener('click', function () {
+          if (!currentRoot || !eventDetailNodeId) return;
+          var node = findNodeById(currentRoot, eventDetailNodeId);
+          if (!node) return;
+          eventDetailBody.querySelectorAll('[data-key]').forEach(function (el) {
+            var key = el.getAttribute('data-key');
+            if (key === 'id') return;
+            var val = el.value;
+            if (node[key] !== null && typeof node[key] === 'object') {
+              try {
+                node[key] = JSON.parse(val);
+              } catch (err) {}
+            } else if (typeof node[key] === 'number') {
+              node[key] = val === '' ? 0 : Number(val);
+            } else {
+              node[key] = val;
+            }
+          });
+          statusEl.textContent = 'Saving…';
+          statusEl.classList.remove('error');
+          closeEventDetailModal();
+          renderWithData(currentRoot);
+          saveEvidenceTree(currentRoot, function () {
+            statusEl.textContent = '';
+          });
+        });
+      }
+
+      var rowEditModalEl = document.getElementById('row-edit-modal');
+      var rowEditCloseBtn = document.getElementById('row-edit-close');
+      var rowEditSaveBtn = document.getElementById('row-edit-save');
+      if (rowEditCloseBtn) rowEditCloseBtn.addEventListener('click', closeRowEditModal);
+      if (rowEditModalEl) {
+        rowEditModalEl.addEventListener('click', function (e) {
+          if (e.target === rowEditModalEl) closeRowEditModal();
+        });
+      }
+      if (rowEditSaveBtn) {
+        rowEditSaveBtn.addEventListener('click', function () {
+          if (!currentRoot || !rowEditNodeId) return;
+          var node = findNodeById(currentRoot, rowEditNodeId);
+          if (!node) return;
+          var rowEditBody = document.getElementById('row-edit-body');
+          if (!rowEditBody) return;
+          rowEditBody.querySelectorAll('select[data-key]').forEach(function (sel) {
+            var key = sel.getAttribute('data-key');
+            if (key) node[key] = sel.value;
+          });
+          var ta = document.getElementById('row-edit-analysis-ta');
+          if (ta) node.analysis_description = ta.value;
+          statusEl.textContent = 'Saving…';
+          statusEl.classList.remove('error');
+          closeRowEditModal();
+          renderWithData(currentRoot);
+          saveEvidenceTree(currentRoot, function () {
+            statusEl.textContent = '';
+          });
+        });
+      }
+
+      function generateNodeId() {
+        return 'n_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+      }
+
+      function openAddEvidenceModal() {
+        if (!currentRoot) return;
+        var body = document.getElementById('add-evidence-body');
+        var modal = document.getElementById('add-evidence-modal');
+        if (!body || !modal) return;
+        body.innerHTML = '';
+        var fields = [
+          { key: 'name', label: 'Name', tag: 'textarea', className: 'event-detail-name', placeholder: '' },
+          { key: 'description', label: 'Description', tag: 'textarea', className: 'event-detail-description', placeholder: '' },
+          { key: 'source', label: 'Source', tag: 'input', type: 'text', placeholder: '' },
+          { key: 'date', label: 'Date', tag: 'input', type: 'text', placeholder: 'YYYY-MM-DD' },
+          { key: 'time', label: 'Time', tag: 'input', type: 'text', placeholder: 'HH:MM' },
+          { key: 'source_reliability', label: 'Source reliability (A–F)', tag: 'input', type: 'text', placeholder: '' },
+          { key: 'source_credibility', label: 'Source credibility (1–6)', tag: 'input', type: 'text', placeholder: '' },
+          { key: 'color', label: 'Color', tag: 'input', type: 'text', placeholder: '#rrggbb' }
+        ];
+        fields.forEach(function (f) {
+          var row = document.createElement('div');
+          row.className = 'event-detail-row';
+          var label = document.createElement('label');
+          label.textContent = f.label;
+          row.appendChild(label);
+          var el = document.createElement(f.tag);
+          el.setAttribute('data-key', f.key);
+          if (f.tag === 'input') {
+            el.type = f.type || 'text';
+            if (f.placeholder) el.placeholder = f.placeholder;
+          } else if (f.className) el.className = f.className;
+          row.appendChild(el);
+          body.appendChild(row);
+        });
+        var opts = ['', '++', '+', '0', '-', '--'];
+        ['H1', 'H2', 'H3', 'H4', 'H5'].forEach(function (key) {
+          var row = document.createElement('div');
+          row.className = 'event-detail-row';
+          var label = document.createElement('label');
+          label.textContent = key;
+          row.appendChild(label);
+          var sel = document.createElement('select');
+          sel.setAttribute('data-key', key);
+          opts.forEach(function (o) {
+            var opt = document.createElement('option');
+            opt.value = o;
+            opt.textContent = o || '—';
+            sel.appendChild(opt);
+          });
+          row.appendChild(sel);
+          body.appendChild(row);
+        });
+        var row = document.createElement('div');
+        row.className = 'event-detail-row';
+        var label = document.createElement('label');
+        label.textContent = 'Analysis';
+        row.appendChild(label);
+        var ta = document.createElement('textarea');
+        ta.setAttribute('data-key', 'analysis_description');
+        ta.placeholder = 'Analysis…';
+        ta.className = 'event-detail-description';
+        row.appendChild(ta);
+        body.appendChild(row);
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeAddEvidenceModal() {
+        var modal = document.getElementById('add-evidence-modal');
+        if (modal) {
+          modal.classList.remove('open');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      var addEvidenceBtn = document.getElementById('add-evidence-btn');
+      var addEvidenceClose = document.getElementById('add-evidence-close');
+      var addEvidenceCreate = document.getElementById('add-evidence-create');
+      var addEvidenceModal = document.getElementById('add-evidence-modal');
+      if (addEvidenceBtn) addEvidenceBtn.addEventListener('click', function () {
+        if (currentRoot) openAddEvidenceModal();
+      });
+      if (addEvidenceClose) addEvidenceClose.addEventListener('click', closeAddEvidenceModal);
+      if (addEvidenceModal) addEvidenceModal.addEventListener('click', function (e) {
+        if (e.target === addEvidenceModal) closeAddEvidenceModal();
+      });
+      if (addEvidenceCreate) addEvidenceCreate.addEventListener('click', function () {
+        if (!currentRoot) return;
+        var body = document.getElementById('add-evidence-body');
+        if (!body) return;
+        var node = {
+          id: generateNodeId(),
+          name: '',
+          description: '',
+          source: '',
+          date: '',
+          time: '',
+          source_reliability: '',
+          source_credibility: '',
+          color: '',
+          evidence: 'Yes',
+          depth: 1,
+          children: [],
+          H1: '',
+          H2: '',
+          H3: '',
+          H4: '',
+          H5: '',
+          analysis_description: ''
+        };
+        body.querySelectorAll('[data-key]').forEach(function (el) {
+          var key = el.getAttribute('data-key');
+          node[key] = el.value;
+        });
+        if (!currentRoot.children) currentRoot.children = [];
+        currentRoot.children.push(node);
+        statusEl.textContent = 'Saving…';
+        statusEl.classList.remove('error');
+        closeAddEvidenceModal();
+        renderWithData(currentRoot);
+        saveEvidenceTree(currentRoot, function () {
+          statusEl.textContent = '';
+        });
+      });
+
+      function escapeHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function applyHypothesisData(data) {
+        if (!hypothesisListEl || !hypothesisStatusEl) return;
+        var irEl = document.getElementById('intelligence-requirement-input');
+        if (irEl) irEl.value = (data && typeof data === 'object' && !Array.isArray(data) && data.intelligence_requirement != null) ? String(data.intelligence_requirement) : '';
+        hypothesisData = [];
+        if (data && typeof data === 'object' && !Array.isArray(data)) {
+          Object.keys(data).sort().forEach(function (key) {
+            if (key === 'intelligence_requirement') return;
+            var o = data[key];
+            if (o && typeof o === 'object' && (o.id || o.title != null)) {
+              hypothesisData.push({
+                id: o.id != null ? String(o.id) : key,
+                title: o.title != null ? String(o.title) : '',
+                description: o.description != null ? String(o.description) : ''
+              });
+            }
+          });
+        }
+        hypothesisStatusEl.textContent = '';
+        if (hypothesisData.length === 0) {
+          hypothesisStatusEl.textContent = 'No hypotheses.';
+          hypothesisListEl.innerHTML = '';
+          return;
+        }
+        hypothesisListEl.innerHTML = hypothesisData.map(function (h, i) {
+          return '<li class="hypothesis-item" data-index="' + i + '">' + escapeHtml(h.id) + ' ' + escapeHtml(h.title) + '</li>';
+        }).join('');
+      }
+
+      function loadHypotheses() {
+        if (!hypothesisListEl || !hypothesisStatusEl) return;
+        hypothesisStatusEl.textContent = 'Loading…';
+        hypothesisListEl.innerHTML = '';
+        fetch('hypothesis_example.json?t=' + Date.now(), { cache: 'no-store' })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status);
+            return r.json();
+          })
+          .then(applyHypothesisData)
+          .catch(function () {
+            hypothesisStatusEl.textContent = 'Hypotheses unavailable (serve this folder to load).';
+          });
+      }
+
+      var hypothesisUpdateBtn = document.getElementById('hypothesis-update-btn');
+      if (hypothesisUpdateBtn) {
+        hypothesisUpdateBtn.addEventListener('click', function () {
+          if (!hypothesisListEl || !hypothesisStatusEl) return;
+          hypothesisStatusEl.textContent = 'Updating…';
+          fetch('api/hypothesis?t=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) {
+              if (!r.ok) throw new Error(r.status);
+              return r.json();
+            })
+            .then(function (data) {
+              applyHypothesisData(data);
+              statusEl.textContent = 'Hypotheses updated from data/hypothesis.json.';
+              statusEl.classList.remove('error');
+            })
+            .catch(function () {
+              hypothesisStatusEl.textContent = 'Update failed (data/hypothesis.json not found or invalid).';
+              statusEl.textContent = 'Update failed. Check data/hypothesis.json.';
+              statusEl.classList.add('error');
+            });
+        });
+      }
+
+      var hypothesisClearBtn = document.getElementById('hypothesis-clear-btn');
+      if (hypothesisClearBtn) {
+        hypothesisClearBtn.addEventListener('click', function () {
+          applyHypothesisData({});
+          if (hypothesisStatusEl) hypothesisStatusEl.textContent = 'Cleared. Click Update to load from file.';
+          statusEl.textContent = 'Intelligence Requirement and hypothesis list cleared. Click Update to load from file.';
+          statusEl.classList.remove('error');
+        });
+      }
+
+      if (hypothesisListEl) {
+        hypothesisListEl.addEventListener('click', function (e) {
+          var item = e.target.closest('.hypothesis-item');
+          if (!item || !hypothesisModal || !hypothesisModalBody) return;
+          var idx = parseInt(item.getAttribute('data-index'), 10);
+          var h = hypothesisData[idx];
+          if (!h) return;
+          hypothesisEditIndex = idx;
+          hypothesisModalBody.innerHTML =
+            '<h3>' + escapeHtml(h.id) + '</h3>' +
+            '<div class="hypothesis-edit-row"><label>ID</label><input type="text" id="hypothesis-edit-id" value="' + escapeHtml(h.id) + '" disabled readonly class="hypothesis-id-locked"></div>' +
+            '<div class="hypothesis-edit-row"><label>Title</label><input type="text" id="hypothesis-edit-title" value="' + escapeHtml(h.title || '') + '" placeholder="Hypothesis title"></div>' +
+            '<div class="hypothesis-edit-row"><label>Description</label><textarea id="hypothesis-edit-description" placeholder="Description">' + escapeHtml(h.description || '') + '</textarea></div>';
+          var actionsEl = document.getElementById('hypothesis-modal-actions');
+          if (actionsEl) actionsEl.style.display = 'flex';
+          hypothesisModal.classList.add('open');
+          hypothesisModal.setAttribute('aria-hidden', 'false');
+        });
+      }
+      if (hypothesisModalClose) {
+        hypothesisModalClose.addEventListener('click', closeHypothesisModal);
+      }
+      if (hypothesisModal) {
+        hypothesisModal.addEventListener('click', function (e) {
+          if (e.target === hypothesisModal) closeHypothesisModal();
+        });
+      }
+      function closeHypothesisModal() {
+        if (hypothesisModal) {
+          hypothesisModal.classList.remove('open');
+          hypothesisModal.setAttribute('aria-hidden', 'true');
+        }
+        hypothesisEditIndex = -1;
+        var actionsEl = document.getElementById('hypothesis-modal-actions');
+        if (actionsEl) actionsEl.style.display = 'none';
+      }
+      // Hypothesis Save writes to data/hypothesis.json (same file as Update reads from).
+      var hypothesisSaveBtn = document.getElementById('hypothesis-save-btn');
+      if (hypothesisSaveBtn) {
+        hypothesisSaveBtn.addEventListener('click', function () {
+          if (hypothesisEditIndex < 0 || !hypothesisData[hypothesisEditIndex]) return;
+          var titleEl = document.getElementById('hypothesis-edit-title');
+          var descEl = document.getElementById('hypothesis-edit-description');
+          var title = titleEl ? titleEl.value.trim() : '';
+          var description = descEl ? descEl.value.trim() : '';
+          hypothesisData[hypothesisEditIndex].title = title;
+          hypothesisData[hypothesisEditIndex].description = description;
+          closeHypothesisModal();
+          statusEl.textContent = 'Saving to file…';
+          statusEl.classList.remove('error');
+          fetch('api/hypothesis?t=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .catch(function () { return {}; })
+            .then(function (existing) {
+              if (typeof existing !== 'object' || existing === null || Array.isArray(existing)) existing = {};
+              var irEl = document.getElementById('intelligence-requirement-input');
+              existing.intelligence_requirement = irEl ? irEl.value.trim() : '';
+              hypothesisData.forEach(function (h) {
+                existing[h.id] = { id: h.id, title: h.title || '', description: h.description || '' };
+              });
+              return fetch('api/save-data-hypothesis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(existing)
+              });
+            })
+            .then(function (r) {
+              if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+              return r.json();
+            })
+            .then(function (data) {
+              if (data && data.ok) {
+                statusEl.textContent = 'Written to data/hypothesis.json.';
+                hypothesisListEl.innerHTML = hypothesisData.map(function (h, i) {
+                  return '<li class="hypothesis-item" data-index="' + i + '">' + escapeHtml(h.id) + ' ' + escapeHtml(h.title) + '</li>';
+                }).join('');
+              } else {
+                statusEl.textContent = 'Save failed: ' + (data && data.error ? data.error : 'Unknown error');
+                statusEl.classList.add('error');
+              }
+            })
+            .catch(function (err) {
+              statusEl.textContent = 'Save failed: ' + (err.message || err);
+              statusEl.classList.add('error');
+            });
+        });
+      }
+
+      function saveHypothesisFile() {
+        var payload = {};
+        var irEl = document.getElementById('intelligence-requirement-input');
+        payload.intelligence_requirement = irEl ? irEl.value.trim() : '';
+        hypothesisData.forEach(function (h) {
+          payload[h.id] = { id: h.id, title: h.title || '', description: h.description || '' };
+        });
+        fetch('api/save-hypothesis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+            return r.json();
+          })
+          .then(function (data) {
+            if (data && data.ok) { statusEl.textContent = 'Saved.'; statusEl.classList.remove('error'); }
+            else { statusEl.textContent = 'Save failed.'; statusEl.classList.add('error'); }
+          })
+          .catch(function (err) {
+            statusEl.textContent = 'Save failed: ' + (err.message || err);
+            statusEl.classList.add('error');
+          });
+      }
+      var intelligenceRequirementInput = document.getElementById('intelligence-requirement-input');
+      if (intelligenceRequirementInput) {
+        intelligenceRequirementInput.addEventListener('blur', function () {
+          saveHypothesisFile();
+        });
+      }
+
+      if (intelligenceRequirementInput) {
+        intelligenceRequirementInput.addEventListener('click', function () {
+          if (this.readOnly) {
+            this.readOnly = false;
+            this.focus();
+          }
+        });
+      }
+      var irSaveBtn = document.getElementById('intelligence-requirement-save-btn');
+      if (irSaveBtn && intelligenceRequirementInput) {
+        irSaveBtn.addEventListener('click', function () {
+          var value = intelligenceRequirementInput.value.trim();
+          fetch('api/hypothesis?t=' + Date.now(), { cache: 'no-store' })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .catch(function () { return {}; })
+            .then(function (data) {
+              if (typeof data !== 'object' || data === null || Array.isArray(data)) data = {};
+              data.intelligence_requirement = value;
+              return fetch('api/save-data-hypothesis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              });
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (result) {
+              if (result && result.ok) {
+                intelligenceRequirementInput.readOnly = true;
+                statusEl.textContent = 'Intelligence requirement saved to data/hypothesis.json.';
+                statusEl.classList.remove('error');
+              } else {
+                statusEl.textContent = 'Save failed: ' + (result && result.error ? result.error : 'Unknown error');
+                statusEl.classList.add('error');
+              }
+            })
+            .catch(function (err) {
+              statusEl.textContent = 'Save failed: ' + (err.message || err);
+              statusEl.classList.add('error');
+            });
+        });
+      }
+
+      loadHypotheses();
+      loadAndRender(false);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cone of Plausibilities</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 40px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .columns-header {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1.8fr;
+      column-gap: 24px;
+      margin-bottom: 16px;
+    }
+    .col-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .group-row {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1.8fr;
+      column-gap: 24px;
+      align-items: stretch;
+      margin-bottom: 20px;
+    }
+
+    .driver-card {
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+    }
+
+    .trends-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .trend-card {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      overflow: hidden;
+    }
+    .trend-card:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .trend-card.selected {
+      border-color: var(--accent);
+      background: rgba(88, 166, 255, 0.08);
+      color: var(--text);
+    }
+    .trend-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.35;
+      flex: 1;
+    }
+    .trend-date {
+      flex-shrink: 0;
+      margin-left: 10px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+
+    .scenario-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .scenario-panel .no-trend {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.85rem;
+      padding: 8px 0;
+    }
+    .scenario-group { display: flex; flex-direction: column; gap: 4px; }
+    .scenario-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .help-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .help-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .help-tooltip {
+      display: none;
+      position: absolute;
+      left: 24px;
+      top: -4px;
+      background: #232d3f;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--text);
+      white-space: normal;
+      width: 260px;
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      line-height: 1.4;
+    }
+    .help-btn.active .help-tooltip { display: block; }
+    .scenario-input {
+      width: 100%;
+      min-height: 48px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      resize: vertical;
+      line-height: 1.4;
+    }
+    .scenario-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+    .btn-import {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-import:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .btn-assist {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      vertical-align: middle;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-assist:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .scenario-save-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+    .btn-save-scenario {
+      padding: 6px 18px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-save-scenario:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .scenario-saved-msg {
+      font-size: 0.78rem;
+      color: #3fb950;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .scenario-saved-msg.show { opacity: 1; }
+
+    /* Modal overlay & panel */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 48px 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 640px;
+      padding: 28px 32px 24px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--accent);
+      line-height: 1.35;
+    }
+    .modal-field { margin-bottom: 14px; }
+    .modal-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .modal-field input,
+    .modal-field textarea,
+    .modal-field select {
+      width: 100%;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.84rem;
+      line-height: 1.4;
+    }
+    .modal-field textarea { min-height: 64px; resize: vertical; }
+    .modal-field input:focus,
+    .modal-field textarea:focus,
+    .modal-field select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .modal-field a.source-link {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .modal-field a.source-link:hover { text-decoration: underline; }
+    .modal-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .modal-h-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .modal-h-row .modal-field { margin-bottom: 0; }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .modal-btn {
+      padding: 8px 22px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .modal-btn:hover { border-color: var(--accent); color: var(--text); }
+    .modal-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0f1419;
+      font-weight: 600;
+    }
+    .modal-btn.primary:hover { background: #79b8ff; border-color: #79b8ff; }
+
+    .hyp-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .btn-view-hyp {
+      padding: 3px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .btn-view-hyp:hover { border-color: var(--accent); color: var(--text); }
+
+    .hyp-popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .hyp-popup-overlay.open { display: flex; }
+    .hyp-popup {
+      background: #1e2a3a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 420px;
+      max-width: 92vw;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 22px 24px 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .hyp-popup-ir {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.4;
+    }
+    .hyp-popup-ir span {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 3px;
+    }
+    .hyp-item {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hyp-item:last-child { border-bottom: none; }
+    .hyp-item-slot {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+    .hyp-item-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .hyp-item-desc {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .hyp-popup-close {
+      display: block;
+      margin: 12px auto 0;
+      padding: 6px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .hyp-popup-close:hover { border-color: var(--accent); color: var(--text); }
+
+    .content-layout {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+    .content-main { flex: 1; min-width: 0; }
+    .content-sidebar {
+      width: 340px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 32px;
+      max-height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+    .generated-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .generated-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+    .generated-panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .btn-expand-generated {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      transition: border-color 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-expand-generated:hover { border-color: var(--accent); color: var(--accent); }
+
+    .gen-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 150;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 24px;
+      overflow-y: auto;
+    }
+    .gen-modal-overlay.open { display: flex; }
+    .gen-modal-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      padding: 28px 36px 24px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    }
+    .gen-modal-panel .generated-type-label { font-size: 0.9rem; }
+    .gen-modal-panel .generated-driver-name { font-size: 0.78rem; }
+    .gen-modal-panel .generated-text { font-size: 0.88rem; line-height: 1.5; }
+    .gen-modal-panel .generated-empty { font-size: 0.84rem; }
+    .gen-modal-close {
+      display: block;
+      margin: 20px auto 0;
+      padding: 7px 24px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .gen-modal-close:hover { border-color: var(--accent); color: var(--text); }
+    .generated-type-group {
+      margin-bottom: 16px;
+    }
+    .generated-type-group:last-child { margin-bottom: 0; }
+    .generated-type-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .generated-entry {
+      margin-bottom: 8px;
+      padding-left: 10px;
+      border-left: 2px solid var(--border);
+    }
+    .generated-entry:last-child { margin-bottom: 0; }
+    .generated-driver-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1px;
+    }
+    .generated-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+    .generated-empty {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-style: italic;
+      opacity: 0.4;
+      padding-left: 10px;
+    }
+
+    #content { display: none; }
+    .loading {
+      color: var(--text-muted);
+      padding: 2rem 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a class="back-link" href="http://localhost:3000" style="margin-bottom:0">&larr; Back to Main Screen</a>
+    <button class="btn-import" id="btnReadFile" type="button">&#8635; Read from File</button>
+  </div>
+  <p class="loading" id="loadingMsg">Loading drivers and trends&hellip;</p>
+
+  <div id="content">
+    <div class="content-layout">
+      <div class="content-main">
+        <div class="columns-header">
+          <div class="col-title">Drivers</div>
+          <div class="col-title">Trends</div>
+          <div class="col-title">Scenario Generation <a href="https://chatgpt.com/g/g-69963f07809c8191b528296b10d0f9eb-cone-of-plausibility-agent" target="_blank" rel="noopener" class="btn-assist">Scenario Assistance</a></div>
+        </div>
+        <div id="rows"></div>
+      </div>
+      <div class="content-sidebar">
+        <div class="generated-panel">
+          <div class="generated-panel-header">
+            <div class="generated-panel-title">Generated Scenarios</div>
+            <button class="btn-expand-generated" id="btnExpandGen" type="button" title="Expand">&#128269;</button>
+          </div>
+          <div id="generatedContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="trendModal">
+    <div class="modal-panel">
+      <div class="modal-title" id="modalTitle"></div>
+
+      <div class="modal-field">
+        <label for="mName">Name</label>
+        <input type="text" id="mName">
+      </div>
+
+      <div class="modal-field">
+        <label for="mDescription">Description</label>
+        <textarea id="mDescription"></textarea>
+      </div>
+
+      <div class="modal-field">
+        <label for="mSource">Source</label>
+        <input type="text" id="mSource">
+        <a class="source-link" id="mSourceLink" href="#" target="_blank" rel="noopener"></a>
+      </div>
+
+      <div class="modal-row">
+        <div class="modal-field">
+          <label for="mDate">Date</label>
+          <input type="date" id="mDate">
+        </div>
+        <div class="modal-field">
+          <label for="mEvidence">Evidence</label>
+          <input type="text" id="mEvidence">
+        </div>
+      </div>
+
+      <div class="hyp-header">
+        <label style="font-size:0.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;margin:0;">Hypothesis Ratings</label>
+        <button class="btn-view-hyp" id="btnViewHyp" type="button">View Active Hypotheses</button>
+      </div>
+      <div class="modal-h-row">
+        <div class="modal-field"><label for="mH1">H1</label><select id="mH1"><option value="">-</option><option>++</option><option>+</option><option>0</option><option>-</option><option>--</option><option>N/A</option></select></div>
+        <div class="modal-field"><label for="mH2">H2</label><select id="mH2"><option value="">-</option><option>++</option><option>+</option><option>0</option><option>-</option><option>--</option><option>N/A</option></select></div>
+        <div class="modal-field"><label for="mH3">H3</label><select id="mH3"><option value="">-</option><option>++</option><option>+</option><option>0</option><option>-</option><option>--</option><option>N/A</option></select></div>
+        <div class="modal-field"><label for="mH4">H4</label><select id="mH4"><option value="">-</option><option>++</option><option>+</option><option>0</option><option>-</option><option>--</option><option>N/A</option></select></div>
+        <div class="modal-field"><label for="mH5">H5</label><select id="mH5"><option value="">-</option><option>++</option><option>+</option><option>0</option><option>-</option><option>--</option><option>N/A</option></select></div>
+      </div>
+
+      <div class="modal-field">
+        <label for="mAnalysis">Analysis Description</label>
+        <textarea id="mAnalysis"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn" id="modalCancel" type="button">Cancel</button>
+        <button class="modal-btn primary" id="modalSave" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hyp-popup-overlay" id="hypPopup">
+    <div class="hyp-popup">
+      <div class="hyp-popup-ir" id="hypIR"></div>
+      <div id="hypList"></div>
+      <button class="hyp-popup-close" id="hypClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <div class="gen-modal-overlay" id="genModal">
+    <div class="gen-modal-panel">
+      <div class="generated-panel-title" style="margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border);">Generated Scenarios</div>
+      <div id="genModalContent"></div>
+      <button class="gen-modal-close" id="genModalClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <script>
+    var scenariosByDriver = {};
+    var driversData = [];
+    var saveTimer = null;
+    var currentRoot = null;
+    var currentModalNode = null;
+    var currentModalCard = null;
+
+    function loadSavedScenarios() {
+      return fetch('/api/load-scenarios')
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (arr) {
+          if (!Array.isArray(arr)) return;
+          arr.forEach(function (driverObj) {
+            if (driverObj.driver_id && driverObj.scenarios) {
+              scenariosByDriver[driverObj.driver_id] = {
+                baseline:     driverObj.scenarios.baseline     || '',
+                plausible:    driverObj.scenarios.plausible    || '',
+                wildcard:     driverObj.scenarios.wildcard     || '',
+                preposterous: driverObj.scenarios.preposterous || ''
+              };
+            }
+          });
+        })
+        .catch(function () {});
+    }
+
+    function buildOutputJson() {
+      return driversData.map(function (d) {
+        var s = scenariosByDriver[d.id] || { baseline: '', plausible: '', wildcard: '', preposterous: '' };
+        return {
+          driver_id:   d.id,
+          driver_name: d.name,
+          trends: d.trends.map(function (t) {
+            var obj = { trend_id: t.id, trend_name: t.name };
+            if (t.description) obj.description = t.description;
+            if (t.source) obj.source = t.source;
+            if (t.date) obj.date = t.date;
+            if (t.evidence) obj.evidence = t.evidence;
+            return obj;
+          }),
+          scenarios: {
+            baseline:     s.baseline,
+            plausible:    s.plausible,
+            wildcard:     s.wildcard,
+            preposterous: s.preposterous
+          }
+        };
+      });
+    }
+
+    function persistToServer(feedbackEl) {
+      var json = JSON.stringify(buildOutputJson(), null, 2);
+      fetch('/api/save-scenarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: json
+      }).then(function () {
+        if (feedbackEl) {
+          feedbackEl.classList.add('show');
+          setTimeout(function () { feedbackEl.classList.remove('show'); }, 2000);
+        }
+        refreshGeneratedScenarios();
+      }).catch(function () {});
+    }
+
+    function getDriverScenarios(driverId) {
+      if (!scenariosByDriver[driverId]) {
+        scenariosByDriver[driverId] = { baseline: '', plausible: '', wildcard: '', preposterous: '' };
+      }
+      return scenariosByDriver[driverId];
+    }
+
+    function getMaxDepth(node) {
+      if (!node.children || node.children.length === 0) return node.depth;
+      var max = node.depth;
+      node.children.forEach(function (c) {
+        var d = getMaxDepth(c);
+        if (d > max) max = d;
+      });
+      return max;
+    }
+
+    function collectAtDepth(node, targetDepth) {
+      var results = [];
+      if (node.depth === targetDepth) { results.push(node); return results; }
+      if (node.children) {
+        node.children.forEach(function (c) {
+          results = results.concat(collectAtDepth(c, targetDepth));
+        });
+      }
+      return results;
+    }
+
+    var SCENARIO_DEFS = [
+      { key: 'baseline',     label: 'Baseline Scenario',     help: 'Shows what is most likely to happen if today\u2019s trends continue without major surprises.' },
+      { key: 'plausible',    label: 'Plausible Scenario',    help: 'Describes a realistic future that could happen based on credible drivers and evidence.' },
+      { key: 'wildcard',     label: 'Wild Card Scenario',    help: 'Explores a future shaped by a low-probability but high-impact surprise event.' },
+      { key: 'preposterous', label: 'Preposterous Scenario', help: 'Imagines an intentionally extreme or unlikely future to challenge assumptions and spark new ideas.' }
+    ];
+
+    function buildScenarioPanel(driverId) {
+      var panel = document.createElement('div');
+      panel.className = 'scenario-panel';
+
+      if (!driverId) {
+        var msg = document.createElement('div');
+        msg.className = 'no-trend';
+        msg.textContent = 'No driver selected.';
+        panel.appendChild(msg);
+        return panel;
+      }
+
+      var data = getDriverScenarios(driverId);
+
+      SCENARIO_DEFS.forEach(function (def) {
+        var group = document.createElement('div');
+        group.className = 'scenario-group';
+
+        var label = document.createElement('div');
+        label.className = 'scenario-label';
+        label.textContent = def.label + ' ';
+
+        var helpBtn = document.createElement('button');
+        helpBtn.className = 'help-btn';
+        helpBtn.textContent = '?';
+        helpBtn.setAttribute('type', 'button');
+        var tooltip = document.createElement('div');
+        tooltip.className = 'help-tooltip';
+        tooltip.textContent = def.help;
+        helpBtn.appendChild(tooltip);
+        helpBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var wasActive = helpBtn.classList.contains('active');
+          document.querySelectorAll('.help-btn.active').forEach(function (b) { b.classList.remove('active'); });
+          if (!wasActive) helpBtn.classList.add('active');
+        });
+        label.appendChild(helpBtn);
+
+        var textarea = document.createElement('textarea');
+        textarea.className = 'scenario-input';
+        textarea.value = data[def.key] || '';
+        textarea.placeholder = def.label + '\u2026';
+        textarea.addEventListener('input', function () {
+          data[def.key] = textarea.value;
+        });
+
+        group.appendChild(label);
+        group.appendChild(textarea);
+        panel.appendChild(group);
+      });
+
+      var saveRow = document.createElement('div');
+      saveRow.className = 'scenario-save-row';
+      var saveBtn = document.createElement('button');
+      saveBtn.className = 'btn-save-scenario';
+      saveBtn.type = 'button';
+      saveBtn.textContent = 'Save Scenarios';
+      var savedMsg = document.createElement('span');
+      savedMsg.className = 'scenario-saved-msg';
+      savedMsg.textContent = 'Saved!';
+      saveBtn.addEventListener('click', function () {
+        persistToServer(savedMsg);
+      });
+      saveRow.appendChild(saveBtn);
+      saveRow.appendChild(savedMsg);
+      panel.appendChild(saveRow);
+
+      return panel;
+    }
+
+    function refreshGeneratedScenarios() {
+      var container = document.getElementById('generatedContent');
+      container.innerHTML = '';
+      var TYPES = [
+        { key: 'baseline',     label: 'Baseline Scenario' },
+        { key: 'plausible',    label: 'Plausible Scenario' },
+        { key: 'wildcard',     label: 'Wild Card Scenario' },
+        { key: 'preposterous', label: 'Preposterous Scenario' }
+      ];
+      TYPES.forEach(function (type) {
+        var group = document.createElement('div');
+        group.className = 'generated-type-group';
+        var lbl = document.createElement('div');
+        lbl.className = 'generated-type-label';
+        lbl.textContent = type.label;
+        group.appendChild(lbl);
+        var hasAny = false;
+        driversData.forEach(function (d) {
+          var s = scenariosByDriver[d.id];
+          var text = s ? (s[type.key] || '').trim() : '';
+          if (!text) return;
+          hasAny = true;
+          var entry = document.createElement('div');
+          entry.className = 'generated-entry';
+          var name = document.createElement('div');
+          name.className = 'generated-driver-name';
+          name.textContent = d.name;
+          var content = document.createElement('div');
+          content.className = 'generated-text';
+          content.textContent = text;
+          entry.appendChild(name);
+          entry.appendChild(content);
+          group.appendChild(entry);
+        });
+        if (!hasAny) {
+          var empty = document.createElement('div');
+          empty.className = 'generated-empty';
+          empty.textContent = 'No entries yet';
+          group.appendChild(empty);
+        }
+        container.appendChild(group);
+      });
+    }
+
+    function openTrendPopup(node, cardEl) {
+      currentModalNode = node;
+      currentModalCard = cardEl;
+      document.getElementById('modalTitle').textContent = node.name || '(untitled)';
+      document.getElementById('mName').value = node.name || '';
+      document.getElementById('mDescription').value = node.description || '';
+      document.getElementById('mSource').value = node.source || '';
+      var linkEl = document.getElementById('mSourceLink');
+      if (node.source) {
+        linkEl.href = node.source;
+        linkEl.textContent = node.source;
+        linkEl.style.display = '';
+      } else {
+        linkEl.style.display = 'none';
+      }
+      document.getElementById('mDate').value = node.date || '';
+      document.getElementById('mEvidence').value = node.evidence || '';
+      document.getElementById('mH1').value = node.H1 || '';
+      document.getElementById('mH2').value = node.H2 || '';
+      document.getElementById('mH3').value = node.H3 || '';
+      document.getElementById('mH4').value = node.H4 || '';
+      document.getElementById('mH5').value = node.H5 || '';
+      document.getElementById('mAnalysis').value = node.analysis_description || '';
+      document.getElementById('trendModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('trendModal').classList.remove('open');
+      currentModalNode = null;
+      currentModalCard = null;
+    }
+
+    function saveModalChanges() {
+      var n = currentModalNode;
+      if (!n) return;
+      n.name = document.getElementById('mName').value;
+      n.description = document.getElementById('mDescription').value;
+      n.source = document.getElementById('mSource').value;
+      n.date = document.getElementById('mDate').value;
+      n.evidence = document.getElementById('mEvidence').value;
+
+      var hKeys = ['H1','H2','H3','H4','H5'];
+      hKeys.forEach(function (k) {
+        var v = document.getElementById('m' + k).value;
+        if (v) { n[k] = v; } else { delete n[k]; }
+      });
+
+      var analysis = document.getElementById('mAnalysis').value;
+      if (analysis) { n.analysis_description = analysis; } else { delete n.analysis_description; }
+
+      if (currentModalCard) {
+        var span = currentModalCard.querySelector('.trend-text');
+        if (span) span.textContent = n.name;
+      }
+
+      if (currentRoot) {
+        fetch('/api/save-evidence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentRoot, null, 2)
+        }).catch(function () {});
+      }
+      closeModal();
+    }
+
+    document.getElementById('modalCancel').addEventListener('click', closeModal);
+    document.getElementById('modalSave').addEventListener('click', saveModalChanges);
+    document.getElementById('trendModal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+    document.getElementById('mSource').addEventListener('input', function () {
+      var linkEl = document.getElementById('mSourceLink');
+      if (this.value) {
+        linkEl.href = this.value;
+        linkEl.textContent = this.value;
+        linkEl.style.display = '';
+      } else {
+        linkEl.style.display = 'none';
+      }
+    });
+
+    document.getElementById('btnViewHyp').addEventListener('click', function (e) {
+      e.stopPropagation();
+      fetch('/data/hypothesis.json')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject('fetch failed'); })
+        .then(function (data) {
+          var irEl = document.getElementById('hypIR');
+          irEl.innerHTML = '<span>Intelligence Requirement</span>';
+          irEl.appendChild(document.createTextNode(data.intelligence_requirement || '(none)'));
+
+          var listEl = document.getElementById('hypList');
+          listEl.innerHTML = '';
+          var slots = ['H1','H2','H3','H4','H5'];
+          slots.forEach(function (key) {
+            var h = data[key];
+            if (!h) return;
+            var item = document.createElement('div');
+            item.className = 'hyp-item';
+            var slot = document.createElement('div');
+            slot.className = 'hyp-item-slot';
+            slot.textContent = key;
+            var title = document.createElement('div');
+            title.className = 'hyp-item-title';
+            title.textContent = h.title || '(untitled)';
+            item.appendChild(slot);
+            item.appendChild(title);
+            if (h.description) {
+              var desc = document.createElement('div');
+              desc.className = 'hyp-item-desc';
+              desc.textContent = h.description;
+              item.appendChild(desc);
+            }
+            listEl.appendChild(item);
+          });
+
+          document.getElementById('hypPopup').classList.add('open');
+        })
+        .catch(function () {
+          alert('Could not load hypothesis.json');
+        });
+    });
+
+    document.getElementById('hypClose').addEventListener('click', function () {
+      document.getElementById('hypPopup').classList.remove('open');
+    });
+    document.getElementById('hypPopup').addEventListener('click', function (e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+
+    document.getElementById('btnExpandGen').addEventListener('click', function () {
+      var target = document.getElementById('genModalContent');
+      var source = document.getElementById('generatedContent');
+      target.innerHTML = source.innerHTML;
+      document.getElementById('genModal').classList.add('open');
+    });
+    document.getElementById('genModalClose').addEventListener('click', function () {
+      document.getElementById('genModal').classList.remove('open');
+    });
+    document.getElementById('genModal').addEventListener('click', function (e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+
+    function render(root) {
+      currentRoot = root;
+      var rowsEl = document.getElementById('rows');
+      rowsEl.innerHTML = '';
+
+      var drivers = (root.children || []).filter(function (c) { return c.depth === 1; });
+
+      driversData = drivers.map(function (driver) {
+        var maxD = getMaxDepth(driver);
+        var trends = collectAtDepth(driver, maxD);
+        return { id: driver.id, name: driver.name, trends: trends };
+      });
+
+      driversData.forEach(function (driver) {
+        var trends = driver.trends;
+
+        var row = document.createElement('div');
+        row.className = 'group-row';
+
+        var driverCol = document.createElement('div');
+        driverCol.className = 'driver-card';
+        driverCol.textContent = driver.name;
+
+        var trendsCol = document.createElement('div');
+        trendsCol.className = 'trends-stack';
+
+        var scenarioContainer = document.createElement('div');
+        scenarioContainer.appendChild(buildScenarioPanel(driver.id));
+
+        if (trends.length === 0) {
+          var empty = document.createElement('div');
+          empty.className = 'trend-card';
+          empty.innerHTML = '<span class="trend-text" style="font-style:italic;">No trends found</span>';
+          trendsCol.appendChild(empty);
+        } else {
+          trends.forEach(function (t, idx) {
+            var card = document.createElement('div');
+            card.className = 'trend-card' + (idx === 0 ? ' selected' : '');
+            var span = document.createElement('span');
+            span.className = 'trend-text';
+            span.textContent = t.name;
+            card.appendChild(span);
+            if (t.date) {
+              var dateSpan = document.createElement('span');
+              dateSpan.className = 'trend-date';
+              dateSpan.textContent = t.date;
+              card.appendChild(dateSpan);
+            }
+            card.addEventListener('click', function () {
+              trendsCol.querySelectorAll('.trend-card').forEach(function (c) { c.classList.remove('selected'); });
+              card.classList.add('selected');
+              openTrendPopup(t, card);
+            });
+            trendsCol.appendChild(card);
+          });
+        }
+
+        row.appendChild(driverCol);
+        row.appendChild(trendsCol);
+        row.appendChild(scenarioContainer);
+        rowsEl.appendChild(row);
+      });
+
+      document.getElementById('loadingMsg').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      refreshGeneratedScenarios();
+    }
+
+    document.addEventListener('click', function () {
+      document.querySelectorAll('.help-btn.active').forEach(function (b) { b.classList.remove('active'); });
+    });
+
+    function fetchAndRender() {
+      document.getElementById('loadingMsg').textContent = 'Loading drivers and trends\u2026';
+      document.getElementById('loadingMsg').style.display = '';
+      return loadSavedScenarios()
+        .then(function () { return fetch('/data/evidence.json'); })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject('fetch failed'); })
+        .then(render)
+        .catch(function () {
+          document.getElementById('loadingMsg').textContent =
+            'Could not load data/evidence.json. Make sure the server is running.';
+        });
+    }
+
+    document.getElementById('btnReadFile').addEventListener('click', function () {
+      scenariosByDriver = {};
+      driversData = [];
+      fetchAndRender();
+    });
+
+    loadSavedScenarios()
+      .then(function () { return fetch('/data/evidence.json'); })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject('fetch failed'); })
+      .then(render)
+      .catch(function () {
+        document.getElementById('loadingMsg').textContent =
+          'Could not load data/evidence.json. Make sure the server is running.';
+      });
+  </script>
+</body>
+</html>

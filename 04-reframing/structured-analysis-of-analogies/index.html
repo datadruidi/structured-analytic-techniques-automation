@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Structured Analogies — Structured Analytic Techniques</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface-alt: #1e2a3a;
+      --border: #2d3a4d;
+      --border-focus: #58a6ff;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79b8ff;
+      --radius: 8px;
+      --col-title: #3fb9504d;
+      --col-country: #58a6ff33;
+      --col-who: #d2a8ff33;
+      --col-what: #f7814833;
+      --col-when: #e3b34133;
+      --col-why: #f778ba33;
+      --col-how: #56d4dd33;
+      --col-notes: #8b949e22;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-back svg { width: 16px; height: 16px; fill: currentColor; }
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      flex: 1;
+    }
+    .page-subtitle {
+      width: 100%;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: -0.25rem;
+    }
+
+    /* Upload area */
+    .upload-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .upload-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2.5rem 3rem;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .upload-box:hover, .upload-box.drag-over {
+      border-color: var(--accent);
+      background: var(--surface-alt);
+    }
+    .upload-box svg {
+      width: 48px;
+      height: 48px;
+      color: var(--text-muted);
+      transition: color 0.25s;
+    }
+    .upload-box:hover svg { color: var(--accent); }
+    .upload-label {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .upload-hint {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .upload-input { display: none; }
+
+    /* Toolbar shown after load */
+    .toolbar {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .toolbar.visible { display: flex; }
+    .toolbar-info {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      flex: 1;
+    }
+    .toolbar-btn {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .toolbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toolbar-btn-save {
+      color: #fff;
+      background: #238636;
+      border-color: #238636;
+    }
+    .toolbar-btn-save:hover { background: #2ea043; border-color: #2ea043; color: #fff; }
+
+    /* Scoreboard */
+    .scoreboard {
+      display: none;
+      padding: 0.9rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .scoreboard.visible { display: block; }
+    .scoreboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .scoreboard-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .scoreboard-toggle {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .scoreboard-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .scoreboard.collapsed .scoreboard-list { display: none; }
+    .scoreboard.collapsed .scoreboard-header { margin-bottom: 0; }
+    .scoreboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .scoreboard-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scoreboard-bar-wrap {
+      flex: 1;
+      height: 18px;
+      background: var(--bg);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .scoreboard-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      min-width: 0;
+    }
+    .scoreboard-name {
+      font-size: 0.78rem;
+      color: var(--text);
+      width: 260px;
+      min-width: 160px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .scoreboard-name.is-hypothesis {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .scoreboard-pts {
+      font-size: 0.75rem;
+      font-weight: 700;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    /* Board grid */
+    .board {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+      padding: 1.25rem 1.25rem 2rem;
+      overflow-x: auto;
+    }
+    .board.visible { display: flex; }
+
+    /* Column headers */
+    .board-header {
+      display: grid;
+      grid-template-columns: 28px 200px 130px 1fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      min-width: 1030px;
+      margin-bottom: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .col-head {
+      padding: 0.55rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: var(--radius) var(--radius) 0 0;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .col-head-title   { background: var(--col-title);   color: #3fb950; }
+    .col-head-country { background: var(--col-country); color: #58a6ff; }
+    .col-head-who     { background: var(--col-who);     color: #d2a8ff; }
+    .col-head-what    { background: var(--col-what);     color: #f78148; }
+    .col-head-when    { background: var(--col-when);     color: #e3b341; }
+    .col-head-why     { background: var(--col-why);      color: #f778ba; }
+    .col-head-how     { background: var(--col-how);      color: #56d4dd; }
+
+    /* Row */
+    .board-row {
+      display: grid;
+      grid-template-columns: 28px 200px 130px 1fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      min-width: 1030px;
+      margin-bottom: 10px;
+    }
+
+    /* Collapse toggle button */
+    .btn-collapse {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: start;
+      margin-top: 0.35rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-collapse:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Collapsed row */
+    .board-row.collapsed {
+      grid-template-columns: 28px 1fr;
+    }
+    .board-row.collapsed .cell:not(.cell-title) { display: none; }
+    .board-row.collapsed .cell-title {
+      font-weight: 600;
+    }
+
+    /* Cell */
+    .cell {
+      padding: 0.6rem 0.7rem;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .cell:hover { border-color: var(--accent); }
+    .cell-title {
+      font-weight: 600;
+      border-left: 3px solid #3fb950;
+    }
+    .cell-country {
+      border-left: 3px solid #58a6ff;
+    }
+    .cell-who {
+      border-left: 3px solid #d2a8ff;
+    }
+    .cell-what {
+      border-left: 3px solid #f78148;
+    }
+    .cell-when {
+      border-left: 3px solid #e3b341;
+    }
+    .cell-why {
+      border-left: 3px solid #f778ba;
+    }
+    .cell-how {
+      border-left: 3px solid #56d4dd;
+    }
+    .cell-empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* First row – hypothesis (grayed out) */
+    .board-row.hypothesis .cell {
+      background: #161c24;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+    .board-row.hypothesis .cell-title {
+      border-left-color: var(--text-muted);
+    }
+    .board-row.hypothesis .cell-country { border-left-color: var(--text-muted); }
+    .board-row.hypothesis .cell-who     { border-left-color: var(--text-muted); }
+    .board-row.hypothesis .cell-what    { border-left-color: var(--text-muted); }
+    .board-row.hypothesis .cell-when    { border-left-color: var(--text-muted); }
+    .board-row.hypothesis .cell-why     { border-left-color: var(--text-muted); }
+    .board-row.hypothesis .cell-how     { border-left-color: var(--text-muted); }
+    .hypothesis-tag {
+      display: inline-block;
+      margin-top: 0.3rem;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #e3b341;
+      background: #e3b34120;
+      border-radius: 3px;
+    }
+
+    /* Help button on column headers */
+    .col-head {
+      position: relative;
+    }
+    .btn-help {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      font-size: 0.6rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-help:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Help tooltip popup */
+    .help-tip {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      width: 220px;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 400;
+      line-height: 1.45;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      white-space: normal;
+      text-align: left;
+    }
+    .help-tip.open { display: block; }
+
+    /* Score button on scorable cells */
+    .cell-scorable {
+      position: relative;
+    }
+    .btn-score {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      font-size: 0.75rem;
+      line-height: 1;
+      color: var(--text-muted);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      z-index: 5;
+    }
+    .btn-score:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-score.scored {
+      color: #3fb950;
+      border-color: #3fb950;
+      background: #3fb95018;
+    }
+    .btn-score.scored:hover { color: #f85149; border-color: #f85149; background: #f8514918; }
+
+
+    /* Description tooltip */
+    .cell-title[data-description] { position: relative; cursor: help; }
+    .cell-title .desc-tooltip {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      z-index: 20;
+      width: 320px;
+      max-width: 80vw;
+      padding: 0.65rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text);
+      background: #1e2a3a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      pointer-events: none;
+    }
+    .cell-title:hover .desc-tooltip { display: block; }
+
+    /* Detail modal */
+    .detail-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .detail-overlay.open { display: flex; }
+    .detail-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .detail-close {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .detail-close:hover { border-color: var(--accent); color: var(--accent); }
+    .detail-body {
+      padding: 0.75rem 1.25rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .detail-field { min-height: 0; }
+    .detail-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+    .detail-label-country { color: #58a6ff; }
+    .detail-label-desc    { color: var(--text-muted); }
+    .detail-label-who     { color: #d2a8ff; }
+    .detail-label-what    { color: #f78148; }
+    .detail-label-when    { color: #e3b341; }
+    .detail-label-why     { color: #f778ba; }
+    .detail-label-how     { color: #56d4dd; }
+    .detail-label-sources { color: #f0883e; }
+    .detail-label-notes   { color: #8b949e; }
+    .detail-sources {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .detail-sources li a {
+      font-size: 0.82rem;
+      color: var(--accent);
+      text-decoration: none;
+      word-break: break-all;
+    }
+    .detail-sources li a:hover { text-decoration: underline; color: var(--accent-hover); }
+    .detail-value {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .detail-value-empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .detail-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0.1rem 0;
+    }
+    .detail-notes-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 0.55rem 0.65rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .detail-notes-textarea:focus { border-color: var(--accent); }
+    .detail-notes-textarea::placeholder { color: var(--text-muted); }
+    .detail-save {
+      display: block;
+      margin-top: 0.75rem;
+      margin-left: auto;
+      padding: 0.4rem 1rem;
+      font-size: 0.82rem;
+      color: #fff;
+      background: #238636;
+      border: 1px solid #238636;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .detail-save:hover { background: #2ea043; }
+
+    /* Responsive */
+    @media (max-width: 1300px) {
+      .board-header, .board-row {
+        grid-template-columns: 28px 180px 110px repeat(5, 1fr);
+      }
+      .board-row.collapsed {
+        grid-template-columns: 28px 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="page-header">
+    <a class="btn-back" href="http://localhost:3000/" aria-label="Back to main screen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Back to Main Screen
+    </a>
+    <h1 class="page-title">Structured Analysis of Analogies</h1>
+    <p class="page-subtitle">Upload the JSON from the Collection and Processor AI Agents, then rank the most similar analogies in relation to the hypothesis.</p>
+  </header>
+
+  <!-- Upload screen -->
+  <div class="upload-area" id="upload-area">
+    <div class="upload-box" id="upload-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <span class="upload-label">Drop JSON file here or click to browse</span>
+      <span class="upload-hint">Accepts .json files with the structured analogies format</span>
+      <input type="file" class="upload-input" id="file-input" accept=".json,application/json">
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar">
+    <span class="toolbar-info" id="toolbar-info"></span>
+    <button type="button" class="toolbar-btn toolbar-btn-save" id="btn-save">Save</button>
+    <button type="button" class="toolbar-btn" id="btn-export">Export JSON</button>
+    <button type="button" class="toolbar-btn" id="btn-new">Load another file</button>
+  </div>
+
+  <!-- Scoreboard -->
+  <div class="scoreboard" id="scoreboard">
+    <div class="scoreboard-header">
+      <div class="scoreboard-title">Analogy Similarity Scores</div>
+      <button type="button" class="scoreboard-toggle" id="scoreboard-toggle">Hide</button>
+    </div>
+    <div class="scoreboard-list" id="scoreboard-list"></div>
+  </div>
+
+  <!-- Board -->
+  <div class="board" id="board">
+    <div class="board-header">
+      <div></div>
+      <div class="col-head col-head-title">Title <button type="button" class="btn-help" data-help="How similar is the overall theme or nature of this event to the hypothesis?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-country">Country <button type="button" class="btn-help" data-help="How similar is the country or regional context to the hypothesis?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-who">Who? <button type="button" class="btn-help" data-help="How similar are the actors and targets to those in the hypothesis?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-what">What? <button type="button" class="btn-help" data-help="How similar is what happened to what the hypothesis describes?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-when">When? <button type="button" class="btn-help" data-help="How similar is the timing or tempo of events to the hypothesis?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-why">Why? <button type="button" class="btn-help" data-help="How similar are the underlying causes or motivations to the hypothesis?">?</button><div class="help-tip"></div></div>
+      <div class="col-head col-head-how">How? <button type="button" class="btn-help" data-help="How similar are the mechanisms or methods of escalation to the hypothesis?">?</button><div class="help-tip"></div></div>
+    </div>
+    <div id="board-rows"></div>
+  </div>
+
+  <!-- Detail modal -->
+  <div class="detail-overlay" id="detail-overlay">
+    <div class="detail-box" id="detail-box">
+      <div class="detail-header">
+        <span class="detail-title" id="detail-title"></span>
+        <button type="button" class="detail-close" id="detail-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="detail-body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const uploadArea    = document.getElementById('upload-area');
+    const uploadBox     = document.getElementById('upload-box');
+    const fileInput     = document.getElementById('file-input');
+    const toolbar       = document.getElementById('toolbar');
+    const toolbarInfo   = document.getElementById('toolbar-info');
+    const scoreboard    = document.getElementById('scoreboard');
+    const scoreboardList = document.getElementById('scoreboard-list');
+    const board         = document.getElementById('board');
+    const boardRows     = document.getElementById('board-rows');
+    const btnSave       = document.getElementById('btn-save');
+    const btnExport     = document.getElementById('btn-export');
+    const btnNew        = document.getElementById('btn-new');
+    const detailOverlay = document.getElementById('detail-overlay');
+    const detailBox     = document.getElementById('detail-box');
+    const detailTitle   = document.getElementById('detail-title');
+    const detailBody    = document.getElementById('detail-body');
+    const detailClose   = document.getElementById('detail-close');
+
+    let currentData = [];
+    let currentFilename = '';
+    let collapsedRows = new Set();
+    const STORAGE_KEY = 'sat-analogies-state';
+
+    function saveState() {
+      try {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+          data: currentData,
+          filename: currentFilename,
+          collapsed: Array.from(collapsedRows)
+        }));
+      } catch (_) { /* quota exceeded – ignore */ }
+    }
+
+    function restoreState() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (Array.isArray(state.collapsed)) {
+          collapsedRows = new Set(state.collapsed);
+        }
+        if (Array.isArray(state.data) && state.data.length) {
+          loadBoard(state.data, state.filename || 'restored session');
+        }
+      } catch (_) { /* corrupt – ignore */ }
+    }
+
+    /* --- Upload handling --- */
+    uploadBox.addEventListener('click', () => fileInput.click());
+
+    uploadBox.addEventListener('dragover', e => {
+      e.preventDefault();
+      uploadBox.classList.add('drag-over');
+    });
+    uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('drag-over'));
+    uploadBox.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadBox.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const json = JSON.parse(e.target.result);
+          if (!Array.isArray(json)) throw new Error('Expected a JSON array');
+          loadBoard(json, file.name);
+        } catch (err) {
+          alert('Failed to parse JSON:\n' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    const scoreboardToggle = document.getElementById('scoreboard-toggle');
+
+    scoreboardToggle.addEventListener('click', () => {
+      scoreboard.classList.toggle('collapsed');
+      scoreboardToggle.textContent = scoreboard.classList.contains('collapsed') ? 'Show' : 'Hide';
+    });
+
+    /* Help tip toggle on ? buttons */
+    document.querySelectorAll('.btn-help').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const tip = btn.parentElement.querySelector('.help-tip');
+        const isOpen = tip.classList.contains('open');
+        document.querySelectorAll('.help-tip.open').forEach(t => t.classList.remove('open'));
+        if (!isOpen) {
+          tip.textContent = btn.dataset.help;
+          tip.classList.add('open');
+        }
+      });
+    });
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.help-tip.open').forEach(t => t.classList.remove('open'));
+    });
+
+    const SCORE_FIELDS = ['Title', 'Country', 'WHO', 'WHAT', 'WHEN', 'WHY', 'HOW'];
+    const BAR_COLORS = ['#3fb950', '#58a6ff', '#d2a8ff', '#f78148', '#e3b341', '#f778ba', '#56d4dd'];
+
+    function renderScoreboard() {
+      scoreboardList.innerHTML = '';
+      if (!currentData.length) { scoreboard.classList.remove('visible'); return; }
+
+      const entries = currentData
+        .map((entry, idx) => {
+          if (!entry._scores) entry._scores = {};
+          const total = SCORE_FIELDS.reduce((s, f) => s + (entry._scores[f] ? 1 : 0), 0);
+          return { title: entry['Title'] || '(untitled)', total, idx };
+        })
+        .filter(e => e.idx !== 0);
+
+      entries.sort((a, b) => b.total - a.total);
+
+      entries.forEach(e => {
+        const pct = Math.round((e.total / 7) * 100);
+        const color = pct > 0 ? BAR_COLORS[Math.min(Math.floor(e.total) - 1, BAR_COLORS.length - 1)] : 'transparent';
+        const row = document.createElement('div');
+        row.className = 'scoreboard-row';
+        row.innerHTML =
+          `<span class="scoreboard-name${e.idx === 0 ? ' is-hypothesis' : ''}">${esc(e.title)}</span>` +
+          `<div class="scoreboard-bar-wrap"><div class="scoreboard-bar" style="width:${pct}%;background:${color};"></div></div>` +
+          `<span class="scoreboard-pts" style="color:${e.total > 0 ? color : 'var(--text-muted)'}">${e.total}/7</span>`;
+        scoreboardList.appendChild(row);
+      });
+
+      scoreboard.classList.add('visible');
+    }
+
+    /* --- Render board --- */
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    function loadBoard(data, filename) {
+      currentData = data;
+      currentFilename = filename;
+      boardRows.innerHTML = '';
+
+      data.forEach((entry, idx) => {
+        const row = document.createElement('div');
+        const isHypothesis = idx === 0;
+        const isCollapsed = collapsedRows.has(idx);
+        row.className = 'board-row' + (isHypothesis ? ' hypothesis' : '') + (isCollapsed ? ' collapsed' : '');
+        row.dataset.idx = idx;
+
+        const title       = entry['Title'] || '';
+        const description = entry['Description'] || '';
+        const country     = entry['Country'] || '';
+        const who         = entry['WHO was the target?'] || '';
+        const what        = entry['WHAT happened?'] || '';
+        const when        = entry['WHEN did it happen?'] || '';
+        const why         = entry['WHY did this happen?'] || '';
+        const how         = entry['HOW did it happen?'] || '';
+
+        if (!entry._scores) entry._scores = {};
+        const sc = entry._scores;
+
+        function scoreBtn(field) {
+          const on = sc[field] ? ' scored' : '';
+          return `<button type="button" class="btn-score${on}" data-row="${idx}" data-field="${field}">${sc[field] ? '✓' : '+'}</button>`;
+        }
+
+        row.innerHTML =
+          `<button type="button" class="btn-collapse" title="Collapse / expand row">${isCollapsed ? '+' : '−'}</button>` +
+          `<div class="cell cell-title cell-scorable" ${description ? 'data-description' : ''}>` +
+            scoreBtn('Title') +
+            esc(title) +
+            (isHypothesis ? `<div class="hypothesis-tag">Hypothesis</div>` : '') +
+            (description ? `<div class="desc-tooltip">${esc(description)}</div>` : '') +
+          `</div>` +
+          `<div class="cell cell-country cell-scorable${!country ? ' cell-empty' : ''}">${scoreBtn('Country')}${country ? esc(country) : '—'}</div>` +
+          `<div class="cell cell-who cell-scorable${!who ? ' cell-empty' : ''}">${scoreBtn('WHO')}${who ? esc(who) : '—'}</div>` +
+          `<div class="cell cell-what cell-scorable${!what ? ' cell-empty' : ''}">${scoreBtn('WHAT')}${what ? esc(what) : '—'}</div>` +
+          `<div class="cell cell-when cell-scorable${!when ? ' cell-empty' : ''}">${scoreBtn('WHEN')}${when ? esc(when) : '—'}</div>` +
+          `<div class="cell cell-why cell-scorable${!why ? ' cell-empty' : ''}">${scoreBtn('WHY')}${why ? esc(why) : '—'}</div>` +
+          `<div class="cell cell-how cell-scorable${!how ? ' cell-empty' : ''}">${scoreBtn('HOW')}${how ? esc(how) : '—'}</div>`;
+
+        boardRows.appendChild(row);
+      });
+
+      /* Collapse/expand toggle */
+      boardRows.querySelectorAll('.btn-collapse').forEach((btn, idx) => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const row = btn.closest('.board-row');
+          row.classList.toggle('collapsed');
+          const nowCollapsed = row.classList.contains('collapsed');
+          btn.textContent = nowCollapsed ? '+' : '−';
+          if (nowCollapsed) { collapsedRows.add(idx); } else { collapsedRows.delete(idx); }
+          saveState();
+        });
+      });
+
+      /* Score toggle buttons */
+      boardRows.querySelectorAll('.btn-score').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          const rowIdx = parseInt(btn.dataset.row, 10);
+          const field = btn.dataset.field;
+          const entry = currentData[rowIdx];
+          if (!entry._scores) entry._scores = {};
+          entry._scores[field] = entry._scores[field] ? 0 : 1;
+          const isOn = !!entry._scores[field];
+          btn.textContent = isOn ? '✓' : '+';
+          btn.classList.toggle('scored', isOn);
+          renderScoreboard();
+          saveState();
+        });
+      });
+
+      /* Click any cell (except score button, collapse button) to open detail */
+      boardRows.querySelectorAll('.board-row').forEach(row => {
+        row.addEventListener('click', e => {
+          if (e.target.closest('.btn-score')) return;
+          if (e.target.closest('.btn-collapse')) return;
+          const idx = parseInt(row.dataset.idx, 10);
+          openDetail(idx);
+        });
+      });
+
+      uploadArea.style.display = 'none';
+      toolbar.classList.add('visible');
+      board.classList.add('visible');
+      const analogyCount = Math.max(0, data.length - 1);
+      toolbarInfo.textContent = `${filename} — 1 hypothesis + ${analogyCount} analog${analogyCount === 1 ? 'y' : 'ies'}`;
+      renderScoreboard();
+      saveState();
+    }
+
+    /* --- Detail modal --- */
+    let openDetailIdx = -1;
+
+    function openDetail(idx) {
+      const entry = currentData[idx];
+      if (!entry) return;
+      openDetailIdx = idx;
+
+      detailTitle.innerHTML = esc(entry['Title'] || '(untitled)') +
+        (idx === 0 ? ' <span class="hypothesis-tag">Hypothesis</span>' : '');
+
+      const fields = [
+        { key: 'Description',           label: 'Description',   cls: 'desc' },
+        { key: 'Country',               label: 'Country',       cls: 'country' },
+        { key: 'WHO was the target?',    label: 'Who was the target?', cls: 'who' },
+        { key: 'WHAT happened?',         label: 'What happened?',      cls: 'what' },
+        { key: 'WHEN did it happen?',    label: 'When did it happen?', cls: 'when' },
+        { key: 'WHY did this happen?',   label: 'Why did this happen?', cls: 'why' },
+        { key: 'HOW did it happen?',     label: 'How did it happen?',  cls: 'how' },
+        { key: 'Sources',               label: 'Sources',             cls: 'sources', isList: true },
+      ];
+
+      let html = '';
+      fields.forEach((f, i) => {
+        if (i > 0) html += '<hr class="detail-sep">';
+
+        if (f.isList) {
+          const arr = entry[f.key] || [];
+          html += `<div class="detail-field">` +
+            `<span class="detail-label detail-label-${f.cls}">${esc(f.label)}</span>`;
+          if (arr.length === 0) {
+            html += `<div class="detail-value detail-value-empty">—</div>`;
+          } else {
+            html += `<ul class="detail-sources">`;
+            arr.forEach(src => {
+              html += `<li><a href="${esc(src)}" target="_blank" rel="noopener noreferrer">${esc(src)}</a></li>`;
+            });
+            html += `</ul>`;
+          }
+          html += `</div>`;
+        } else {
+          const val = entry[f.key] || '';
+          html += `<div class="detail-field">` +
+            `<span class="detail-label detail-label-${f.cls}">${esc(f.label)}</span>` +
+            `<div class="detail-value${!val ? ' detail-value-empty' : ''}">${val ? esc(val) : '—'}</div>` +
+            `</div>`;
+        }
+      });
+
+      html += '<hr class="detail-sep">';
+      html += `<div class="detail-field">` +
+        `<span class="detail-label detail-label-notes">Notes</span>` +
+        `<textarea class="detail-notes-textarea" id="detail-notes-input" placeholder="Add notes…">${esc(entry['Notes'] || '')}</textarea>` +
+        `<button type="button" class="detail-save" id="detail-save-btn">Save</button>` +
+        `</div>`;
+
+      detailBody.innerHTML = html;
+
+      document.getElementById('detail-save-btn').addEventListener('click', () => {
+        const ta = document.getElementById('detail-notes-input');
+        currentData[openDetailIdx]['Notes'] = ta.value;
+        saveState();
+        closeDetail();
+      });
+
+      detailOverlay.classList.add('open');
+    }
+
+    function closeDetail() {
+      detailOverlay.classList.remove('open');
+    }
+
+    detailClose.addEventListener('click', closeDetail);
+    detailOverlay.addEventListener('click', e => {
+      if (e.target === detailOverlay) closeDetail();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && detailOverlay.classList.contains('open')) closeDetail();
+    });
+
+    /* --- Save (overwrite original file with current state) --- */
+    btnSave.addEventListener('click', () => {
+      saveState();
+      const orig = btnSave.textContent;
+      btnSave.textContent = '✓ Saved';
+      btnSave.disabled = true;
+      setTimeout(() => { btnSave.textContent = orig; btnSave.disabled = false; }, 1500);
+    });
+
+    /* --- Export (strips Sources) --- */
+    btnExport.addEventListener('click', () => {
+      const output = currentData.map(entry => {
+        const clone = {};
+        for (const key of Object.keys(entry)) {
+          if (key === 'Sources') continue;
+          clone[key] = entry[key];
+        }
+        return clone;
+      });
+
+      const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'analogies-export.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    /* --- Load another file --- */
+    btnNew.addEventListener('click', () => {
+      board.classList.remove('visible');
+      toolbar.classList.remove('visible');
+      scoreboard.classList.remove('visible');
+      uploadArea.style.display = '';
+      boardRows.innerHTML = '';
+      fileInput.value = '';
+      currentData = [];
+      currentFilename = '';
+      collapsedRows = new Set();
+      sessionStorage.removeItem(STORAGE_KEY);
+    });
+
+    /* --- Restore previous session on page load --- */
+    restoreState();
+  </script>
+</body>
+</html>

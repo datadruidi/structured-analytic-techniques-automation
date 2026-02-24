@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeline Creator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <section class="timeline-section" id="timeline-section">
+      <div id="timeline-toolbar" class="timeline-toolbar">
+        <div class="timeline-toolbar-inner">
+          <header class="timeline-header-bar" id="timeline-header-bar">
+            <div class="timeline-header-left">
+              <a href="http://localhost:3000/" target="_self" class="btn-back-to-hub" aria-label="Back to main screen" title="Back to SAT Tools hub">
+                <svg class="btn-back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+                Back to Main Screen
+              </a>
+              <button type="button" class="btn-save-header" id="btn-save-header" aria-label="Save evidence">Save</button>
+              <div class="layouts-wrap" id="layouts-wrap">
+                <button type="button" class="btn-file-menu" id="btn-file-menu" aria-haspopup="true" aria-expanded="false" aria-label="File menu">File</button>
+                <button type="button" class="btn-layouts" id="btn-layouts" aria-haspopup="true" aria-expanded="false" aria-label="View menu">View</button>
+              </div>
+            </div>
+            <h2 class="timeline-header-title" id="timeline-header-title">Timeline for Structured Analytic Techniques</h2>
+            <div class="timeline-header-right">
+              <div class="timeline-view-controls">
+                <button type="button" class="btn-zoom-out" id="btn-zoom-out" title="Zoom out">−</button>
+                <span class="zoom-label" id="zoom-label">100%</span>
+                <button type="button" class="btn-zoom-in" id="btn-zoom-in" title="Zoom in">+</button>
+                <button type="button" class="btn-reset-view" id="btn-reset-view">Reset view</button>
+              </div>
+              <button type="button" class="btn-create-evidence" id="btn-create-evidence">Create New Evidence</button>
+            </div>
+          </header>
+          <div class="timeline-scale-strip">
+            <div class="scale-strip-row">
+              <div class="scale-range-group" id="scale-range-group">
+                <label for="scale-first-date" class="year-scale-label">Scale range</label>
+                <input type="date" id="scale-first-date" class="year-scale-input scale-date-input" aria-label="First date on scale">
+                <span class="year-scale-sep">–</span>
+                <input type="date" id="scale-last-date" class="year-scale-input scale-date-input" aria-label="Last date on scale">
+                <button type="button" class="btn-year-scale-apply" id="btn-year-scale-apply">Apply</button>
+              </div>
+              <div class="scale-bar-spacer scale-bar-spacer-left" aria-hidden="true"></div>
+              <div class="scale-bar-wrap" id="scale-bar-wrap">
+                <div class="timeline-scaler-overview" id="timeline-scaler-overview">
+                  <div class="timeline-scaler-selection" id="timeline-scaler-selection"></div>
+                  <div class="timeline-scaler-handle timeline-scaler-handle-left" id="scaler-handle-left"></div>
+                  <div class="timeline-scaler-handle timeline-scaler-handle-right" id="scaler-handle-right"></div>
+                </div>
+              </div>
+              <div class="scale-bar-spacer scale-bar-spacer-right">
+                <span class="scale-range-display" id="scaler-range-display" aria-live="polite">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="timeline-toolbar-resize-handle" id="timeline-toolbar-resize-handle" role="separator" aria-label="Drag to resize toolbar" title="Drag to resize">⋮⋮</div>
+      </div>
+      <div id="timeline-viewport" class="timeline-viewport">
+        <div id="timeline-empty" class="timeline-empty" hidden>
+          <p>No evidence yet. Click <strong>Create New Evidence</strong> in the toolbar to add one.</p>
+        </div>
+        <div id="timeline-world" class="timeline-world" hidden>
+          <div id="timeline-horizontal" class="timeline-horizontal">
+            <div class="timeline-callouts" id="timeline-callouts" aria-label="Event callouts"></div>
+            <div class="timeline-line" id="timeline-line" aria-label="Timeline with markers">
+              <div class="timeline-line-bar" id="timeline-line-bar"></div>
+              <div class="timeline-axis">
+                <span class="axis-label" id="axis-start"></span>
+                <span class="axis-label" id="axis-end"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="floating-panel" id="panel-events" data-panel-id="events" aria-label="Evidence list">
+      <div class="panel-drag-handle" id="panel-events-handle">
+        <h2 class="panel-title">Evidence</h2>
+        <button type="button" class="btn-panel-hide" id="btn-hide-events" aria-label="Hide panel">×</button>
+      </div>
+      <div class="panel-body">
+        <div id="events-list-summary" class="events-list-summary" aria-live="polite"></div>
+        <div id="events-list" class="events-list" aria-label="Evidence list"></div>
+      </div>
+      <div class="resize-handle" id="panel-events-resize" aria-label="Resize"></div>
+    </div>
+    <div class="floating-panel" id="panel-details" data-panel-id="details" aria-label="Evidence details">
+      <div class="panel-drag-handle" id="panel-details-handle">
+        <h2 class="panel-title">Evidence Details</h2>
+        <button type="button" class="btn-indicators btn-indicators-small" id="btn-indicators-details">Generate Hypothesis Keywords</button>
+        <button type="button" class="evidence-info-tip" id="indicators-tip" aria-label="Hypothesis keywords info" title="Hypothesis keywords info">?</button>
+        <button type="button" class="btn-panel-hide" id="btn-hide-details" aria-label="Hide panel">−</button>
+      </div>
+      <div class="panel-body event-details-body">
+        <div class="event-details-top-actions">
+          <button type="button" class="btn-details-action btn-details-edit" id="btn-details-edit" aria-label="Edit this evidence" hidden>Edit</button>
+          <button type="button" class="btn-details-action btn-details-source" id="btn-details-source" aria-label="View source" hidden>View Source</button>
+          <button type="button" class="btn-details-action btn-details-delete" id="btn-details-delete" aria-label="Delete this evidence" hidden>Delete</button>
+          <button type="button" class="event-details-close" id="event-details-close" aria-label="Clear selection">×</button>
+        </div>
+        <div id="event-details-content" class="event-details-content">
+          <p class="event-details-placeholder">Empty state — click evidence on the timeline or in the Evidence list to view details.</p>
+        </div>
+      </div>
+      <div class="resize-handle" id="panel-details-resize" aria-label="Resize"></div>
+    </div>
+  </div>
+  <div id="overlay-root">
+    <div class="layouts-dropdown overlay-dropdown" id="layouts-dropdown" role="menu" hidden>
+      <div class="layouts-menu-item" role="menuitemcheckbox" aria-checked="true" id="layouts-toggle-events" tabindex="0">
+        <input type="checkbox" id="layouts-check-events" checked aria-hidden="true">
+        <label for="layouts-check-events">Show Evidence</label>
+      </div>
+      <div class="layouts-menu-item" role="menuitemcheckbox" aria-checked="true" id="layouts-toggle-details" tabindex="0">
+        <input type="checkbox" id="layouts-check-details" checked aria-hidden="true">
+        <label for="layouts-check-details">Show Evidence Details</label>
+      </div>
+    </div>
+    <div class="file-dropdown overlay-dropdown" id="file-dropdown" role="menu" hidden>
+      <button type="button" class="file-menu-item" id="file-update-from-file" role="menuitem">Update Evidence from File</button>
+      <div class="file-menu-row file-menu-row-with-tip">
+        <button type="button" class="file-menu-item" id="file-import-events" role="menuitem">Import Evidence</button>
+        <button type="button" class="file-menu-item file-menu-item-tip" id="file-import-tip" aria-label="Tip about import file location" title="Import tip">?</button>
+      </div>
+      <button type="button" class="file-menu-item" id="file-download-template" role="menuitem">Download JSON Template</button>
+      <button type="button" class="file-menu-item" id="file-download-evidence" role="menuitem">Download Evidence</button>
+      <button type="button" class="file-menu-item" id="file-clear-screen" role="menuitem">Clear Evidence</button>
+      <button type="button" class="file-menu-item file-menu-item-danger" id="file-remove-all" role="menuitem">Remove all Evidence</button>
+    </div>
+    <input type="file" id="json-file-input" accept=".json,application/json" hidden>
+    <div class="add-evidence-overlay" id="add-evidence-overlay" hidden>
+      <div class="add-evidence-backdrop" id="add-evidence-backdrop"></div>
+      <div class="add-evidence-modal" id="add-evidence-modal" role="dialog" aria-labelledby="add-evidence-modal-title" aria-modal="true">
+        <div class="add-evidence-modal-header">
+          <h2 class="add-evidence-modal-title" id="add-evidence-modal-title">Create New Evidence</h2>
+          <button type="button" class="add-evidence-modal-close" id="add-evidence-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="add-evidence-modal-body">
+          <form id="event-form" novalidate>
+            <div class="field">
+              <label for="event-name">Name <span class="required">*</span></label>
+              <input type="text" id="event-name" name="name" autocomplete="off" placeholder="Evidence name">
+              <span class="error" id="error-name" aria-live="polite"></span>
+            </div>
+            <div class="field">
+              <label for="event-description">Description <span class="required">*</span></label>
+              <textarea id="event-description" name="description" rows="2" placeholder="What happened?"></textarea>
+              <span class="error" id="error-description" aria-live="polite"></span>
+            </div>
+            <div class="field">
+              <label for="event-source">Source</label>
+              <input type="url" id="event-source" name="source" autocomplete="off" placeholder="https://...">
+              <span class="error" id="error-source" aria-live="polite"></span>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label for="event-date">Date <span class="required">*</span></label>
+                <input type="date" id="event-date" name="date">
+                <span class="error" id="error-date" aria-live="polite"></span>
+              </div>
+              <div class="field">
+                <label for="event-time">Time</label>
+                <div class="time-input-row">
+                  <input type="time" id="event-time" name="time">
+                  <button type="button" class="btn-time-skip" id="btn-time-skip" title="Set time to 00:00 (unknown time)">No time</button>
+                </div>
+                <span class="error" id="error-time" aria-live="polite"></span>
+              </div>
+            </div>
+            <div class="evidence-row-wrap">
+              <label class="evidence-row">
+                <input type="checkbox" id="event-evidence" aria-describedby="event-evidence-desc">
+                <span id="event-evidence-desc">Use as Evidence?</span>
+              </label>
+              <button type="button" class="evidence-info-tip" id="form-evidence-tip" aria-label="Evidence info" title="Evidence info">?</button>
+            </div>
+            <div class="add-evidence-modal-actions">
+              <button type="submit" class="btn-submit" id="btn-submit">Add evidence</button>
+              <button type="button" class="btn-cancel" id="btn-cancel">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="indicators-overlay" id="indicators-overlay" hidden>
+      <div class="indicators-backdrop" id="indicators-backdrop"></div>
+      <div class="indicators-modal" id="indicators-modal" role="dialog" aria-labelledby="indicators-modal-title" aria-modal="true">
+        <div class="indicators-modal-header">
+          <h2 class="indicators-modal-title" id="indicators-modal-title">Generate Hypothesis Keywords</h2>
+          <button type="button" class="indicators-modal-close" id="indicators-modal-close" aria-label="Close">×</button>
+        </div>
+        <p class="indicators-hint">Fill one or more fields (comma-separated for multiple). Not all are required.</p>
+        <div class="indicators-entities" id="indicators-entities">
+          <div class="indicators-entity" data-entity="What">
+            <label class="indicators-entity-label">What?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="What kind of indicator could it be?" data-entity="What">
+                <button type="button" class="indicators-add-row" data-entity="What" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="indicators-entity" data-entity="Who">
+            <label class="indicators-entity-label">Who?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="Who could cause the indicator?" data-entity="Who">
+                <button type="button" class="indicators-add-row" data-entity="Who" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="indicators-entity" data-entity="When">
+            <label class="indicators-entity-label">When?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="When would we see the indicator?" data-entity="When">
+                <button type="button" class="indicators-add-row" data-entity="When" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="indicators-entity" data-entity="Where">
+            <label class="indicators-entity-label">Where?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="Where would we see the indicator?" data-entity="Where">
+                <button type="button" class="indicators-add-row" data-entity="Where" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="indicators-entity" data-entity="Why">
+            <label class="indicators-entity-label">Why?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="Why is the indicator important?" data-entity="Why">
+                <button type="button" class="indicators-add-row" data-entity="Why" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="indicators-entity" data-entity="How">
+            <label class="indicators-entity-label">How?</label>
+            <div class="indicators-entity-rows">
+              <div class="indicators-row">
+                <input type="text" class="indicators-input" placeholder="How would this indicator manifest / be observed?" data-entity="How">
+                <button type="button" class="indicators-add-row" data-entity="How" aria-label="Add row">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="indicators-modal-actions">
+          <button type="button" class="btn-indicators-primary" id="indicators-btn-create">Generate Hypothesis Keywords</button>
+          <button type="button" class="indicators-btn-cancel" id="indicators-btn-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

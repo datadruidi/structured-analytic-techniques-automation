@@ -1,0 +1,1541 @@
+{
+  "id": "n_hlttgjsg_5iqw3s0",
+  "name": "Long-term changes in regional security and military activity in Finnish border area",
+  "depth": 0,
+  "evidence": "",
+  "children": [
+    {
+      "id": "n_dvcgu4cq_an5c6lq",
+      "name": "Movement restrictions and border governance",
+      "depth": 1,
+      "evidence": "",
+      "children": [
+        {
+          "id": "n_vzp7pbjd_yc4fta5",
+          "name": "Land border closure and impacts",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_78a0yv0y_h10ttdg",
+              "name": "Border closed",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_6u6grp1p_nwteli9",
+                  "name": "Finland closed its border with Russia in late 2023",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland closed its border with Russia in late 2023 after accusing Russia of sending migrants to the frontier.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "x": 677.279846018065,
+                  "y": -18.228648973870207,
+                  "H1": "",
+                  "H2": "--",
+                  "H3": "-",
+                  "H4": "0",
+                  "H5": "",
+                  "analysis_description": "Write an analysis here"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 522.9276919941224,
+              "y": 25.826537002717355
+            },
+            {
+              "id": "n_jqkq52rq_b9wuhpa",
+              "name": "Closure ongoing",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_ua5nq260_r4ibkze",
+                  "name": "border crossing points on Finland’s eastern border are closed",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Border Guard states that border crossing points on Finland’s eastern border are closed to traffic until further notice.",
+                  "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+                  "date": "2025-04-17",
+                  "x": 124.84782512364548,
+                  "y": -183.24310253624245,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 215.81516632627097,
+              "y": -51.56219574868657
+            },
+            {
+              "id": "n_oe7nfxxa_cmvtglt",
+              "name": "Trade collapse",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_cj3ggj96_asjomv9",
+                  "name": "cross-border trade and tourism collapse has cost Finland’s border regions",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that cross-border trade and tourism collapse has cost Finland’s border regions over €300 million annually.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": 534.0780711433612,
+                  "y": -206.492381377852,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 406.7655378610475,
+              "y": -115.52544530432118
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 356.80892810962155,
+          "y": 39.41536208667925
+        },
+        {
+          "id": "n_csfrpy2u_4x9sze9",
+          "name": "Traffic-type exceptions and local measures",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_53pfld26_k0n1w1p",
+              "name": "Rail exception",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_wnx5m52x_iba4fq3",
+                  "name": "The Finnish Border Guard lists railway traffic through Vainikkala",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Border Guard lists railway traffic through Vainikkala as an exception for commercial traffic while the eastern border crossing points are otherwise closed.",
+                  "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+                  "x": 987.0677701147816,
+                  "y": 352.8914667283145
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 812.7577318932324,
+              "y": 300.8003521872996
+            },
+            {
+              "id": "n_632vgn0z_jrwdjc3",
+              "name": "Cargo vessels",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_mqw5j6dw_ez45khk",
+                  "name": "cargo vessel traffic may be received at the port",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Border Guard states that cargo vessel traffic may be received at the port of Nuijamaa where necessary.",
+                  "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+                  "x": 989.0489646666421,
+                  "y": 158.84434625377892
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 811.8592909887461,
+              "y": 166.4619248631043
+            },
+            {
+              "id": "n_495j2y82_xtwhkna",
+              "name": "Leisure boating",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_2p67h25o_k9j47x2",
+                  "name": "the maritime border crossing points for leisure boating at Haapasaari",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Border Guard states that the maritime border crossing points for leisure boating at Haapasaari and Santio are closed until further notice.",
+                  "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+                  "x": 453.9994317043804,
+                  "y": 380.9068295171235
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 610.2981375083194,
+              "y": 358.2382091664545
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 621.7391281472022,
+          "y": 217.37710064254222
+        },
+        {
+          "id": "n_w9u9yk36_ohk941e",
+          "name": "Border Security Act and asylum rules",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_q2iva6s0_4fbnyue",
+              "name": "Act adopted",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_z9x7qluc_8fpljr4",
+                  "name": "the President of the Republic approved the Border Security Act",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that the President of the Republic approved the Border Security Act on 16 July 2024 and that it entered into force on 22 July 2024.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2024-07-22",
+                  "x": 672.6489730212743,
+                  "y": 845.857198250481,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 608.3653449694084,
+              "y": 675.9016190332197
+            },
+            {
+              "id": "n_xaqotgp1_8iqpkrr",
+              "name": "Act extended",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_zzg4q2pq_4tzbcjd",
+                  "name": "an amendment confirmed on 27 June 2025 extended the Border",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that an amendment confirmed on 27 June 2025 extended the Border Security Act until 31 December 2026 and entered into force on 1 July 2025.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2025-07-01",
+                  "x": 954.2910174597813,
+                  "y": 583.8899290725358,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 783.4204946275381,
+              "y": 518.4652992141688
+            },
+            {
+              "id": "n_pj02j8cb_s7es5et",
+              "name": "Tech amendment",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_6bdxt19q_sjirpoe",
+                  "name": "amendments on the use of technology in maintaining border security",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that amendments on the use of technology in maintaining border security were approved on 28 June 2024 and entered into force on 5 July 2024.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2024-07-05",
+                  "x": 858.8112874599117,
+                  "y": 765.2392177651652,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 728.867342090012,
+              "y": 633.3935373434927
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 578.6119289546637,
+          "y": 475.98224019472644
+        }
+      ],
+      "color": "#8b5a2b",
+      "description": "Intelligence Gap",
+      "side": "down",
+      "x": 359.29477769743664,
+      "y": 210.3865381583209
+    },
+    {
+      "id": "n_a0xv25iq_avlzcxj",
+      "name": "Border infrastructure and enforcement capabilities",
+      "depth": 1,
+      "evidence": "",
+      "children": [
+        {
+          "id": "n_figklzgh_hayb8wm",
+          "name": "Eastern border fence",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_xgb8o76c_n4y4lcu",
+              "name": "Fence rationale",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_8ba054dm_ximb6kj",
+                  "name": "Finland is building a fence on the eastern border",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that Finland is building a fence on the eastern border to improve border control and support management of incidents at the border.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "x": 267.8061582040919,
+                  "y": 1091.7934947126025
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 194.57394547594632,
+              "y": 922.35967813753
+            },
+            {
+              "id": "n_ffmhcmjt_mi91cnn",
+              "name": "Fence under way",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_fbu184yg_w2ryuks",
+                  "name": "a 200-kilometre high-tech border fence is under construction along Finland’s",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that a 200-kilometre high-tech border fence is under construction along Finland’s border with Russia.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": 417.4166788205262,
+                  "y": 717.1515102628754,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 279.6335953122634,
+              "y": 644.0446295498829
+            },
+            {
+              "id": "n_77u73wjd_odkp3g2",
+              "name": "Dependence reduced",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_zgv01phb_nkdtz3w",
+                  "name": "the eastern border fence will reduce Finland’s dependence on the",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that the eastern border fence will reduce Finland’s dependence on the effectiveness of Russian border control.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "x": 423.7217871879232,
+                  "y": 983.4404425163025
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 299.41424265118064,
+              "y": 850.9594119943341
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 140.549147768918,
+          "y": 721.0330954731404
+        },
+        {
+          "id": "n_pglsboxb_38kape7",
+          "name": "Technology and surveillance authorities",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_wp116pgl_6wx6z8u",
+              "name": "Surveillance expanded",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_92gss401_6fge96c",
+                  "name": "a legislative amendment entering into force on 5 July 2024",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that a legislative amendment entering into force on 5 July 2024 expanded the Border Guard’s technical surveillance and granted new powers for radio-technology-based surveillance.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2024-07-05",
+                  "x": -106.45200643416928,
+                  "y": 1183.896667433146,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -89.04750896590838,
+              "y": 999.911602797935
+            },
+            {
+              "id": "n_8a2stl6u_wnze03m",
+              "name": "Staffing secured",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_h48olzqt_7opwlg4",
+                  "name": "acts securing the Border Guard’s human resources were adopted",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that acts securing the Border Guard’s human resources were adopted on 17 May 2024 and entered into force on 15 June 2024.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2024-06-15",
+                  "x": 81.45938665233179,
+                  "y": 1176.532015928163,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 36.8892048451638,
+              "y": 996.4119461066276
+            },
+            {
+              "id": "n_5cs55phn_tv7uzyb",
+              "name": "Offence powers",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_jyatm73p_dakc2om",
+                  "name": "amendments to improve conditions for combating offences investigated by the",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that amendments to improve conditions for combating offences investigated by the Border Guard were approved on 27 June 2025 and entered into force on 1 September 2025.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2025-09-01",
+                  "x": 15.359815048571821,
+                  "y": 626.3460142284575,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -127.34103743172213,
+              "y": 678.9248305246258
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -36.59426891333632,
+          "y": 797.9100507817504
+        },
+        {
+          "id": "n_ks95qb55_0zaq5pu",
+          "name": "Preparedness and intelligence reforms",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_j64osa9d_svcj0zi",
+              "name": "Preparedness review",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_s044yc60_hzhqsq5",
+                  "name": "comments on strengthening the Border Guard’s preparedness-related powers ran",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that comments on strengthening the Border Guard’s preparedness-related powers ran from 9 December 2025 to 21 January 2026.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2025-12-09",
+                  "x": -594.5190198475925,
+                  "y": 930.820932009839,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -443.4251211453847,
+              "y": 830.9903593058525
+            },
+            {
+              "id": "n_tnnv3b1g_uefjrmf",
+              "name": "Internal report",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_zpbv8yyv_yluwc8j",
+                  "name": "The Ministry of the Interior lists a government Report",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior lists a government Report on Internal Security submitted to Parliament on 11 September 2025.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2025-09-11",
+                  "x": -311.65572901167286,
+                  "y": 1162.913632722556,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -268.46036358479375,
+              "y": 982.7489711286892
+            },
+            {
+              "id": "n_ynfhtysc_0525u5r",
+              "name": "Intel project",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_5c0m37p1_vkzbdhh",
+                  "name": "a legislative project on the Finnish Border Guard’s criminal intelligence",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry of the Interior states that a legislative project on the Finnish Border Guard’s criminal intelligence activities runs from 24 November 2025 to 30 October 2026.",
+                  "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+                  "date": "2025-11-24",
+                  "x": -494.030969336865,
+                  "y": 1099.4580189858852,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -386.2970477354172,
+              "y": 947.1732932359577
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -253.05616846600765,
+          "y": 774.2158792213556
+        }
+      ],
+      "color": "#8b5a2b",
+      "description": "Intelligence Gap",
+      "side": "down",
+      "x": -42.58642639503547,
+      "y": 512.1877655508736
+    },
+    {
+      "id": "n_a66bv8b2_8fg0ck6",
+      "name": "Finnish Defence Forces posture near the border",
+      "depth": 1,
+      "evidence": "",
+      "children": [
+        {
+          "id": "n_hzdy7079_p4zjrn1",
+          "name": "Arctic and northern training",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_lyig0eoe_a8u9g72",
+              "name": "RYSKE Ivalo",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_e425tx8n_gx7bbd7",
+                  "name": "the Jaeger Brigade’s readiness unit exercise RYSKE would be held",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Army stated that the Jaeger Brigade’s readiness unit exercise RYSKE would be held in Ivalo and the Tsarmitunturi fell area on 4–11 February 2026.",
+                  "source": "https://maavoimat.fi/en/-/jaeger-brigade-s-readiness-unit-to-train-in-ivalo-in-february",
+                  "date": "2026-02-04",
+                  "x": -874.9749433195153,
+                  "y": 623.5435278304724,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -734.4033042926695,
+              "y": 503.34752155031236
+            },
+            {
+              "id": "n_1dkhxs6n_c70k2zt",
+              "name": "Utti winter",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_fg8843oq_iitwink",
+                  "name": "Utti Jaeger Regiment would train in Northern Finland from 2",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Army stated that Utti Jaeger Regiment would train in Northern Finland from 2 February to 27 March 2026 with about 1,000 soldiers including allied-country participants.",
+                  "source": "https://maavoimat.fi/en/-/utti-jaeger-regiment-to-carry-out-training-in-northern-finland-s-harsh-winter-conditions",
+                  "date": "2026-02-02",
+                  "x": -284.3733329924729,
+                  "y": 452.3803030068293,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -437.1652160491373,
+              "y": 471.1922505042155
+            },
+            {
+              "id": "n_s880bued_5u7qx0u",
+              "name": "Local defence",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_qzpg5oul_5ghg5np",
+                  "name": "it would exercise local defence during 20 February 6 March",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Army stated that it would exercise local defence during 20 February–6 March 2026 with up to about 3,500 soldiers and other authorities.",
+                  "source": "https://maavoimat.fi/en/-/local-defence-exercises-to-develop-joint-readiness",
+                  "date": "2026-02-20",
+                  "x": -706.0456867242713,
+                  "y": 719.0773719186484,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -616.127174703703,
+              "y": 567.5561637563525
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -568.0228311120701,
+          "y": 376.99333254622525
+        },
+        {
+          "id": "n_bu3r0qw2_1qicwyn",
+          "name": "F-35 programme milestones",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_rdua5qt6_ht2e1rf",
+              "name": "Production starts",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_t0iv8b3l_yxu34n5",
+                  "name": "production of Finland’s first F-35A fighters began in the latter",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Air Force stated that production of Finland’s first F-35A fighters began in the latter part of 2023.",
+                  "source": "https://ilmavoimat.fi/en/-/production-of-finland-s-first-f-35-fighters-progressing",
+                  "x": -891.4059124454545,
+                  "y": -73.32435801878103
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -745.6824426538939,
+              "y": 14.805302644649958
+            },
+            {
+              "id": "n_yuy2uw8r_z98cajd",
+              "name": "Autumn completion",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_5d0cf9va_otqnbfz",
+                  "name": "Finland has contracted the manufacturing lots 17 22 for its",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Air Force stated that Finland has contracted the manufacturing lots 17–22 for its F-35A fighters.",
+                  "source": "https://ilmavoimat.fi/en/-/production-of-finland-s-first-f-35-fighters-progressing",
+                  "x": -316.58910461380765,
+                  "y": 211.81322007148242
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -481.9438360192074,
+              "y": 234.7528393634119
+            },
+            {
+              "id": "n_y7nkhb69_pqlme5j",
+              "name": "Engine assembly",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_vn7iyqhl_h2jl1in",
+                  "name": "Patria to conduct final assembly of the first F135 fighter",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Patria and Pratt & Whitney signed an agreement for Patria to conduct final assembly of the first F135 fighter jet engines for Finland and stated that production had already begun.",
+                  "source": "https://www.f35.com/f35/news-and-features/Patria_and_RTXs_Pratt_and_Whitney_Agree_on_Final_Assembly.html",
+                  "date": "2026-02-05",
+                  "x": -884.7706278737566,
+                  "y": 411.25098752749915,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -756.4252090270428,
+              "y": 292.2256243661047
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -627.8066294661381,
+          "y": 153.95667086227016
+        },
+        {
+          "id": "n_ya3b8voi_3pnl569",
+          "name": "Reserve force reforms and stockpiles",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_69wpgd7e_8toh08f",
+              "name": "Reservist age",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_mox02cbv_cf6ki0u",
+                  "name": "Finland raised its reservist age limit to 65",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland raised its reservist age limit to 65.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": -1135.096292857311,
+                  "y": 402.60994753695553,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -983.6470087716758,
+              "y": 295.53257975872316
+            },
+            {
+              "id": "n_9527nu5k_0a362q7",
+              "name": "Landmine stocks",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_38bhzoc0_pzq6rnv",
+                  "name": "Finland was stockpiling landmines",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland was stockpiling landmines.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": -1218.8044023234593,
+                  "y": 207.01705526681644,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -1034.3142729586511,
+              "y": 182.59853547446596
+            },
+            {
+              "id": "n_ggzim0aq_hbdc58e",
+              "name": "NATO command",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_7r061kte_0fdw6by",
+                  "name": "Finland was building a NATO Northern Command in Mikkeli",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland was building a NATO Northern Command in Mikkeli.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": -1171.7778793380387,
+                  "y": -6.3243186079864335,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -1000.8818873946504,
+              "y": 59.818610523821
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -812.8948357496985,
+          "y": 161.0764482644177
+        }
+      ],
+      "color": "#8b5a2b",
+      "description": "Intelligence Gap",
+      "side": "down",
+      "x": -447.18289076220356,
+      "y": 135.65528241285065
+    },
+    {
+      "id": "n_pv40xy90_6gm91h0",
+      "name": "International defence cooperation and exercises",
+      "depth": 1,
+      "evidence": "",
+      "children": [
+        {
+          "id": "n_ue7uq9ac_whgh8co",
+          "name": "US–Finland Defence Cooperation Agreement",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_bab2bxzi_1wr7dol",
+              "name": "Talks start",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_ibqa0apj_72n7ryk",
+                  "name": "Finland decided in August 2022 to start negotiations with the",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Finland’s Ministry of Defence states that Finland decided in August 2022 to start negotiations with the United States on a Defence Cooperation Agreement.",
+                  "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+                  "x": -962.8573282282592,
+                  "y": -402.71336418520355
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -781.2963213407608,
+              "y": -420.5043453716963
+            },
+            {
+              "id": "n_hmiokxid_rfb9bpg",
+              "name": "Proposal comments",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_z8hb0osb_9y54z0v",
+                  "name": "a draft government proposal on the DCA was sent out",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Ministry for Foreign Affairs of Finland stated that a draft government proposal on the DCA was sent out for comments on 28 March 2024.",
+                  "source": "https://finlandabroad.fi/web/usa/current-affairs/-/asset_publisher/h5w4iTUJhNne/content/suomen-ja-yhdysvaltojen-valista-puolustusyhteistyosopimusta-koskeva-hallituksen-esitys-lausuntokierrokselle/35732",
+                  "date": "2024-03-28",
+                  "x": -968.6784640426139,
+                  "y": -588.7024677139111,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -787.7859617742145,
+              "y": -539.3656743663397
+            },
+            {
+              "id": "n_scr48930_mufqohp",
+              "name": "Parliament approves",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_at9980qo_h1d2khi",
+                  "name": "the Finnish Parliament approved the Defence Cooperation Agreement with the",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported that the Finnish Parliament approved the Defence Cooperation Agreement with the United States on 1 July 2024.",
+                  "source": "https://yle.fi/a/74-20097360",
+                  "date": "2024-07-01",
+                  "x": -364.06912406181175,
+                  "y": -231.6249260417023,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -466.9288413001858,
+              "y": -352.7924510947139
+            },
+            {
+              "id": "n_a26fhqgz_ptm3hpb",
+              "name": "DCA in force",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_f24r79j6_aix8x5s",
+                  "name": "the DCA entered into force on 1 September 2024",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Finland’s Ministry of Defence states that the DCA entered into force on 1 September 2024.",
+                  "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+                  "date": "2024-09-01",
+                  "x": -805.1680160537028,
+                  "y": -245.2510401555007,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -662.4443788565562,
+              "y": -319.8578320518239
+            },
+            {
+              "id": "n_jtp9ml69_j7l80yf",
+              "name": "Infra agreement",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_4ujxilex_gmu16vh",
+                  "name": "an Implementing Agreement Regarding Infrastructure under the DCA was signed",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Finland’s Ministry of Defence states that an Implementing Agreement Regarding Infrastructure under the DCA was signed on 13 August 2025.",
+                  "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+                  "date": "2025-08-13",
+                  "x": -842.4394077589634,
+                  "y": -712.5323785853816,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -689.1367188875116,
+              "y": -620.8772614200333
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -583.2998978980729,
+          "y": -468.65612344861427
+        },
+        {
+          "id": "n_2txoc59e_9vlwkth",
+          "name": "Multinational exercises in the Nordic region",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_6x8vpgt6_lc5wsvr",
+              "name": "SD24 begins",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_n33t7xza_8f2crmg",
+                  "name": "Exercise Steadfast Defender 2024 began on 24 January 2024",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "SHAPE stated that Exercise Steadfast Defender 2024 began on 24 January 2024.",
+                  "source": "https://shape.nato.int/news-archive/2024/nato-marks-the-start-of-exercise-steadfast-defender-2024",
+                  "date": "2024-01-24",
+                  "x": -1050.948152603716,
+                  "y": -1071.3080121995276,
+                  "time": "00:00"
+                },
+                {
+                  "id": "n_mlsd2d95_s76s7g6",
+                  "name": "Test-1",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#2d3142",
+                  "description": "AAAAAA",
+                  "date": "2026-01-01",
+                  "time": "00:00"
+                },
+                {
+                  "id": "n_mlsd3gu3_1uwn028",
+                  "name": "Test-2",
+                  "depth": 4,
+                  "evidence": "",
+                  "children": [],
+                  "color": "#2d3142",
+                  "description": "AAAAAAAAA",
+                  "date": "2026-01-01",
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -626.3917793969572,
+              "y": -927.9073883790613
+            },
+            {
+              "id": "n_8yyyf1gy_5nb3e89",
+              "name": "Nordic battles",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_qlek6q42_3ojr8aq",
+                  "name": "the main battles of Exercise Nordic Response 24 began",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Finnish Defence Forces stated that the main battles of Exercise Nordic Response 24 began on 7 March 2024.",
+                  "source": "https://puolustusvoimat.fi/en/-/1950813/main-battles-of-exercise-nordic-response-24-begin",
+                  "date": "2024-03-07",
+                  "x": -1007.0839277876995,
+                  "y": -892.6909821558987,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -670.7133347909876,
+              "y": -819.176794146734
+            },
+            {
+              "id": "n_rwxradyi_7e46nio",
+              "name": "NR24 window",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_1b4scvp8_1tnoi0m",
+                  "name": "The Norwegian Armed Forces state that the main part",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Norwegian Armed Forces state that the main part of Nordic Response exercise activities took place in the northern Nordic region from 3 to 14 March 2024.",
+                  "source": "https://www.forsvaret.no/en/exercises-and-operations/exercises/nr24",
+                  "date": "2024-03-03",
+                  "x": -556.9547409347819,
+                  "y": -1240.1268142838803,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -525.4799506259454,
+              "y": -980.6230190222599
+            },
+            {
+              "id": "n_v8mupq61_1959mha",
+              "name": "ACE23 dates",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_jwimt5o4_ycytt3n",
+                  "name": "Arctic Challenge Exercise 2023 would take place from 29 May",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "NATO Allied Command stated that Arctic Challenge Exercise 2023 would take place from 29 May to 9 June 2023.",
+                  "source": "https://ac.nato.int/archive/2023/finland-to-begin-exercise-arctic-challenge-with-allies-and-partner-sweden",
+                  "date": "2023-05-29",
+                  "x": -241.03944320261235,
+                  "y": -1228.6269475442034,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -407.1670598797491,
+              "y": -959.1109185600053
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -474.2432976495192,
+          "y": -767.7993204168432
+        },
+        {
+          "id": "n_6z8o91v1_j7k4n5q",
+          "name": "NATO integration steps affecting the border area",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_dl55uz69_5or0pkn",
+              "name": "Finland joins",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_4dcb49ru_mzsbixj",
+                  "name": "Finland joined NATO on 4 April 2023",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland joined NATO on 4 April 2023.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2023-04-04",
+                  "x": 25.590148542097765,
+                  "y": -508.0921349353198,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -65.72712817820947,
+              "y": -629.2739685714174
+            },
+            {
+              "id": "n_lo6yadb8_3bp33zf",
+              "name": "Nordic drill",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_yfar98z9_yzk53z8",
+                  "name": "Nordic Response 2024 is a Norway-led military exercise held across",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Associated Press reported that Nordic Response 2024 is a Norway-led military exercise held across Finland, Norway and Sweden.",
+                  "source": "https://apnews.com/article/87ff05e1bb24f77dc9d5b5bf09c709b0",
+                  "date": "2024-03-04",
+                  "x": -204.62670512138033,
+                  "y": -1038.1791074760833,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -231.47022091820006,
+              "y": -860.3042056453904
+            },
+            {
+              "id": "n_lphsedqx_hmfu1ki",
+              "name": "Border length",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_9k3yht5k_bgr8fbs",
+                  "name": "Finland shares a 1 340-kilometre border with Russia",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland shares a 1,340-kilometre border with Russia.",
+                  "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+                  "date": "2025-06-24",
+                  "x": -26.233242519277635,
+                  "y": -989.695625371049,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": -100.14764167931324,
+              "y": -827.0789477666322
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": -216.41399259634542,
+          "y": -666.6594692784348
+        }
+      ],
+      "color": "#8b5a2b",
+      "description": "Intelligence Gap",
+      "side": "down",
+      "x": -295.775729782143,
+      "y": -437.82841684592626
+    },
+    {
+      "id": "n_olgx48kv_ozir1if",
+      "name": "Russian military changes and activity relevant to the Finnish border",
+      "depth": 1,
+      "evidence": "",
+      "children": [
+        {
+          "id": "n_sb4dr5a6_i6xdmfh",
+          "name": "District reorganisation and official plans",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_f2xyon9d_yfj84rj",
+              "name": "Shoigu proposal",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_stkmzilk_zzb5b9g",
+                  "name": "TASS reported on 21 December 2022 that Defence Minister Sergei",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "TASS reported on 21 December 2022 that Defence Minister Sergei Shoigu proposed re-establishing the Moscow and Leningrad Military Districts.",
+                  "source": "https://tass.com/defense/1554071",
+                  "date": "2022-12-21",
+                  "x": 358.9084802356304,
+                  "y": -993.9214018184958,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 371.8969631594758,
+              "y": -813.0503903988882
+            },
+            {
+              "id": "n_jwch21ip_zbdy5on",
+              "name": "Karelia corps",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_fdabl4qd_1blj865",
+                  "name": "Sergei Shoigu said an army corps would be formed",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Barents Observer reported that Sergei Shoigu said an army corps would be formed in Karelia.",
+                  "source": "https://www.thebarentsobserver.com/security/shoigu-vows-more-troops-near-nordic-countries/163082",
+                  "date": "2022-12-21",
+                  "x": 187.42122224186795,
+                  "y": -845.7423901191505,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 263.45215692485266,
+              "y": -698.9005419147786
+            },
+            {
+              "id": "n_iuv4glmk_7qtqfv3",
+              "name": "Decree signed",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_5n0lkr7p_ybygfzb",
+                  "name": "Vladimir Putin signed a decree on 26 February 2024 reestablishing",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "The Barents Observer reported that Vladimir Putin signed a decree on 26 February 2024 reestablishing the Moscow and Leningrad military districts with changes valid from 1 March 2024.",
+                  "source": "https://www.thebarentsobserver.com/security/putins-signs-northwestern-regions-into-leningrad-military-district/163619",
+                  "date": "2024-03-01",
+                  "x": 561.582077252853,
+                  "y": -974.8712018544953,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 498.72271991846475,
+              "y": -803.4111091154012
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 409.6869131901972,
+          "y": -612.0288757769292
+        },
+        {
+          "id": "n_3sps8e78_5pz5gi6",
+          "name": "Base and troop indicators near the Finnish border",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_6974vkjp_90r1w4h",
+              "name": "Losses visible",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_qlf29lb8_lqu5f8e",
+                  "name": "Yle reported on 11 January 2025 that satellite images showed",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported on 11 January 2025 that satellite images showed Russian troops stationed near the Finnish border were focusing on the war in Ukraine.",
+                  "source": "https://yle.fi/a/74-20135804",
+                  "date": "2025-01-11",
+                  "x": 569.0935156884777,
+                  "y": -661.4373332560846,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 697.6318016642542,
+              "y": -721.6692978854387
+            },
+            {
+              "id": "n_k2fgy3jk_pwdrrpf",
+              "name": "Military town",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_s8eu10ow_0sc5c37",
+                  "name": "Yle reported on 17 June 2025 that satellite images showed",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported on 17 June 2025 that satellite images showed extensive construction work at the Lupche-Savino garrison near Kandalaksha across the border from Finnish Lapland.",
+                  "source": "https://yle.fi/a/74-20168262",
+                  "date": "2025-06-17",
+                  "x": 876.8079408148772,
+                  "y": -942.3611079619973,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 802.5062195668911,
+              "y": -774.6323425491605
+            },
+            {
+              "id": "n_6h2tnw7w_6ed5cro",
+              "name": "NYT report",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_70igrgar_ri44k4z",
+                  "name": "Yle reported on 20 May 2025 that the New York",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported on 20 May 2025 that the New York Times said Russia was building up a base along the Finnish border based on satellite imagery.",
+                  "source": "https://yle.fi/a/74-20162966",
+                  "date": "2025-05-20",
+                  "x": 1041.1947122283366,
+                  "y": -803.5012470815152,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 893.628972320732,
+              "y": -690.1151772476956
+            },
+            {
+              "id": "n_70t07aeh_84vb8w5",
+              "name": "Petrozavodsk",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_u5z7cwzo_kmh30o1",
+                  "name": "Yle reported on 30 January 2026 that Russia was upgrading",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported on 30 January 2026 that Russia was upgrading a Soviet-era garrison in Petrozavodsk.",
+                  "source": "https://yle.fi/a/74-20207070",
+                  "date": "2026-01-30",
+                  "x": 1096.3692952897538,
+                  "y": -616.6783418758506,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 917.8910253364488,
+              "y": -569.9218526550525
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 713.2762365340669,
+          "y": -563.8302371162089
+        },
+        {
+          "id": "n_g1yg9p5c_zmr846i",
+          "name": "Official response signals and airspace incidents",
+          "depth": 2,
+          "evidence": "",
+          "children": [
+            {
+              "id": "n_lnkeol90_m8ddve8",
+              "name": "MiG-31 case",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_6br26vjm_w8nnm4m",
+                  "name": "two Russian MiG-31 fighter aircraft were suspected of violating Finland’s",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Finland’s Ministry of Defence stated that two Russian MiG-31 fighter aircraft were suspected of violating Finland’s airspace near Porvoo on 18 August 2022.",
+                  "source": "https://defmin.fi/en/-/suspected-violation-of-finnish-airspace-in-the-gulf-of-finland",
+                  "date": "2022-08-18",
+                  "x": 1113.100874884826,
+                  "y": -416.5141978950654,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 931.9262940970738,
+              "y": -382.530242704988
+            },
+            {
+              "id": "n_k1ithbri_ouuz9ex",
+              "name": "Four aircraft",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_gkcepuej_er05dxo",
+                  "name": "Finland suspected four Russian military aircraft violated Finnish airspace",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Reuters reported that Finland suspected four Russian military aircraft violated Finnish airspace on 10 June 2024 near Loviisa.",
+                  "source": "https://www.reuters.com/world/europe/finland-suspects-four-russian-military-planes-violated-its-airspace-2024-06-14/",
+                  "date": "2024-06-10",
+                  "x": 1151.3646645762615,
+                  "y": -238.1327116647641,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 965.1410895217502,
+              "y": -264.66879549596
+            },
+            {
+              "id": "n_3hfukn5c_lppi4ki",
+              "name": "Minister comment",
+              "depth": 3,
+              "evidence": "",
+              "children": [
+                {
+                  "id": "n_huqamest_2c9ecug",
+                  "name": "Finland’s Defence Minister Antti H kk nen said on 18",
+                  "depth": 4,
+                  "evidence": "Yes",
+                  "children": [],
+                  "color": "#6a4c93",
+                  "description": "Yle reported that Finland’s Defence Minister Antti Häkkänen said on 18 June 2025 that there was \"nothing surprising or dramatic\" in Russia’s base buildup near the Finnish border.",
+                  "source": "https://yle.fi/a/74-20168553",
+                  "date": "2025-06-18",
+                  "x": 1050.046568649696,
+                  "y": -79.17192721663766,
+                  "time": "00:00"
+                }
+              ],
+              "color": "#6a4c93",
+              "description": "Intelligence Gap",
+              "x": 889.928281619826,
+              "y": -162.34148828826878
+            }
+          ],
+          "color": "#40916c",
+          "description": "Intelligence Gap",
+          "x": 748.6703209123758,
+          "y": -299.53919553257373
+        }
+      ],
+      "color": "#8b5a2b",
+      "description": "Intelligence Gap",
+      "side": "down",
+      "x": 435.13855349468145,
+      "y": -342.0035218028491
+    }
+  ],
+  "color": "#e76f51",
+  "description": "Intelligence Gap",
+  "x": 0,
+  "y": 0
+}

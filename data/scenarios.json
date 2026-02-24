@@ -1,0 +1,458 @@
+[
+  {
+    "driver_id": "n_dvcgu4cq_an5c6lq",
+    "driver_name": "Movement restrictions and border governance",
+    "trends": [
+      {
+        "trend_id": "n_6u6grp1p_nwteli9",
+        "trend_name": "Finland closed its border with Russia in late 2023",
+        "description": "Reuters reported that Finland closed its border with Russia in late 2023 after accusing Russia of sending migrants to the frontier.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_ua5nq260_r4ibkze",
+        "trend_name": "border crossing points on Finland’s eastern border are closed",
+        "description": "The Finnish Border Guard states that border crossing points on Finland’s eastern border are closed to traffic until further notice.",
+        "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+        "date": "2025-04-17",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_cj3ggj96_asjomv9",
+        "trend_name": "cross-border trade and tourism collapse has cost Finland’s border regions",
+        "description": "Reuters reported that cross-border trade and tourism collapse has cost Finland’s border regions over €300 million annually.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_wnx5m52x_iba4fq3",
+        "trend_name": "The Finnish Border Guard lists railway traffic through Vainikkala",
+        "description": "The Finnish Border Guard lists railway traffic through Vainikkala as an exception for commercial traffic while the eastern border crossing points are otherwise closed.",
+        "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_mqw5j6dw_ez45khk",
+        "trend_name": "cargo vessel traffic may be received at the port",
+        "description": "The Finnish Border Guard states that cargo vessel traffic may be received at the port of Nuijamaa where necessary.",
+        "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_2p67h25o_k9j47x2",
+        "trend_name": "the maritime border crossing points for leisure boating at Haapasaari",
+        "description": "The Finnish Border Guard states that the maritime border crossing points for leisure boating at Haapasaari and Santio are closed until further notice.",
+        "source": "https://raja.fi/en/restrictions-at-the-border-crossing-points-on-the-eastern-border-of-finland",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_z9x7qluc_8fpljr4",
+        "trend_name": "the President of the Republic approved the Border Security Act",
+        "description": "The Ministry of the Interior states that the President of the Republic approved the Border Security Act on 16 July 2024 and that it entered into force on 22 July 2024.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2024-07-22",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_zzg4q2pq_4tzbcjd",
+        "trend_name": "an amendment confirmed on 27 June 2025 extended the Border",
+        "description": "The Ministry of the Interior states that an amendment confirmed on 27 June 2025 extended the Border Security Act until 31 December 2026 and entered into force on 1 July 2025.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2025-07-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_6bdxt19q_sjirpoe",
+        "trend_name": "amendments on the use of technology in maintaining border security",
+        "description": "The Ministry of the Interior states that amendments on the use of technology in maintaining border security were approved on 28 June 2024 and entered into force on 5 July 2024.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2024-07-05",
+        "evidence": "Yes"
+      }
+    ],
+    "scenarios": {
+      "baseline": "Finland keeps the eastern land border closed for an extended period, while allowing only tightly controlled exceptions like limited rail logistics via Vainikkala and selected cargo/maritime traffic. Border governance hardens through the Border Security Act and incremental legal extensions, and technology is increasingly used for monitoring and enforcement. Border-region economies remain pressured as trade and tourism stay suppressed, and adaptation shifts toward domestic markets and state support.",
+      "plausible": "Finland moves from a “closed border” posture to a “controlled corridor” model: a small number of crossings reopen for pre-approved freight and essential travel under strict screening. Technology-enabled checks (data sharing, risk scoring, surveillance, and automated monitoring) become standard practice, backed by updated legislation. Trade partially recovers through limited channels, but tourism remains low and border governance stays security-first.",
+      "wildcard": "A sudden hybrid pressure campaign—such as an abrupt surge in irregular migration or coordinated disruptions—forces Finland to escalate emergency border measures and rapidly expand surveillance and patrol capacity. Rail and maritime exceptions are suspended or heavily restricted, and cross-border movement becomes unpredictable. The economic shock deepens in border regions, while international support and crisis coordination intensify.",
+      "preposterous": "A dramatic political breakthrough leads to a rapid normalization where the border reopens widely, trade and tourism rebound fast, and Finland and Russia establish an unusually cooperative cross-border governance regime. At the same time, Finland relies on near-total “smart border” automation—drones, sensors, and AI triage—to keep friction low while maintaining security. The border becomes a showcase of openness-plus-high-tech control rather than a long-term closure zone."
+    }
+  },
+  {
+    "driver_id": "n_a0xv25iq_avlzcxj",
+    "driver_name": "Border infrastructure and enforcement capabilities",
+    "trends": [
+      {
+        "trend_id": "n_8ba054dm_ximb6kj",
+        "trend_name": "Finland is building a fence on the eastern border",
+        "description": "The Ministry of the Interior states that Finland is building a fence on the eastern border to improve border control and support management of incidents at the border.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_fbu184yg_w2ryuks",
+        "trend_name": "a 200-kilometre high-tech border fence is under construction along Finland’s",
+        "description": "Reuters reported that a 200-kilometre high-tech border fence is under construction along Finland’s border with Russia.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_zgv01phb_nkdtz3w",
+        "trend_name": "the eastern border fence will reduce Finland’s dependence on the",
+        "description": "The Ministry of the Interior states that the eastern border fence will reduce Finland’s dependence on the effectiveness of Russian border control.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_92gss401_6fge96c",
+        "trend_name": "a legislative amendment entering into force on 5 July 2024",
+        "description": "The Ministry of the Interior states that a legislative amendment entering into force on 5 July 2024 expanded the Border Guard’s technical surveillance and granted new powers for radio-technology-based surveillance.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2024-07-05",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_h48olzqt_7opwlg4",
+        "trend_name": "acts securing the Border Guard’s human resources were adopted",
+        "description": "The Ministry of the Interior states that acts securing the Border Guard’s human resources were adopted on 17 May 2024 and entered into force on 15 June 2024.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2024-06-15",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_jyatm73p_dakc2om",
+        "trend_name": "amendments to improve conditions for combating offences investigated by the",
+        "description": "The Ministry of the Interior states that amendments to improve conditions for combating offences investigated by the Border Guard were approved on 27 June 2025 and entered into force on 1 September 2025.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2025-09-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_s044yc60_hzhqsq5",
+        "trend_name": "comments on strengthening the Border Guard’s preparedness-related powers ran",
+        "description": "The Ministry of the Interior states that comments on strengthening the Border Guard’s preparedness-related powers ran from 9 December 2025 to 21 January 2026.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2025-12-09",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_zpbv8yyv_yluwc8j",
+        "trend_name": "The Ministry of the Interior lists a government Report",
+        "description": "The Ministry of the Interior lists a government Report on Internal Security submitted to Parliament on 11 September 2025.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2025-09-11",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_5c0m37p1_vkzbdhh",
+        "trend_name": "a legislative project on the Finnish Border Guard’s criminal intelligence",
+        "description": "The Ministry of the Interior states that a legislative project on the Finnish Border Guard’s criminal intelligence activities runs from 24 November 2025 to 30 October 2026.",
+        "source": "https://intermin.fi/en/border-management/government-programme-measures-to-reform-border-security",
+        "date": "2025-11-24",
+        "evidence": "Yes"
+      }
+    ],
+    "scenarios": {
+      "baseline": "Finland continues building the 200 km high-tech fence in phases, while steadily strengthening the Border Guard’s legal powers, staffing, and criminal-intelligence capabilities. Surveillance technology and infrastructure become the default way to manage risk on the eastern border, with enforcement more standardized and resilient. The result is a “harder” border that is harder to breach but more expensive to maintain.",
+      "plausible": "The fence is completed and integrated into a broader layered system: sensors, patrol routines, data-driven screening, and stronger investigative tools against cross-border crime. Legislative updates clarify preparedness powers and enable faster response, while human resources are expanded to reduce fatigue and improve readiness. Smuggling and hostile probing shift tactics rather than disappear, pushing Finland toward continuous adaptation and periodic upgrades.",
+      "wildcard": "A sudden security shock—such as a coordinated border surge, sabotage against construction sites, or a major cross-border crime network breakthrough—forces rapid acceleration of infrastructure and emergency legal measures. Temporary “maximum control” procedures are introduced (expanded restricted areas, fast-track procurements, intensified intelligence operations), and the fence becomes a crisis-response centerpiece rather than a gradual project. Operational strain rises sharply, and public debate focuses on tradeoffs between speed, cost, and civil liberties.",
+      "preposterous": "Finland deploys a near-fully autonomous “smart border” where AI-assisted detection, drones, and automated barriers handle most routine enforcement, and human patrols intervene only when the system flags high-risk events. At the same time, the border becomes a showcase export project—Finland sells the model abroad and turns the eastern border into a testing ground for next-generation security tech. The fence shifts from a defensive necessity to a global demonstrator platform."
+    }
+  },
+  {
+    "driver_id": "n_a66bv8b2_8fg0ck6",
+    "driver_name": "Finnish Defence Forces posture near the border",
+    "trends": [
+      {
+        "trend_id": "n_e425tx8n_gx7bbd7",
+        "trend_name": "the Jaeger Brigade’s readiness unit exercise RYSKE would be held",
+        "description": "The Finnish Army stated that the Jaeger Brigade’s readiness unit exercise RYSKE would be held in Ivalo and the Tsarmitunturi fell area on 4–11 February 2026.",
+        "source": "https://maavoimat.fi/en/-/jaeger-brigade-s-readiness-unit-to-train-in-ivalo-in-february",
+        "date": "2026-02-04",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_fg8843oq_iitwink",
+        "trend_name": "Utti Jaeger Regiment would train in Northern Finland from 2",
+        "description": "The Finnish Army stated that Utti Jaeger Regiment would train in Northern Finland from 2 February to 27 March 2026 with about 1,000 soldiers including allied-country participants.",
+        "source": "https://maavoimat.fi/en/-/utti-jaeger-regiment-to-carry-out-training-in-northern-finland-s-harsh-winter-conditions",
+        "date": "2026-02-02",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_qzpg5oul_5ghg5np",
+        "trend_name": "it would exercise local defence during 20 February 6 March",
+        "description": "The Finnish Army stated that it would exercise local defence during 20 February–6 March 2026 with up to about 3,500 soldiers and other authorities.",
+        "source": "https://maavoimat.fi/en/-/local-defence-exercises-to-develop-joint-readiness",
+        "date": "2026-02-20",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_t0iv8b3l_yxu34n5",
+        "trend_name": "production of Finland’s first F-35A fighters began in the latter",
+        "description": "The Finnish Air Force stated that production of Finland’s first F-35A fighters began in the latter part of 2023.",
+        "source": "https://ilmavoimat.fi/en/-/production-of-finland-s-first-f-35-fighters-progressing",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_5d0cf9va_otqnbfz",
+        "trend_name": "Finland has contracted the manufacturing lots 17 22 for its",
+        "description": "The Finnish Air Force stated that Finland has contracted the manufacturing lots 17–22 for its F-35A fighters.",
+        "source": "https://ilmavoimat.fi/en/-/production-of-finland-s-first-f-35-fighters-progressing",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_vn7iyqhl_h2jl1in",
+        "trend_name": "Patria to conduct final assembly of the first F135 fighter",
+        "description": "Patria and Pratt & Whitney signed an agreement for Patria to conduct final assembly of the first F135 fighter jet engines for Finland and stated that production had already begun.",
+        "source": "https://www.f35.com/f35/news-and-features/Patria_and_RTXs_Pratt_and_Whitney_Agree_on_Final_Assembly.html",
+        "date": "2026-02-05",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_mox02cbv_cf6ki0u",
+        "trend_name": "Finland raised its reservist age limit to 65",
+        "description": "Reuters reported that Finland raised its reservist age limit to 65.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_38bhzoc0_pzq6rnv",
+        "trend_name": "Finland was stockpiling landmines",
+        "description": "Reuters reported that Finland was stockpiling landmines.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_7r061kte_0fdw6by",
+        "trend_name": "Finland was building a NATO Northern Command in Mikkeli",
+        "description": "Reuters reported that Finland was building a NATO Northern Command in Mikkeli.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      }
+    ],
+    "scenarios": {
+      "baseline": "Finland sustains a heightened Defence Forces posture near the eastern border through regular readiness exercises, expanded local-defence training, and steady modernization such as the F-35 program and Patria’s assembly work. Reservist policy changes (including a higher age limit) increase available manpower, while capabilities like stockpiled landmines and improved command-and-control strengthen deterrence. The overall effect is a more credible, routine “high readiness” stance without major force surges.",
+      "plausible": "Border-adjacent readiness becomes more integrated and scalable: exercises increasingly link local defence, rapid reinforcement, and NATO coordination, supported by the emerging NATO Northern Command structure. As F-35 deliveries and domestic support capacity mature, Finland improves airpower readiness and sustainment, enabling faster response options and stronger joint operations. The posture remains defensive but more visibly networked, with reservists used more frequently in structured rotations.",
+      "wildcard": "A sudden regional crisis or major provocation triggers an accelerated readiness spike: larger call-ups, more frequent snap exercises, temporary deployment shifts toward the east, and intensified air policing and reconnaissance. Landmine planning and barrier preparations move from “stockpile and policy” into rapid operational readiness, while NATO coordination becomes near-continuous. The posture shifts from routine deterrence to sustained crisis footing, creating strain on personnel and logistics.",
+      "preposterous": "Finland establishes a permanently forward-leaning “border shield” with near-constant high-readiness rotations, persistent drone and sensor coverage, and continuous NATO-led joint training in the region. F-35s and air-defence assets are kept on an always-on alert cycle, and reservists are mobilized in a highly active, semi-regular service model. The eastern border becomes one of Europe’s most militarized deterrence zones even without an active conflict."
+    }
+  },
+  {
+    "driver_id": "n_pv40xy90_6gm91h0",
+    "driver_name": "International defence cooperation and exercises",
+    "trends": [
+      {
+        "trend_id": "n_ibqa0apj_72n7ryk",
+        "trend_name": "Finland decided in August 2022 to start negotiations with the",
+        "description": "Finland’s Ministry of Defence states that Finland decided in August 2022 to start negotiations with the United States on a Defence Cooperation Agreement.",
+        "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_z8hb0osb_9y54z0v",
+        "trend_name": "a draft government proposal on the DCA was sent out",
+        "description": "The Ministry for Foreign Affairs of Finland stated that a draft government proposal on the DCA was sent out for comments on 28 March 2024.",
+        "source": "https://finlandabroad.fi/web/usa/current-affairs/-/asset_publisher/h5w4iTUJhNne/content/suomen-ja-yhdysvaltojen-valista-puolustusyhteistyosopimusta-koskeva-hallituksen-esitys-lausuntokierrokselle/35732",
+        "date": "2024-03-28",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_at9980qo_h1d2khi",
+        "trend_name": "the Finnish Parliament approved the Defence Cooperation Agreement with the",
+        "description": "Yle reported that the Finnish Parliament approved the Defence Cooperation Agreement with the United States on 1 July 2024.",
+        "source": "https://yle.fi/a/74-20097360",
+        "date": "2024-07-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_f24r79j6_aix8x5s",
+        "trend_name": "the DCA entered into force on 1 September 2024",
+        "description": "Finland’s Ministry of Defence states that the DCA entered into force on 1 September 2024.",
+        "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+        "date": "2024-09-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_4ujxilex_gmu16vh",
+        "trend_name": "an Implementing Agreement Regarding Infrastructure under the DCA was signed",
+        "description": "Finland’s Ministry of Defence states that an Implementing Agreement Regarding Infrastructure under the DCA was signed on 13 August 2025.",
+        "source": "https://defmin.fi/en/areas-of-expertise/international-defence-cooperation/international-conventions/defence-cooperation-agreement-with-the-united-states-dca-?gsid=73c98dca-b310-4223-9e76-ae6237a26960",
+        "date": "2025-08-13",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_n33t7xza_8f2crmg",
+        "trend_name": "Exercise Steadfast Defender 2024 began on 24 January 2024",
+        "description": "SHAPE stated that Exercise Steadfast Defender 2024 began on 24 January 2024.",
+        "source": "https://shape.nato.int/news-archive/2024/nato-marks-the-start-of-exercise-steadfast-defender-2024",
+        "date": "2024-01-24",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_mlsd2d95_s76s7g6",
+        "trend_name": "Test-1",
+        "description": "AAAAAA",
+        "date": "2026-01-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_mlsd3gu3_1uwn028",
+        "trend_name": "Test-2",
+        "description": "AAAAAAAAA",
+        "date": "2026-01-01"
+      },
+      {
+        "trend_id": "n_qlek6q42_3ojr8aq",
+        "trend_name": "the main battles of Exercise Nordic Response 24 began",
+        "description": "The Finnish Defence Forces stated that the main battles of Exercise Nordic Response 24 began on 7 March 2024.",
+        "source": "https://puolustusvoimat.fi/en/-/1950813/main-battles-of-exercise-nordic-response-24-begin",
+        "date": "2024-03-07",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_1b4scvp8_1tnoi0m",
+        "trend_name": "The Norwegian Armed Forces state that the main part",
+        "description": "The Norwegian Armed Forces state that the main part of Nordic Response exercise activities took place in the northern Nordic region from 3 to 14 March 2024.",
+        "source": "https://www.forsvaret.no/en/exercises-and-operations/exercises/nr24",
+        "date": "2024-03-03",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_jwimt5o4_ycytt3n",
+        "trend_name": "Arctic Challenge Exercise 2023 would take place from 29 May",
+        "description": "NATO Allied Command stated that Arctic Challenge Exercise 2023 would take place from 29 May to 9 June 2023.",
+        "source": "https://ac.nato.int/archive/2023/finland-to-begin-exercise-arctic-challenge-with-allies-and-partner-sweden",
+        "date": "2023-05-29",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_4dcb49ru_mzsbixj",
+        "trend_name": "Finland joined NATO on 4 April 2023",
+        "description": "Reuters reported that Finland joined NATO on 4 April 2023.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2023-04-04",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_yfar98z9_yzk53z8",
+        "trend_name": "Nordic Response 2024 is a Norway-led military exercise held across",
+        "description": "The Associated Press reported that Nordic Response 2024 is a Norway-led military exercise held across Finland, Norway and Sweden.",
+        "source": "https://apnews.com/article/87ff05e1bb24f77dc9d5b5bf09c709b0",
+        "date": "2024-03-04",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_9k3yht5k_bgr8fbs",
+        "trend_name": "Finland shares a 1 340-kilometre border with Russia",
+        "description": "Reuters reported that Finland shares a 1,340-kilometre border with Russia.",
+        "source": "https://www.reuters.com/business/aerospace-defense/fearing-war-with-russia-finland-hardens-natos-north-frontier-2025-06-24/",
+        "date": "2025-06-24",
+        "evidence": "Yes"
+      }
+    ],
+    "scenarios": {
+      "baseline": "Finland deepens international defence cooperation through NATO integration, recurring large exercises (e.g., Nordic Response/Steadfast Defender), and the full implementation of the Defence Cooperation Agreement (DCA) that enables infrastructure and host-nation support. Interoperability improves year by year as procedures, logistics, and planning become more standardized with key partners. The overall effect is stronger deterrence through routine multinational presence and readiness, without permanent basing being the main driver.",
+      "plausible": "Cooperation becomes more operationally “plug-and-play”: Finland and allies develop standing exercise cycles, pre-planned reinforcement routes, and upgraded infrastructure under the DCA to shorten response times. Joint training expands in the High North and across Finland, and planning increasingly focuses on cross-domain operations (air, land, maritime, cyber, and logistics). Finland remains the framework nation for its own defence, but allied support becomes faster, more predictable, and more visible.",
+      "wildcard": "A regional escalation or major incident forces a rapid shift from exercises to sustained operational reassurance: allied units rotate through Finland more frequently, infrastructure upgrades are accelerated, and DCA arrangements are used at high tempo. Political pressure rises—domestically and internationally—over the scale of presence, rules for host-nation support, and the risk of spillover. Cooperation intensifies quickly, but so do adversary countermeasures and hybrid activity.",
+      "preposterous": "Finland becomes the primary Northern European hub for allied operations, with near-continuous multinational forces training and operating from Finnish bases under an expanded DCA framework. Exercises blur into persistent deployments, and Finland hosts a de facto “always-on” NATO presence that reshapes regional military geography. The country shifts from being a highly capable national defender to a central staging and command platform for the entire High North."
+    }
+  },
+  {
+    "driver_id": "n_olgx48kv_ozir1if",
+    "driver_name": "Russian military changes and activity relevant to the Finnish border",
+    "trends": [
+      {
+        "trend_id": "n_stkmzilk_zzb5b9g",
+        "trend_name": "TASS reported on 21 December 2022 that Defence Minister Sergei",
+        "description": "TASS reported on 21 December 2022 that Defence Minister Sergei Shoigu proposed re-establishing the Moscow and Leningrad Military Districts.",
+        "source": "https://tass.com/defense/1554071",
+        "date": "2022-12-21",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_fdabl4qd_1blj865",
+        "trend_name": "Sergei Shoigu said an army corps would be formed",
+        "description": "The Barents Observer reported that Sergei Shoigu said an army corps would be formed in Karelia.",
+        "source": "https://www.thebarentsobserver.com/security/shoigu-vows-more-troops-near-nordic-countries/163082",
+        "date": "2022-12-21",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_5n0lkr7p_ybygfzb",
+        "trend_name": "Vladimir Putin signed a decree on 26 February 2024 reestablishing",
+        "description": "The Barents Observer reported that Vladimir Putin signed a decree on 26 February 2024 reestablishing the Moscow and Leningrad military districts with changes valid from 1 March 2024.",
+        "source": "https://www.thebarentsobserver.com/security/putins-signs-northwestern-regions-into-leningrad-military-district/163619",
+        "date": "2024-03-01",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_qlf29lb8_lqu5f8e",
+        "trend_name": "Yle reported on 11 January 2025 that satellite images showed",
+        "description": "Yle reported on 11 January 2025 that satellite images showed Russian troops stationed near the Finnish border were focusing on the war in Ukraine.",
+        "source": "https://yle.fi/a/74-20135804",
+        "date": "2025-01-11",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_s8eu10ow_0sc5c37",
+        "trend_name": "Yle reported on 17 June 2025 that satellite images showed",
+        "description": "Yle reported on 17 June 2025 that satellite images showed extensive construction work at the Lupche-Savino garrison near Kandalaksha across the border from Finnish Lapland.",
+        "source": "https://yle.fi/a/74-20168262",
+        "date": "2025-06-17",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_70igrgar_ri44k4z",
+        "trend_name": "Yle reported on 20 May 2025 that the New York",
+        "description": "Yle reported on 20 May 2025 that the New York Times said Russia was building up a base along the Finnish border based on satellite imagery.",
+        "source": "https://yle.fi/a/74-20162966",
+        "date": "2025-05-20",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_u5z7cwzo_kmh30o1",
+        "trend_name": "Yle reported on 30 January 2026 that Russia was upgrading",
+        "description": "Yle reported on 30 January 2026 that Russia was upgrading a Soviet-era garrison in Petrozavodsk.",
+        "source": "https://yle.fi/a/74-20207070",
+        "date": "2026-01-30",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_6br26vjm_w8nnm4m",
+        "trend_name": "two Russian MiG-31 fighter aircraft were suspected of violating Finland’s",
+        "description": "Finland’s Ministry of Defence stated that two Russian MiG-31 fighter aircraft were suspected of violating Finland’s airspace near Porvoo on 18 August 2022.",
+        "source": "https://defmin.fi/en/-/suspected-violation-of-finnish-airspace-in-the-gulf-of-finland",
+        "date": "2022-08-18",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_gkcepuej_er05dxo",
+        "trend_name": "Finland suspected four Russian military aircraft violated Finnish airspace",
+        "description": "Reuters reported that Finland suspected four Russian military aircraft violated Finnish airspace on 10 June 2024 near Loviisa.",
+        "source": "https://www.reuters.com/world/europe/finland-suspects-four-russian-military-planes-violated-its-airspace-2024-06-14/",
+        "date": "2024-06-10",
+        "evidence": "Yes"
+      },
+      {
+        "trend_id": "n_huqamest_2c9ecug",
+        "trend_name": "Finland’s Defence Minister Antti H kk nen said on 18",
+        "description": "Yle reported that Finland’s Defence Minister Antti Häkkänen said on 18 June 2025 that there was \"nothing surprising or dramatic\" in Russia’s base buildup near the Finnish border.",
+        "source": "https://yle.fi/a/74-20168553",
+        "date": "2025-06-18",
+        "evidence": "Yes"
+      }
+    ],
+    "scenarios": {
+      "baseline": "Russia continues gradual force reorganization and infrastructure upgrades relevant to Finland’s border, while periodic air and maritime activity creates recurring alerts and occasional suspected airspace violations. Open-source reporting and satellite imagery keep highlighting incremental changes rather than a single decisive buildup. Finland responds with steady monitoring and readiness, treating the activity as long-term pressure and signalling rather than an imminent invasion indicator.",
+      "plausible": "Russia increases the tempo and clarity of its posture near the Finnish border by forming or reactivating units, improving bases and logistics, and conducting more frequent exercises and patrol patterns. Air activity becomes more assertive (though still mostly below the threshold of direct escalation), and “grey-zone” signalling—close approaches, jamming, ambiguous probing—becomes more regular. Finland and NATO adjust by tightening air policing, intelligence collection, and reinforcement planning, producing a more visibly contested security environment.",
+      "wildcard": "A sudden spike in Russian activity—such as an unexpected large-scale snap exercise, rapid redeployment from another theatre, or a serious border/air incident—creates a short-warning crisis. Miscalculation risk rises as both sides surge readiness, increase air operations, and compress decision timelines. Even if it de-escalates, the episode locks in higher long-term alert levels and accelerates Finnish/NATO posture changes.",
+      "preposterous": "Russia announces a dramatic “new northern front” posture and rapidly mass-builds major formations and permanent infrastructure opposite Finland, coupled with near-daily high-risk air activity. Finland responds by transforming the border region into a permanent high-readiness zone with constant allied presence and continuous air operations. The region becomes one of Europe’s most militarized flashpoints despite no formal outbreak of war."
+    }
+  }
+]

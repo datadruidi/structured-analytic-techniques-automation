@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circleboard — Structured Analytic Techniques</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <div class="dashboard-header-row">
+        <a href="http://localhost:3000/" target="_self" class="btn-back-to-hub" aria-label="Back to main screen" title="Back to SAT Tools hub">
+          <svg class="btn-back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+          Back to Main Screen
+        </a>
+        <div class="dashboard-header-title-wrap">
+          <h1 class="dashboard-title">Circleboarding for Structured Analysis Techniques</h1>
+          <p class="dashboard-subtitle">Drag items to reorder or into So what? to build your synthesis. Data is stored in CircleboardData.txt (and this browser); use Refresh to add new items from hypothesis_keywords.jsonl.</p>
+        </div>
+        <button type="button" id="btn-clean" class="btn-clean" aria-label="Clean all boxes (does not change files)">Clean</button>
+        <button type="button" id="btn-refresh" class="btn-refresh" aria-label="Refresh: merge new items from hypothesis_keywords.jsonl into current data">Refresh from hypothesis_keywords.jsonl</button>
+      </div>
+    </header>
+
+    <section class="categories-zone" aria-label="Category boxes">
+      <div class="category-box" data-category="who">
+        <div class="category-box-inner">
+          <h2 class="category-header">Who?</h2>
+          <p class="category-help">Who could cause the indicator?</p>
+          <div class="category-content" role="list" aria-label="Who items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="who" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide Who?">-</button>
+        <button type="button" class="btn-show" aria-label="Show Who?" >Show</button>
+      </div>
+      <div class="category-box" data-category="what">
+        <div class="category-box-inner">
+          <h2 class="category-header">What?</h2>
+          <p class="category-help">What kind of indicator could it be?</p>
+          <div class="category-content" role="list" aria-label="What items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="what" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide What?">-</button>
+        <button type="button" class="btn-show" aria-label="Show What?" >Show</button>
+      </div>
+      <div class="category-box" data-category="why">
+        <div class="category-box-inner">
+          <h2 class="category-header">Why?</h2>
+          <p class="category-help">Why is the indicator important?</p>
+          <div class="category-content" role="list" aria-label="Why items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="why" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide Why?">-</button>
+        <button type="button" class="btn-show" aria-label="Show Why?" >Show</button>
+      </div>
+      <div class="category-box" data-category="when">
+        <div class="category-box-inner">
+          <h2 class="category-header">When?</h2>
+          <p class="category-help">When would we see the indicator?</p>
+          <div class="category-content" role="list" aria-label="When items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="when" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide When?">-</button>
+        <button type="button" class="btn-show" aria-label="Show When?" >Show</button>
+      </div>
+      <div class="category-box" data-category="where">
+        <div class="category-box-inner">
+          <h2 class="category-header">Where?</h2>
+          <p class="category-help">Where would we see the indicator?</p>
+          <div class="category-content" role="list" aria-label="Where items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="where" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide Where?">-</button>
+        <button type="button" class="btn-show" aria-label="Show Where?" >Show</button>
+      </div>
+      <div class="category-box" data-category="how">
+        <div class="category-box-inner">
+          <h2 class="category-header">How?</h2>
+          <p class="category-help">How would this indicator manifest / be observed?</p>
+          <div class="category-content" role="list" aria-label="How items">
+            <div class="category-items"></div>
+          </div>
+        </div>
+        <span class="category-count" aria-hidden="true">0</span>
+        <button type="button" class="btn-add" data-add-target="how" aria-label="Add item">+</button>
+        <button type="button" class="btn-hide" aria-label="Hide How?">-</button>
+        <button type="button" class="btn-show" aria-label="Show How?" >Show</button>
+      </div>
+    </section>
+
+    <section class="so-what-zone" aria-label="So what synthesis">
+      <div class="so-what-box">
+        <div class="so-what-box-inner">
+          <h2 class="so-what-header">So what?</h2>
+          <p class="so-what-help">What do we want the indicators to tell us?</p>
+          <div class="so-what-content">
+          <div class="so-what-lanes">
+            <div class="so-what-lane" data-lane="0" data-category="who" role="list" aria-label="Who lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+            <div class="so-what-lane" data-lane="1" data-category="what" role="list" aria-label="What lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+            <div class="so-what-lane" data-lane="2" data-category="why" role="list" aria-label="Why lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+            <div class="so-what-lane" data-lane="3" data-category="when" role="list" aria-label="When lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+            <div class="so-what-lane" data-lane="4" data-category="where" role="list" aria-label="Where lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+            <div class="so-what-lane" data-lane="5" data-category="how" role="list" aria-label="How lane">
+              <div class="so-what-lane-items"></div>
+            </div>
+          </div>
+          <p class="so-what-empty-hint" aria-live="polite">Drag key indicators here to build your synthesis.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-save-hypothesis" aria-label="Save So what? items for hypothesis generation">Save for Hypothesis Generation</button>
+        <button type="button" class="btn-hide btn-hide-so-what" aria-label="Hide So what?">-</button>
+        <button type="button" class="btn-show btn-show-so-what" aria-label="Show So what?" >Show</button>
+      </div>
+    </section>
+
+    <section class="trash-zone" aria-label="Trash">
+      <div class="trash-box is-hidden">
+        <h2 class="trash-header">Trash</h2>
+        <div class="trash-box-inner">
+          <div class="trash-lanes">
+            <div class="trash-lane" data-lane="0" data-category="who" role="list" aria-label="Trash Who">
+              <div class="trash-lane-items"></div>
+            </div>
+            <div class="trash-lane" data-lane="1" data-category="what" role="list" aria-label="Trash What">
+              <div class="trash-lane-items"></div>
+            </div>
+            <div class="trash-lane" data-lane="2" data-category="why" role="list" aria-label="Trash Why">
+              <div class="trash-lane-items"></div>
+            </div>
+            <div class="trash-lane" data-lane="3" data-category="when" role="list" aria-label="Trash When">
+              <div class="trash-lane-items"></div>
+            </div>
+            <div class="trash-lane" data-lane="4" data-category="where" role="list" aria-label="Trash Where">
+              <div class="trash-lane-items"></div>
+            </div>
+            <div class="trash-lane" data-lane="5" data-category="how" role="list" aria-label="Trash How">
+              <div class="trash-lane-items"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-hide btn-hide-trash" aria-label="Hide Trash">-</button>
+        <button type="button" class="btn-show btn-show-trash" aria-label="Show Trash">Show Trash</button>
+      </div>
+    </section>
+
+    <div id="add-modal" class="add-modal" role="dialog" aria-modal="true" aria-labelledby="add-modal-title" hidden>
+      <div class="add-modal-backdrop"></div>
+      <div class="add-modal-box">
+        <h2 id="add-modal-title" class="add-modal-title"></h2>
+        <label for="add-modal-input" class="add-modal-label">New item</label>
+        <input type="text" id="add-modal-input" class="add-modal-input" placeholder="" autocomplete="off" />
+        <div class="add-modal-actions">
+          <button type="button" class="add-modal-cancel">Cancel</button>
+          <button type="button" class="add-modal-add">Add</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    window.INDICATORS_DATA = {
+      who: ["aaaaaaaaaaaaaaaa", "bbbbbbb", "bbbbbbb", "bbbbbbb"],
+      what: ["aaaaaaaaaaaaaaaa", "bbbbbbb"],
+      where: ["aaaaaaaaaaaaaaaa", "bbbbbbb"],
+      when: ["aaaaaaaaaaaaaaaa", "bbbbbbb"],
+      why: ["aaaaaaaaaaaaaaaa"],
+      how: ["aaaaaaaaaaaaaaaa"]
+    };
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

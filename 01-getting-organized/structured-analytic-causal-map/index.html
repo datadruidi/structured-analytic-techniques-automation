@@ -1,0 +1,2794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Causal Map for SAT</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1d23;
+      color: #e4e6eb;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: #252830;
+      border-bottom: 1px solid #3a3f4b;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      z-index: 100;
+    }
+    #toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    #toolbar button, .toolbar-menu-btn {
+      padding: 8px 14px;
+      border: 1px solid #4a5060;
+      background: #353a46;
+      color: #e4e6eb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #btn-file, #btn-view, #btn-filter, #btn-float {
+      width: 88px;
+      min-width: 88px;
+      box-sizing: border-box;
+    }
+    #btn-float {
+      white-space: nowrap;
+    }
+    #toolbar button:hover, .toolbar-menu-btn:hover {
+      background: #404654;
+      border-color: #5a6070;
+    }
+    .toolbar-menu-btn.primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+    .toolbar-menu-btn.primary:hover {
+      background: #3b82f6;
+    }
+    .toolbar-dropdown {
+      position: relative;
+    }
+    .toolbar-dropdown .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      min-width: 160px;
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      padding: 6px 0;
+      z-index: 110;
+    }
+    .toolbar-dropdown.open .dropdown-menu {
+      display: block;
+    }
+    .toolbar-dropdown .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: #e4e6eb;
+      text-align: left;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .toolbar-dropdown .dropdown-menu button:hover {
+      background: #353a46;
+    }
+    .toolbar-dropdown .dropdown-menu button.primary {
+      background: #2563eb;
+      color: #fff;
+    }
+    .toolbar-dropdown .dropdown-menu button.primary:hover {
+      background: #3b82f6;
+    }
+    .toolbar-dropdown .dropdown-menu button.danger {
+      color: #f87171;
+    }
+    .toolbar-dropdown .dropdown-menu button.danger:hover {
+      background: #4a2525;
+    }
+    .toolbar-dropdown .dropdown-menu .filter-levels {
+      padding: 8px 16px 12px;
+      min-width: 140px;
+    }
+    .toolbar-dropdown .dropdown-menu .filter-levels .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      cursor: pointer;
+      color: #e4e6eb;
+      font-size: 13px;
+    }
+    .toolbar-dropdown .dropdown-menu .filter-levels .filter-row:hover {
+      background: transparent;
+    }
+    .toolbar-dropdown .dropdown-menu .filter-levels input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #3d5a80;
+    }
+    .btn-keywords,
+    #toolbar .btn-keywords,
+    #btn-keywords {
+      background: #b91c1c !important;
+      color: #fff !important;
+      border-color: #991b1b !important;
+    }
+    .btn-keywords:hover,
+    #toolbar .btn-keywords:hover,
+    #btn-keywords:hover {
+      background: #dc2626 !important;
+      border-color: #b91c1b !important;
+      color: #fff !important;
+    }
+    #toolbar-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 15px;
+      font-weight: 600;
+      color: #e4e6eb;
+      pointer-events: none;
+    }
+    #toolbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+    .toolbar-btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .toolbar-btn-back svg { width: 18px; height: 18px; flex-shrink: 0; fill: currentColor; }
+    #toolbar input[type="file"] {
+      display: none;
+    }
+    #canvas-wrap {
+      position: fixed;
+      top: 48px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+    }
+    #canvas-wrap.dragging { cursor: grabbing; }
+    #canvas-wrap:not(.dragging) .node { cursor: pointer; }
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .link {
+      fill: none;
+      stroke: #5a6070;
+      stroke-width: 2;
+      marker-end: url(#arrowhead);
+      transition: stroke 0.15s;
+    }
+    .link:hover { stroke: #7a8090; }
+    .node-group {
+      cursor: grab;
+    }
+    .node-group:active {
+      cursor: grabbing;
+    }
+    .node-box {
+      stroke: #4a5060;
+      stroke-width: 2;
+      rx: 20;
+      ry: 12;
+      transition: fill 0.15s, stroke 0.15s;
+    }
+    .node-group:hover .node-box {
+      filter: brightness(1.08);
+      stroke: #5a6070;
+    }
+    .node-group.selected .node-box {
+      stroke: #2563eb;
+      stroke-width: 2.5;
+    }
+    .node-label {
+      fill: #e4e6eb;
+      font-size: 14px;
+      font-weight: 500;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+      user-select: none;
+    }
+    .node-label-wrap {
+      margin: 0;
+      padding: 6px 12px 4px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #e4e6eb;
+      line-height: 1.35;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .node-add {
+      fill: #2563eb;
+      stroke: #1d4ed8;
+      stroke-width: 1.5;
+      cursor: pointer;
+      transition: fill 0.15s;
+    }
+    .node-add:hover {
+      fill: #3b82f6;
+    }
+    .node-add-icon {
+      fill: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+    .node-edit {
+      fill: #dc2626;
+      stroke: #b91c1c;
+      stroke-width: 1.5;
+      cursor: pointer;
+      transition: fill 0.15s;
+    }
+    .node-edit:hover {
+      fill: #ef4444;
+    }
+    .node-edit-icon {
+      fill: #fff;
+      font-size: 12px;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+    .node-comment {
+      fill: #16a34a;
+      stroke: #15803d;
+      stroke-width: 1.5;
+      cursor: pointer;
+      transition: fill 0.15s;
+    }
+    .node-comment:hover {
+      fill: #22c55e;
+    }
+    .node-comment-icon {
+      fill: #fff;
+      font-size: 11px;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+    .node-button-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      font-size: 9px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .node-button-row .node-add,
+    .node-button-row .node-edit,
+    .node-button-row .node-comment {
+      pointer-events: auto;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+      flex-shrink: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    .node-button-row .node-add {
+      color: #93c5fd;
+      background: transparent;
+    }
+    .node-button-row .node-add:hover {
+      background: rgba(59, 130, 246, 0.4);
+    }
+    .node-button-row .node-edit {
+      color: #fca5a5;
+      background: transparent;
+    }
+    .node-button-row .node-edit:hover {
+      background: rgba(239, 68, 68, 0.4);
+    }
+    .node-button-row .node-comment {
+      color: #86efac;
+      background: transparent;
+    }
+    .node-button-row .node-comment:hover {
+      background: rgba(34, 197, 94, 0.4);
+    }
+    #prompt-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #prompt-overlay.visible {
+      display: flex;
+    }
+    #prompt-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #prompt-box label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #b0b4bc;
+    }
+    #prompt-box input {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #4a5060;
+      border-radius: 6px;
+      background: #1a1d23;
+      color: #e4e6eb;
+      margin-bottom: 8px;
+    }
+    #prompt-box input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    #prompt-colors {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    #prompt-colors.visible {
+      display: flex;
+    }
+    #prompt-colors .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    #prompt-colors .color-swatch:hover { transform: scale(1.1); }
+    #prompt-colors .color-swatch.selected { border-color: #e4e6eb; }
+    #prompt-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    #prompt-actions button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #prompt-change-color {
+      margin-right: auto;
+      background: #353a46;
+      color: #e4e6eb;
+      border: 1px solid #4a5060;
+    }
+    #prompt-change-color:hover { background: #404654; }
+    #prompt-cancel {
+      background: #353a46;
+      color: #e4e6eb;
+      border: 1px solid #4a5060;
+    }
+    #prompt-ok {
+      background: #2563eb;
+      color: #fff;
+    }
+    #prompt-ok:hover { background: #3b82f6; }
+    #prompt-cancel:hover { background: #404654; }
+    #side-picker-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #side-picker-overlay.visible { display: flex; }
+    #side-picker-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 280px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #side-picker-box p { margin: 0 0 16px; color: #b0b4bc; font-size: 13px; }
+    .side-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    #side-picker-box .side-btn {
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid #4a5060;
+      background: #353a46;
+      color: #e4e6eb;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #side-picker-box .side-btn:hover { background: #404654; border-color: #5a6070; }
+    #side-picker-box .side-btn.left { border-color: #3d5a80; }
+    #side-picker-box .side-btn.right { border-color: #5c7e9e; }
+    #side-picker-box .side-btn.down { border-color: #2d6a4f; }
+    #keywords-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #keywords-overlay.visible { display: flex; }
+    #keywords-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 360px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #keywords-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    #keywords-title { margin: 0; font-size: 16px; font-weight: 600; color: #e4e6eb; }
+    #keywords-close {
+      background: transparent; border: none; color: #b0b4bc; font-size: 24px;
+      line-height: 1; cursor: pointer; padding: 0 4px; border-radius: 4px;
+    }
+    #keywords-close:hover { color: #e4e6eb; background: #353a46; }
+    #keywords-hint {
+      margin: 0 0 16px; font-size: 12px; color: #9ca3af;
+    }
+    #keywords-box label {
+      display: block; margin: 12px 0 6px; font-size: 13px; color: #b0b4bc;
+    }
+    #keywords-box label:first-of-type { margin-top: 0; }
+    #keywords-box input[type="text"] {
+      width: 100%; padding: 10px 12px; font-size: 14px;
+      border: 1px solid #4a5060; border-radius: 6px;
+      background: #1a1d23; color: #e4e6eb; box-sizing: border-box;
+    }
+    #keywords-box input:focus {
+      outline: none; border-color: #2563eb;
+    }
+    .keyword-entity {
+      margin-bottom: 12px;
+    }
+    .keyword-entity > label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 13px;
+      color: #b0b4bc;
+    }
+    .keyword-entity > label:first-child { margin-top: 0; }
+    .keyword-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .keyword-row input {
+      flex: 1;
+      min-width: 0;
+    }
+    .keyword-add-row {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px dashed #4a5060;
+      border-radius: 6px;
+      background: #2a2e36;
+      color: #9ca3af;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .keyword-add-row:hover {
+      background: #353a46;
+      color: #e4e6eb;
+      border-color: #5a6070;
+    }
+    #keywords-actions {
+      display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;
+    }
+    #keywords-actions button {
+      padding: 10px 18px; font-size: 14px; border-radius: 6px;
+      cursor: pointer; border: 1px solid #4a5060;
+      background: #353a46; color: #e4e6eb;
+    }
+    #keywords-actions button.primary {
+      background: #b91c1c; border-color: #991b1b; color: #fff;
+    }
+    #keywords-actions button.primary:hover { background: #dc2626; }
+    #keywords-actions button:hover { background: #4a5060; }
+
+    #comment-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #comment-overlay.visible { display: flex; }
+    #comment-panels-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 95vw;
+      max-height: 95vh;
+      overflow: auto;
+    }
+    #comment-keywords-slot {
+      flex-shrink: 0;
+    }
+    #comment-keywords-slot:empty {
+      display: none;
+    }
+    #comment-keywords-slot .keywords-box-inline {
+      align-self: stretch;
+    }
+    #comment-actions-row {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    #comment-actions-row #comment-btn-keywords,
+    #comment-actions-row #comment-save-close {
+      flex: 0 0 auto;
+      width: 140px;
+      max-width: 140px;
+      padding: 8px 12px;
+      font-size: 13px;
+      box-sizing: border-box;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #comment-save-close {
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #2563eb;
+      background: #2563eb;
+      color: #fff;
+    }
+    #comment-save-close:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+    #comment-delete {
+      margin-right: auto;
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #991b1b;
+      background: #b91c1c;
+      color: #fff;
+      cursor: pointer;
+    }
+    #comment-delete:hover { background: #dc2626; border-color: #b91c1b; }
+    #comment-delete.hidden { display: none; }
+    #comment-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 360px;
+      max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    #comment-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    #comment-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #e4e6eb;
+    }
+    #comment-close {
+      background: transparent;
+      border: none;
+      color: #b0b4bc;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+    #comment-close:hover {
+      color: #e4e6eb;
+      background: #353a46;
+    }
+    #comment-box label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 13px;
+      color: #b0b4bc;
+    }
+    #comment-box label:first-of-type { margin-top: 0; }
+    #comment-description, #comment-source, #comment-date, #comment-time {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #4a5060;
+      border-radius: 6px;
+      background: #1a1d23;
+      color: #e4e6eb;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    #comment-description {
+      resize: vertical;
+      min-height: 80px;
+    }
+    #comment-description:focus, #comment-source:focus, #comment-date:focus, #comment-time:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    .comment-evidence-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0 0;
+      cursor: pointer;
+      font-size: 13px;
+      color: #b0b4bc;
+    }
+    .comment-evidence-row input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #3d5a80;
+      width: 18px;
+      height: 18px;
+    }
+    .comment-evidence-row span {
+      color: #e4e6eb;
+    }
+    .comment-evidence-info-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .comment-evidence-info-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: #3a3f4b;
+      color: #9ca3af;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .comment-evidence-info-btn:hover {
+      background: #4a5060;
+      color: #e4e6eb;
+    }
+    .comment-evidence-info-popover {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 8px;
+      padding: 12px 14px;
+      width: 280px;
+      max-width: min(320px, calc(100vw - 120px));
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      font-size: 12px;
+      line-height: 1.5;
+      color: #e4e6eb;
+      z-index: 10;
+    }
+    .comment-evidence-info-popover.visible {
+      display: block;
+    }
+    .comment-evidence-info-popover p {
+      margin: 0 0 6px;
+    }
+    .comment-evidence-info-popover p:last-child {
+      margin-bottom: 0;
+    }
+    .comment-evidence-info-popover strong {
+      color: #b0b4bc;
+    }
+    .comment-color-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    #comment-change-color {
+      padding: 6px 12px;
+      font-size: 13px;
+      border: 1px solid #4a5060;
+      border-radius: 6px;
+      background: #252830;
+      color: #e4e6eb;
+      cursor: pointer;
+    }
+    #comment-change-color:hover { background: #404654; }
+    #comment-colors {
+      display: none;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    #comment-colors.visible {
+      display: flex;
+    }
+    #comment-colors .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    #comment-colors .color-swatch:hover { transform: scale(1.1); }
+    #comment-colors .color-swatch.selected { border-color: #e4e6eb; }
+    #comment-btn-keywords {
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .evidence-info-tip {
+      flex-shrink: 0;
+      width: 1.3rem;
+      height: 1.3rem;
+      min-width: 1.3rem;
+      min-height: 1.3rem;
+      padding: 0;
+      margin: 0 0 0 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1;
+      color: #9ca3af;
+      background: transparent;
+      border: 1px solid #4a5060;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+    .evidence-info-tip:hover {
+      color: #e4e6eb;
+      border-color: #e4e6eb;
+    }
+    #edit-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #edit-overlay.visible { display: flex; }
+    #edit-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 320px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #edit-box label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 13px;
+      color: #b0b4bc;
+    }
+    #edit-box label:first-child { margin-top: 0; }
+    #edit-box #edit-label {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #4a5060;
+      border-radius: 6px;
+      background: #1a1d23;
+      color: #e4e6eb;
+    }
+    #edit-box #edit-label:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+    .edit-row { margin: 12px 0; }
+    #edit-change-color {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid #4a5060;
+      background: #353a46;
+      color: #e4e6eb;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #edit-change-color:hover { background: #404654; }
+    #edit-colors {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    #edit-colors.visible {
+      display: flex;
+    }
+    #edit-colors .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    #edit-colors .color-swatch:hover { transform: scale(1.1); }
+    #edit-colors .color-swatch.selected { border-color: #e4e6eb; }
+    #edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    #edit-actions button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #edit-delete {
+      background: #b91c1c;
+      color: #fff;
+      margin-right: auto;
+    }
+    #edit-delete:hover { background: #dc2626; }
+    #edit-delete.hidden { display: none; }
+    #edit-cancel {
+      background: #353a46;
+      color: #e4e6eb;
+      border: 1px solid #4a5060;
+    }
+    #edit-ok { background: #2563eb; color: #fff; }
+    #edit-ok:hover { background: #3b82f6; }
+    #edit-cancel:hover { background: #404654; }
+    .btn-delete-view {
+      background: #4a2525;
+      border-color: #6a3535;
+      color: #e4e6eb;
+    }
+    .btn-delete-view:hover { background: #5a3030; border-color: #7a4545; }
+    #confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #confirm-overlay.visible { display: flex; }
+    #confirm-box {
+      background: #252830;
+      border: 1px solid #3a3f4b;
+      border-radius: 12px;
+      padding: 24px;
+      min-width: 320px;
+      max-width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    #confirm-message {
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: #e4e6eb;
+      line-height: 1.5;
+    }
+    #confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    #confirm-actions button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    #confirm-cancel {
+      background: #353a46;
+      color: #e4e6eb;
+      border: 1px solid #4a5060;
+    }
+    #confirm-cancel:hover { background: #404654; }
+    #confirm-ok {
+      background: #b91c1c;
+      color: #fff;
+    }
+    #confirm-ok:hover { background: #dc2626; }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <div id="toolbar-left">
+      <a href="http://localhost:3000/" target="_self" class="toolbar-menu-btn toolbar-btn-back" aria-label="Back to main screen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Back to Main Screen
+      </a>
+      <div class="toolbar-dropdown" id="dropdown-file">
+        <button type="button" class="toolbar-menu-btn" id="btn-file">File</button>
+        <div class="dropdown-menu" id="menu-file">
+          <button type="button" id="btn-export">Save</button>
+          <button type="button" id="btn-download">Download Evidence</button>
+          <button type="button" id="btn-import-trigger">Import JSON</button>
+          <button type="button" id="btn-load-example">Load test-data JSON</button>
+          <button type="button" id="btn-export-sample">Download template JSON</button>
+        </div>
+      </div>
+      <div class="toolbar-dropdown" id="dropdown-view">
+        <button type="button" class="toolbar-menu-btn" id="btn-view">View</button>
+        <div class="dropdown-menu" id="menu-view">
+          <button type="button" id="btn-center-view" class="primary">Center View</button>
+          <button type="button" id="btn-delete-view" class="btn-delete-view">Reset Map</button>
+        </div>
+      </div>
+      <div class="toolbar-dropdown" id="dropdown-filter">
+        <button type="button" class="toolbar-menu-btn" id="btn-filter">Filter</button>
+        <div class="dropdown-menu" id="menu-filter">
+          <div class="filter-levels" id="filter-levels"></div>
+        </div>
+      </div>
+      <button type="button" id="btn-float" class="toolbar-menu-btn">Float OFF</button>
+    </div>
+    <div id="toolbar-title">Causal Map for Structured Analytic Techniques</div>
+    <div id="toolbar-right">
+      <button type="button" id="btn-keywords" class="toolbar-menu-btn btn-keywords">Generate Hypothesis Keywords</button>
+      <button type="button" class="evidence-info-tip" id="indicators-tip-toolbar" aria-label="Hypothesis keywords info" title="Hypothesis keywords info">?</button>
+    </div>
+    <input type="file" id="file-import" accept=".json,application/json">
+  </div>
+
+  <div id="canvas-wrap">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#5a6070" />
+        </marker>
+      </defs>
+      <g id="zoom-pan">
+        <g id="links"></g>
+        <g id="nodes"></g>
+      </g>
+    </svg>
+  </div>
+
+  <div id="prompt-overlay">
+    <div id="prompt-box">
+      <label id="prompt-label">Name the new sub-variable</label>
+      <input type="text" id="prompt-input" placeholder="Enter label..." autocomplete="off">
+      <div id="prompt-colors"></div>
+      <div id="prompt-actions">
+        <button type="button" id="prompt-change-color">Color</button>
+        <button type="button" id="prompt-cancel">Cancel</button>
+        <button type="button" id="prompt-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="side-picker-overlay">
+    <div id="side-picker-box">
+      <p>Place new first-level node on which side?</p>
+      <div class="side-buttons">
+        <button type="button" class="side-btn left" data-side="left">Left</button>
+        <button type="button" class="side-btn right" data-side="right">Right</button>
+        <button type="button" class="side-btn down" data-side="down">Down</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="keywords-overlay">
+    <div id="keywords-box">
+      <div id="keywords-header">
+        <h2 id="keywords-title">Create Keywords</h2>
+        <button type="button" id="keywords-close" aria-label="Close">×</button>
+      </div>
+      <p id="keywords-hint">Fill one or more fields (comma-separated for multiple). Not all are required.</p>
+      <div class="keyword-entity" data-entity="What">
+        <label>What?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="What kind of indicator could it be?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div class="keyword-entity" data-entity="Who">
+        <label>Who?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="Who could cause the indicator?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div class="keyword-entity" data-entity="When">
+        <label>When?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="When would we see the indicator?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div class="keyword-entity" data-entity="Where">
+        <label>Where?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="Where would we see the indicator?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div class="keyword-entity" data-entity="Why">
+        <label>Why?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="Why is the indicator important?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div class="keyword-entity" data-entity="How">
+        <label>How?</label>
+        <div class="keyword-rows">
+          <div class="keyword-row"><input type="text" placeholder="How would this indicator manifest / be observed?"><button type="button" class="keyword-add-row" aria-label="Add row">+</button></div>
+        </div>
+      </div>
+      <div id="keywords-actions">
+        <button type="button" id="keywords-create" class="primary">Create Keywords</button>
+        <button type="button" id="keywords-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="comment-overlay">
+    <div id="comment-panels-wrapper">
+      <div id="comment-box">
+        <div id="comment-header">
+          <h2 id="comment-title">Comment</h2>
+          <button type="button" id="comment-close" aria-label="Close">×</button>
+        </div>
+        <label for="comment-description">Description</label>
+        <textarea id="comment-description" rows="4" placeholder="Optional description..."></textarea>
+        <label for="comment-source">Source</label>
+        <input type="text" id="comment-source" placeholder="Optional source URL or reference...">
+        <label for="comment-date">Date</label>
+        <input type="text" id="comment-date" placeholder="YYYY-MM-DD">
+        <label for="comment-time">Time</label>
+        <input type="text" id="comment-time" placeholder="HH:MM">
+        <div class="comment-evidence-row">
+          <label class="comment-evidence-info-wrap" for="comment-evidence">
+            <input type="checkbox" id="comment-evidence" aria-describedby="comment-evidence-desc">
+            <span id="comment-evidence-desc">Use as Evidence?</span>
+          </label>
+          <span style="position: relative;">
+            <button type="button" class="comment-evidence-info-btn" id="comment-evidence-info-btn" aria-label="Information about Use as Evidence" aria-expanded="false" aria-controls="comment-evidence-info-popover">i</button>
+            <div id="comment-evidence-info-popover" class="comment-evidence-info-popover" role="tooltip" aria-hidden="true">
+              <p>If this is checked, the event will appear as <strong>evidence</strong> in the later analysis phase.</p>
+              <p>It is recommended to tag events that have a source, although it is not mandatory.</p>
+            </div>
+          </span>
+        </div>
+        <div class="comment-color-row">
+          <button type="button" id="comment-change-color">Change Color</button>
+          <div id="comment-colors"></div>
+        </div>
+        <div id="comment-actions-row">
+          <button type="button" id="comment-delete" class="comment-delete">Delete</button>
+          <button type="button" id="comment-btn-keywords" class="btn-keywords">Generate Keywords</button>
+          <button type="button" class="evidence-info-tip" id="indicators-tip-comment" aria-label="Hypothesis keywords info" title="Hypothesis keywords info">?</button>
+          <button type="button" id="comment-save-close" class="comment-save-close">Save</button>
+        </div>
+      </div>
+      <div id="comment-keywords-slot"></div>
+    </div>
+  </div>
+
+  <div id="confirm-overlay">
+    <div id="confirm-box">
+      <p id="confirm-message">Are you sure? This will remove everything and reset the map to the default.</p>
+      <div id="confirm-actions">
+        <button type="button" id="confirm-cancel">Cancel</button>
+        <button type="button" id="confirm-ok">Reset Map</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-overlay">
+    <div id="edit-box">
+      <label>Label</label>
+      <input type="text" id="edit-label" placeholder="Node label..." autocomplete="off">
+      <div class="edit-row">
+        <button type="button" id="edit-change-color">Change Color</button>
+        <div id="edit-colors"></div>
+      </div>
+      <div id="edit-actions">
+        <button type="button" id="edit-delete" class="edit-delete">Delete</button>
+        <button type="button" id="edit-cancel">Cancel</button>
+        <button type="button" id="edit-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  const NODE_MIN_WIDTH = 160;
+  const NODE_MAX_WIDTH = 380;
+  const NODE_WIDTH = 160;
+  const NODE_HEIGHT = 48;
+  const MIN_GAP = 28;
+  const EDGE_CLEARANCE = 24;
+
+  const NODE_COLORS = [
+    '#2d3142', '#3d5a80', '#2d6a4f', '#5c4d7d', '#8b5a2b',
+    '#6a4c93', '#b5651d', '#457b9d', '#2a9d8f', '#e76f51',
+    '#6c757d', '#40916c'
+  ];
+
+  const FORCE_REPULSE = 26000;
+  const FORCE_LINK_IDEAL = 140;
+  const FORCE_LINK_STRENGTH = 0.08;
+  const FORCE_CENTER = 0.02;
+  const FORCE_ITERATIONS = 120;
+  const DAMPING = 0.85;
+
+  const SIDES = ['left', 'right', 'down'];
+
+  function getNodeName(node) {
+    return node.name != null ? node.name : (node.label != null ? node.label : 'Unnamed');
+  }
+
+  function generateId() {
+    return 'n_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9);
+  }
+
+  function createNode(name, children = [], side, depth = 0) {
+    const node = {
+      id: generateId(),
+      name: name || 'Unnamed',
+      depth: depth,
+      evidence: '',
+      children: Array.isArray(children) ? children : []
+    };
+    if (side && SIDES.includes(side)) node.side = side;
+    return node;
+  }
+
+  const NODE_TEXT_PADDING_X = 12;
+  const NODE_TEXT_PADDING_TOP = 6;
+  const NODE_BUTTON_ROW_HEIGHT = 26;
+  let nodeSizeMeasurer = null;
+
+  function getNodeSize(node) {
+    if (!nodeSizeMeasurer) {
+      nodeSizeMeasurer = document.createElement('div');
+      nodeSizeMeasurer.style.cssText = 'position:fixed;left:-9999px;top:0;visibility:hidden;white-space:normal;word-wrap:break-word;word-break:break-word;font-size:14px;font-weight:500;line-height:1.35;font-family:inherit;padding:0;margin:0;';
+      document.body.appendChild(nodeSizeMeasurer);
+    }
+    const maxContentWidth = NODE_MAX_WIDTH - 2 * NODE_TEXT_PADDING_X;
+    nodeSizeMeasurer.style.maxWidth = maxContentWidth + 'px';
+    nodeSizeMeasurer.style.width = 'max-content';
+    nodeSizeMeasurer.textContent = getNodeName(node) || 'Unnamed';
+    const naturalW = nodeSizeMeasurer.offsetWidth;
+    const naturalH = nodeSizeMeasurer.offsetHeight;
+    nodeSizeMeasurer.style.width = maxContentWidth + 'px';
+    const wrappedW = nodeSizeMeasurer.offsetWidth;
+    const wrappedH = nodeSizeMeasurer.offsetHeight;
+    const contentW = naturalW <= maxContentWidth ? naturalW : wrappedW;
+    const contentH = naturalW <= maxContentWidth ? naturalH : wrappedH;
+    const w = Math.max(NODE_MIN_WIDTH, Math.min(NODE_MAX_WIDTH, contentW + 2 * NODE_TEXT_PADDING_X));
+    const textH = contentH + NODE_TEXT_PADDING_TOP + 4;
+    const h = Math.max(NODE_HEIGHT, textH + NODE_BUTTON_ROW_HEIGHT);
+    return { w, h };
+  }
+
+  function getNodeWidth(node) {
+    return getNodeSize(node).w;
+  }
+
+  const defaultRoot = createNode('Main category', [], undefined, 0);
+
+  const TREE_STORAGE_KEY = 'osamuuttuja_tree';
+
+  let tree = JSON.parse(JSON.stringify(defaultRoot));
+  let selectedNodeId = null;
+  let visibleDepths = null;
+  let nodePositions = new Map();
+  let lastNodeWidths = new Map();
+  let lastNodeHeights = new Map();
+  let simPositions = new Map();
+  let simVelocities = new Map();
+  let nodeElements = new Map();
+  let linkElements = [];
+  let animationId = null;
+  let draggingNodeId = null;
+  let dragNode = null;
+  let dragG = null;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let dragMouseStartX = 0;
+  let dragMouseStartY = 0;
+  let lastDragX = 0;
+  let lastDragY = 0;
+  let didDrag = false;
+  let justDragged = false;
+  let floatMode = false;
+  let dragReturnX = 0;
+  let dragReturnY = 0;
+
+  const zoomPan = document.getElementById('zoom-pan');
+  const linksG = document.getElementById('links');
+  const nodesG = document.getElementById('nodes');
+  const wrap = document.getElementById('canvas-wrap');
+  const svg = document.getElementById('svg');
+
+  const VIEW_STORAGE_KEY = 'osamuuttuja_view';
+  let transform = { x: 0, y: 0, k: 1 };
+  let isPanning = false;
+  let panStart = { x: 0, y: 0 };
+
+  function applyTransform() {
+    zoomPan.setAttribute('transform', `translate(${transform.x},${transform.y}) scale(${transform.k})`);
+  }
+
+  function saveView() {
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, JSON.stringify({ x: transform.x, y: transform.y, k: transform.k }));
+    } catch (_) {}
+  }
+
+  function restoreView() {
+    try {
+      const s = localStorage.getItem(VIEW_STORAGE_KEY);
+      if (!s) return false;
+      const t = JSON.parse(s);
+      if (typeof t.x !== 'number' || typeof t.y !== 'number' || typeof t.k !== 'number') return false;
+      transform.x = t.x;
+      transform.y = t.y;
+      transform.k = Math.max(0.2, Math.min(3, t.k));
+      applyTransform();
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function getTreeBounds() {
+    if (nodePositions.size === 0) return { x: 0, y: 0, w: 400, h: 300 };
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    nodePositions.forEach((pos, id) => {
+      const halfW = (lastNodeWidths.get(id) ?? NODE_WIDTH) / 2;
+      const halfH = NODE_HEIGHT / 2;
+      minX = Math.min(minX, pos.x - halfW - EDGE_CLEARANCE);
+      maxX = Math.max(maxX, pos.x + halfW + EDGE_CLEARANCE);
+      minY = Math.min(minY, pos.y - halfH - EDGE_CLEARANCE);
+      maxY = Math.max(maxY, pos.y + halfH + EDGE_CLEARANCE);
+    });
+    return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+  }
+
+  function fitToScreen() {
+    const bounds = getTreeBounds();
+    const padding = 60;
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    const scale = Math.min((w - padding * 2) / bounds.w, (h - padding * 2) / bounds.h, 1.5);
+    transform.k = Math.max(0.3, scale);
+    transform.x = w / 2 - (bounds.x + bounds.w / 2) * transform.k;
+    transform.y = h / 2 - (bounds.y + bounds.h / 2) * transform.k;
+    applyTransform();
+    saveView();
+  }
+
+  function screenToGraph(screenX, screenY) {
+    const rect = wrap.getBoundingClientRect();
+    const sx = screenX - rect.left;
+    const sy = screenY - rect.top;
+    return { x: (sx - transform.x) / transform.k, y: (sy - transform.y) / transform.k };
+  }
+
+  wrap.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.node-group') && !e.target.closest('.node-add') && !e.target.closest('.node-edit') && !e.target.closest('.node-comment')) return;
+    isPanning = true;
+    panStart = { x: e.clientX - transform.x, y: e.clientY - transform.y };
+  });
+  wrap.addEventListener('mousemove', (e) => {
+    if (!isPanning) return;
+    transform.x = e.clientX - panStart.x;
+    transform.y = e.clientY - panStart.y;
+    applyTransform();
+  });
+  wrap.addEventListener('mouseup', () => {
+    if (isPanning) saveView();
+    isPanning = false;
+  });
+  wrap.addEventListener('mouseleave', () => {
+    if (isPanning) saveView();
+    isPanning = false;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!draggingNodeId || !dragG) return;
+    didDrag = true;
+    const gm = screenToGraph(e.clientX, e.clientY);
+    lastDragX = dragStartX + (gm.x - dragMouseStartX);
+    lastDragY = dragStartY + (gm.y - dragMouseStartY);
+    simPositions.set(draggingNodeId, { x: lastDragX, y: lastDragY });
+    dragG.setAttribute('transform', `translate(${lastDragX},${lastDragY})`);
+    updatePositions();
+  });
+  document.addEventListener('mouseup', (e) => {
+    if (!draggingNodeId || !dragNode) return;
+    justDragged = didDrag;
+    if (didDrag && dragNode) {
+      if (floatMode) {
+        simPositions.set(draggingNodeId, { x: dragReturnX, y: dragReturnY });
+        simVelocities.set(draggingNodeId, { vx: 0, vy: 0 });
+        updatePositions();
+      } else {
+        dragNode.x = lastDragX;
+        dragNode.y = lastDragY;
+        simPositions.set(draggingNodeId, { x: lastDragX, y: lastDragY });
+        simVelocities.set(draggingNodeId, { vx: 0, vy: 0 });
+        saveTree();
+      }
+    }
+    draggingNodeId = null;
+    dragNode = null;
+    dragG = null;
+    didDrag = false;
+  });
+
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newK = Math.max(0.2, Math.min(3, transform.k * scaleFactor));
+    const rect = wrap.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const wx = (cx - transform.x) / transform.k;
+    const wy = (cy - transform.y) / transform.k;
+    transform.k = newK;
+    transform.x = cx - wx * transform.k;
+    transform.y = cy - wy * transform.k;
+    applyTransform();
+    saveView();
+  }, { passive: false });
+
+  if (wrap.classList) {
+    wrap.addEventListener('mousedown', () => wrap.classList.add('dragging'));
+    wrap.addEventListener('mouseup', () => wrap.classList.remove('dragging'));
+    wrap.addEventListener('mouseleave', () => wrap.classList.remove('dragging'));
+  }
+
+  function collectNodesAndEdges(node, list, edges, depth) {
+    list.push({ id: node.id, node, isRoot: depth === 0 });
+    node.children.forEach((child) => {
+      edges.push({ sourceId: node.id, targetId: child.id });
+      collectNodesAndEdges(child, list, edges, depth + 1);
+    });
+  }
+
+  function getDepthsInTree(node, set) {
+    const d = node.depth ?? 0;
+    set.add(d);
+    node.children.forEach((c) => getDepthsInTree(c, set));
+  }
+
+  function isDepthVisible(depth) {
+    if (visibleDepths === null) return true;
+    return visibleDepths.has(depth);
+  }
+
+  function clampToBox(px, py, cx, cy, halfW, halfH) {
+    halfW = halfW ?? NODE_WIDTH / 2;
+    halfH = halfH ?? NODE_HEIGHT / 2;
+    const dx = cx - px;
+    const dy = cy - py;
+    if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) return { x: px + (dx >= 0 ? halfW : -halfW), y: py };
+    const tx = Math.abs(dx) > 1e-6 ? halfW / Math.abs(dx) : 1;
+    const ty = Math.abs(dy) > 1e-6 ? halfH / Math.abs(dy) : 1;
+    const t = Math.min(tx, ty, 1);
+    return { x: px + dx * t, y: py + dy * t };
+  }
+
+  function runForcesStep(nodes, edges) {
+    const forces = new Map();
+    nodes.forEach((n) => forces.set(n.id, { fx: 0, fy: 0 }));
+    nodes.forEach((a) => {
+      const pa = simPositions.get(a.id);
+      if (!pa) return;
+      if (a.id === draggingNodeId) return;
+      nodes.forEach((b) => {
+        if (a.id === b.id) return;
+        const pb = simPositions.get(b.id);
+        if (!pb) return;
+        const dx = pa.x - pb.x;
+        const dy = pa.y - pb.y;
+        let d = Math.sqrt(dx * dx + dy * dy) || 0.1;
+        d = Math.max(d, 18);
+        const f = FORCE_REPULSE / (d * d);
+        const fa = forces.get(a.id);
+        fa.fx += (f * dx) / d;
+        fa.fy += (f * dy) / d;
+      });
+    });
+    edges.forEach((e) => {
+      const pa = simPositions.get(e.sourceId);
+      const pb = simPositions.get(e.targetId);
+      if (!pa || !pb) return;
+      const dx = pb.x - pa.x;
+      const dy = pb.y - pa.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 0.1;
+      const stretch = d - FORCE_LINK_IDEAL;
+      const f = stretch * FORCE_LINK_STRENGTH;
+      const fx = (f * dx) / d;
+      const fy = (f * dy) / d;
+      if (e.sourceId !== draggingNodeId) {
+        const fa = forces.get(e.sourceId);
+        fa.fx += fx;
+        fa.fy += fy;
+      }
+      if (e.targetId !== draggingNodeId) {
+        const fb = forces.get(e.targetId);
+        fb.fx -= fx;
+        fb.fy -= fy;
+      }
+    });
+    nodes.forEach((n) => {
+      if (n.id === draggingNodeId) return;
+      const p = simPositions.get(n.id);
+      const v = simVelocities.get(n.id);
+      if (!p || !v) return;
+      const fa = forces.get(n.id);
+      v.vx = (v.vx + fa.fx) * DAMPING - p.x * FORCE_CENTER * 0.01;
+      v.vy = (v.vy + fa.fy) * DAMPING - p.y * FORCE_CENTER * 0.01;
+      p.x += v.vx;
+      p.y += v.vy;
+    });
+  }
+
+  function initSimFromLayout() {
+    nodePositions.forEach((pos, id) => {
+      simPositions.set(id, { x: pos.x, y: pos.y });
+      simVelocities.set(id, { vx: 0, vy: 0 });
+    });
+  }
+
+  function runForces(nodes, edges, positions, rootId) {
+    const pos = new Map();
+    nodes.forEach((n) => {
+      const p = positions.get(n.id) || { x: 0, y: 0 };
+      const hasCustomPos = n.node.x != null && n.node.y != null;
+      pos.set(n.id, { x: p.x, y: p.y, vx: 0, vy: 0, fixed: n.id === rootId || hasCustomPos });
+    });
+    for (let iter = 0; iter < FORCE_ITERATIONS; iter++) {
+      const forces = new Map();
+      nodes.forEach((n) => forces.set(n.id, { fx: 0, fy: 0 }));
+      nodes.forEach((a) => {
+        const pa = pos.get(a.id);
+        if (pa.fixed) return;
+        nodes.forEach((b) => {
+          if (a.id === b.id) return;
+          const pb = pos.get(b.id);
+          const dx = pa.x - pb.x;
+          const dy = pa.y - pb.y;
+          let d = Math.sqrt(dx * dx + dy * dy) || 0.1;
+          d = Math.max(d, 18);
+          const f = FORCE_REPULSE / (d * d);
+          const fx = (f * dx) / d;
+          const fy = (f * dy) / d;
+          const fa = forces.get(a.id);
+          fa.fx += fx;
+          fa.fy += fy;
+        });
+      });
+      edges.forEach((e) => {
+        const pa = pos.get(e.sourceId);
+        const pb = pos.get(e.targetId);
+        if (!pa || !pb) return;
+        const dx = pb.x - pa.x;
+        const dy = pb.y - pa.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 0.1;
+        const stretch = d - FORCE_LINK_IDEAL;
+        const f = stretch * FORCE_LINK_STRENGTH;
+        const fx = (f * dx) / d;
+        const fy = (f * dy) / d;
+        if (!pa.fixed) {
+          const fa = forces.get(e.sourceId);
+          fa.fx += fx;
+          fa.fy += fy;
+        }
+        if (!pb.fixed) {
+          const fb = forces.get(e.targetId);
+          fb.fx -= fx;
+          fb.fy -= fy;
+        }
+      });
+      nodes.forEach((n) => {
+        const p = pos.get(n.id);
+        if (p.fixed) {
+          p.vx = 0;
+          p.vy = 0;
+          return;
+        }
+        const centerPull = FORCE_CENTER;
+        p.vx = (p.vx + forces.get(n.id).fx) * DAMPING - p.x * centerPull * 0.01;
+        p.vy = (p.vy + forces.get(n.id).fy) * DAMPING - p.y * centerPull * 0.01;
+        p.x += p.vx;
+        p.y += p.vy;
+      });
+    }
+    pos.forEach((p, id) => nodePositions.set(id, { x: p.x, y: p.y }));
+  }
+
+  function computeLayout() {
+    nodePositions.clear();
+    const root = tree;
+    const nodes = [];
+    const edges = [];
+    collectNodesAndEdges(root, nodes, edges, 0);
+    nodePositions.set(root.id, { x: 0, y: 0 });
+    const radius = 180;
+    nodes.forEach((n, i) => {
+      if (n.id === root.id) return;
+      if (n.node.x != null && n.node.y != null) {
+        nodePositions.set(n.id, { x: n.node.x, y: n.node.y });
+      } else {
+        const angle = (i / Math.max(nodes.length - 1, 1)) * Math.PI * 2 * 0.9 + 0.1;
+        nodePositions.set(n.id, { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
+      }
+    });
+    runForces(nodes, edges, nodePositions, root.id);
+    nodes.forEach((n) => {
+      if (n.node.x != null && n.node.y != null) {
+        nodePositions.set(n.id, { x: n.node.x, y: n.node.y });
+      }
+    });
+  }
+
+  function renderLink(parentPos, childPos, parentW, childW, parentH, childH) {
+    const hwP = (parentW ?? NODE_WIDTH) / 2;
+    const hwC = (childW ?? NODE_WIDTH) / 2;
+    const hhP = (parentH ?? NODE_HEIGHT) / 2;
+    const hhC = (childH ?? NODE_HEIGHT) / 2;
+    const pad = 4;
+    const start = clampToBox(parentPos.x, parentPos.y, childPos.x, childPos.y, hwP, hhP);
+    const end = clampToBox(childPos.x, childPos.y, parentPos.x, parentPos.y, hwC, hhC);
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
+    const inset = Math.min(pad, dist / 2);
+    const s = { x: start.x + (dx / dist) * inset, y: start.y + (dy / dist) * inset };
+    const e = { x: end.x - (dx / dist) * inset, y: end.y - (dy / dist) * inset };
+    return `M ${s.x} ${s.y} L ${e.x} ${e.y}`;
+  }
+
+  function buildNodeWidths(node, map) {
+    map.set(node.id, getNodeWidth(node));
+    node.children.forEach((c) => buildNodeWidths(c, map));
+  }
+
+  function buildNodeHeights(node, map) {
+    map.set(node.id, getNodeSize(node).h);
+    node.children.forEach((c) => buildNodeHeights(c, map));
+  }
+
+  function updatePositions() {
+    simPositions.forEach((pos, id) => {
+      nodePositions.set(id, { x: pos.x, y: pos.y });
+      if (!floatMode) {
+        const node = findNode(tree, id);
+        if (node) { node.x = pos.x; node.y = pos.y; }
+      }
+    });
+    nodeElements.forEach((g, id) => {
+      const pos = nodePositions.get(id) || simPositions.get(id);
+      if (pos) g.setAttribute('transform', `translate(${pos.x},${pos.y})`);
+    });
+    const nodeWidths = new Map();
+    const nodeHeights = new Map();
+    buildNodeWidths(tree, nodeWidths);
+    buildNodeHeights(tree, nodeHeights);
+    linkElements.forEach(({ pathEl, sourceId, targetId }) => {
+      const ppos = nodePositions.get(sourceId) || simPositions.get(sourceId);
+      const cpos = nodePositions.get(targetId) || simPositions.get(targetId);
+      if (!ppos || !cpos) return;
+      const pnode = findNode(tree, sourceId);
+      const cnode = findNode(tree, targetId);
+      const pw = nodeWidths.get(sourceId) ?? (pnode ? getNodeWidth(pnode) : NODE_WIDTH);
+      const cw = nodeWidths.get(targetId) ?? (cnode ? getNodeWidth(cnode) : NODE_WIDTH);
+      const ph = nodeHeights.get(sourceId) ?? (pnode ? getNodeSize(pnode).h : NODE_HEIGHT);
+      const ch = nodeHeights.get(targetId) ?? (cnode ? getNodeSize(cnode).h : NODE_HEIGHT);
+      pathEl.setAttribute('d', renderLink(ppos, cpos, pw, cw, ph, ch));
+    });
+  }
+
+  function render(fullBuild) {
+    if (fullBuild !== false) {
+      computeLayout();
+      initSimFromLayout();
+    }
+    const nodeWidths = new Map();
+    const nodeHeights = new Map();
+    buildNodeWidths(tree, nodeWidths);
+    buildNodeHeights(tree, nodeHeights);
+    lastNodeWidths = nodeWidths;
+    lastNodeHeights = nodeHeights;
+
+    linksG.innerHTML = '';
+    nodesG.innerHTML = '';
+    nodeElements.clear();
+    linkElements = [];
+
+    function addLinks(node) {
+      if (!isDepthVisible(node.depth ?? 0)) return;
+      const pos = nodePositions.get(node.id);
+      if (!pos) return;
+      const pw = nodeWidths.get(node.id);
+      const ph = nodeHeights.get(node.id);
+      node.children.forEach((child) => {
+        if (!isDepthVisible(child.depth ?? 0)) return;
+        const cpos = nodePositions.get(child.id);
+        if (!cpos) return;
+        const cw = nodeWidths.get(child.id);
+        const ch = nodeHeights.get(child.id);
+        const path = renderLink(pos, cpos, pw, cw, ph, ch);
+        const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        el.setAttribute('class', 'link');
+        el.setAttribute('d', path);
+        linksG.appendChild(el);
+        linkElements.push({ pathEl: el, sourceId: node.id, targetId: child.id });
+        addLinks(child);
+      });
+    }
+    addLinks(tree);
+
+    function addNodeEl(node) {
+      if (isDepthVisible(node.depth ?? 0)) {
+        const pos = nodePositions.get(node.id);
+        if (pos) {
+      const size = getNodeSize(node);
+      const w = size.w;
+      const h = size.h;
+      const hw = w / 2;
+      const hh = h / 2;
+      const boxFill = node.color || '#2d3142';
+
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('class', 'node-group' + (selectedNodeId === node.id ? ' selected' : ''));
+      g.setAttribute('data-id', node.id);
+      g.setAttribute('transform', `translate(${pos.x},${pos.y})`);
+
+      const box = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      box.setAttribute('class', 'node-box');
+      box.setAttribute('x', -hw);
+      box.setAttribute('y', -hh);
+      box.setAttribute('width', w);
+      box.setAttribute('height', h);
+      box.setAttribute('fill', boxFill);
+      box.style.setProperty('fill', boxFill);
+
+      const textAreaHeight = h - NODE_BUTTON_ROW_HEIGHT;
+      const buttonRowY = hh - NODE_BUTTON_ROW_HEIGHT;
+
+      const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      fo.setAttribute('x', -hw);
+      fo.setAttribute('y', -hh);
+      fo.setAttribute('width', w);
+      fo.setAttribute('height', textAreaHeight);
+      fo.setAttribute('class', 'node-label-fo');
+      const labelDiv = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+      labelDiv.setAttribute('class', 'node-label-wrap');
+      labelDiv.textContent = getNodeName(node);
+
+      const buttonRowFo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      buttonRowFo.setAttribute('x', -hw);
+      buttonRowFo.setAttribute('y', buttonRowY);
+      buttonRowFo.setAttribute('width', w);
+      buttonRowFo.setAttribute('height', NODE_BUTTON_ROW_HEIGHT);
+      const buttonRowDiv = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+      buttonRowDiv.setAttribute('class', 'node-button-row');
+
+      const addBtn = document.createElementNS('http://www.w3.org/1999/xhtml', 'span');
+      addBtn.setAttribute('class', 'node-add');
+      addBtn.setAttribute('data-id', node.id);
+      addBtn.textContent = 'Add node';
+
+      const editBtn = document.createElementNS('http://www.w3.org/1999/xhtml', 'span');
+      editBtn.setAttribute('class', 'node-edit');
+      editBtn.setAttribute('data-id', node.id);
+      editBtn.textContent = 'Rename';
+
+      const commentBtn = document.createElementNS('http://www.w3.org/1999/xhtml', 'span');
+      commentBtn.setAttribute('class', 'node-comment');
+      commentBtn.setAttribute('data-id', node.id);
+      commentBtn.textContent = 'Comment';
+
+      buttonRowDiv.appendChild(addBtn);
+      buttonRowDiv.appendChild(editBtn);
+      buttonRowDiv.appendChild(commentBtn);
+      buttonRowFo.appendChild(buttonRowDiv);
+
+      fo.appendChild(labelDiv);
+      g.appendChild(box);
+      g.appendChild(fo);
+      g.appendChild(buttonRowFo);
+
+      g.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('node-add') || e.target.classList.contains('node-add-icon') || e.target.closest('.node-add')) return;
+        if (e.target.classList.contains('node-edit') || e.target.classList.contains('node-edit-icon') || e.target.closest('.node-edit')) return;
+        if (e.target.classList.contains('node-comment') || e.target.classList.contains('node-comment-icon') || e.target.closest('.node-comment')) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const current = simPositions.get(node.id) || nodePositions.get(node.id) || pos;
+        const gm = screenToGraph(e.clientX, e.clientY);
+        draggingNodeId = node.id;
+        dragNode = node;
+        dragG = g;
+        dragStartX = current.x;
+        dragStartY = current.y;
+        dragMouseStartX = gm.x;
+        dragMouseStartY = gm.y;
+        lastDragX = current.x;
+        lastDragY = current.y;
+        didDrag = false;
+        if (floatMode) {
+          dragReturnX = current.x;
+          dragReturnY = current.y;
+        }
+      });
+      g.addEventListener('click', (e) => {
+        if (justDragged) { justDragged = false; return; }
+        if (e.target.classList.contains('node-add') || e.target.classList.contains('node-add-icon') || e.target.closest('.node-add')) return;
+        if (e.target.classList.contains('node-edit') || e.target.classList.contains('node-edit-icon') || e.target.closest('.node-edit')) return;
+        if (e.target.classList.contains('node-comment') || e.target.classList.contains('node-comment-icon') || e.target.closest('.node-comment')) return;
+        selectedNodeId = node.id;
+        render();
+      });
+      g.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.node-add') || e.target.closest('.node-edit') || e.target.closest('.node-comment')) return;
+        e.stopPropagation();
+        openEditNode(node);
+      });
+
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openPromptWithColor('Name the new sub-variable', NODE_COLORS[0], (name, color) => {
+          const child = createNode(name.trim() || 'Unnamed', [], undefined, (node.depth ?? 0) + 1);
+          child.color = color;
+          if (node.id === tree.id) child.side = 'down';
+          node.children.push(child);
+          saveTree();
+          render();
+        });
+      });
+
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openEditNode(node);
+      });
+
+      commentBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCommentPopup(node);
+      });
+
+      nodeElements.set(node.id, g);
+      nodesG.appendChild(g);
+        }
+      }
+      node.children.forEach((child) => addNodeEl(child));
+    }
+    addNodeEl(tree);
+    if (fullBuild !== false) {
+      simNodes = [];
+      simEdges = [];
+      collectNodesAndEdges(tree, simNodes, simEdges, 0);
+    }
+  }
+
+  let simNodes = [];
+  let simEdges = [];
+  function tick() {
+    if (!floatMode) {
+      animationId = null;
+      return;
+    }
+    if (simNodes.length === 0) {
+      const nodes = [];
+      const edges = [];
+      collectNodesAndEdges(tree, nodes, edges, 0);
+      simNodes = nodes;
+      simEdges = edges;
+    }
+    for (let i = 0; i < 3; i++) runForcesStep(simNodes, simEdges);
+    if (draggingNodeId) {
+      const pos = simPositions.get(draggingNodeId);
+      if (pos) {
+        pos.x = lastDragX;
+        pos.y = lastDragY;
+      }
+      simVelocities.set(draggingNodeId, { vx: 0, vy: 0 });
+    }
+    updatePositions();
+    animationId = requestAnimationFrame(tick);
+  }
+  function syncSimFromTree() {
+    function walk(n) {
+      if (n.x != null && n.y != null) {
+        simPositions.set(n.id, { x: n.x, y: n.y });
+        simVelocities.set(n.id, { vx: 0, vy: 0 });
+      }
+      n.children.forEach(walk);
+    }
+    walk(tree);
+  }
+  function startSimulation() {
+    if (animationId != null) return;
+    syncSimFromTree();
+    const nodes = [];
+    const edges = [];
+    collectNodesAndEdges(tree, nodes, edges, 0);
+    simNodes = nodes;
+    simEdges = edges;
+    tick();
+  }
+  function stopSimulation() {
+    if (animationId != null) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    syncSimFromTree();
+    updatePositions();
+  }
+
+  const overlay = document.getElementById('prompt-overlay');
+  const promptInput = document.getElementById('prompt-input');
+  const promptLabel = document.getElementById('prompt-label');
+  const promptColorsEl = document.getElementById('prompt-colors');
+  const promptChangeColorBtn = document.getElementById('prompt-change-color');
+
+  function openPrompt(labelText, initialValue, onOk) {
+    promptLabel.textContent = labelText;
+    promptInput.value = initialValue;
+    promptChangeColorBtn.style.display = 'none';
+    promptColorsEl.classList.remove('visible');
+    promptColorsEl.innerHTML = '';
+    overlay.classList.add('visible');
+    promptInput.focus();
+    promptInput.select();
+
+    function finish(ok) {
+      overlay.classList.remove('visible');
+      if (ok) onOk(promptInput.value);
+      promptInput.value = '';
+    }
+
+    document.getElementById('prompt-ok').onclick = () => finish(true);
+    document.getElementById('prompt-cancel').onclick = () => finish(false);
+    promptInput.onkeydown = (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    };
+  }
+
+  function openPromptWithColor(labelText, initialColor, onOk) {
+    promptLabel.textContent = labelText;
+    promptInput.value = '';
+    let chosenColor = initialColor || NODE_COLORS[0];
+    promptChangeColorBtn.style.display = 'block';
+    promptColorsEl.innerHTML = '';
+    promptColorsEl.classList.remove('visible');
+    NODE_COLORS.forEach((hex) => {
+      const swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'color-swatch' + (hex === chosenColor ? ' selected' : '');
+      swatch.style.background = hex;
+      swatch.dataset.color = hex;
+      swatch.addEventListener('click', () => {
+        promptColorsEl.querySelectorAll('.color-swatch').forEach((s) => s.classList.remove('selected'));
+        swatch.classList.add('selected');
+        chosenColor = hex;
+      });
+      promptColorsEl.appendChild(swatch);
+    });
+    overlay.classList.add('visible');
+    promptInput.focus();
+
+    function finish(ok) {
+      overlay.classList.remove('visible');
+      if (ok) onOk(promptInput.value, chosenColor);
+      promptInput.value = '';
+    }
+
+    document.getElementById('prompt-ok').onclick = () => finish(true);
+    document.getElementById('prompt-cancel').onclick = () => finish(false);
+    promptChangeColorBtn.onclick = () => promptColorsEl.classList.toggle('visible');
+    promptInput.onkeydown = (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    };
+  }
+
+  const editOverlay = document.getElementById('edit-overlay');
+  const editLabelInput = document.getElementById('edit-label');
+  const editColorsEl = document.getElementById('edit-colors');
+
+  function openEditNode(node) {
+    const deleteBtn = document.getElementById('edit-delete');
+    editLabelInput.value = getNodeName(node) || '';
+    editColorsEl.innerHTML = '';
+    editColorsEl.classList.remove('visible');
+    let chosenColor = node.color || NODE_COLORS[0];
+    NODE_COLORS.forEach((hex) => {
+      const swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'color-swatch' + (hex === chosenColor ? ' selected' : '');
+      swatch.style.background = hex;
+      swatch.dataset.color = hex;
+      swatch.addEventListener('click', () => {
+        editColorsEl.querySelectorAll('.color-swatch').forEach((s) => s.classList.remove('selected'));
+        swatch.classList.add('selected');
+        chosenColor = hex;
+      });
+      editColorsEl.appendChild(swatch);
+    });
+    if (node.id === tree.id) {
+      deleteBtn.classList.add('hidden');
+    } else {
+      deleteBtn.classList.remove('hidden');
+    }
+    editOverlay.classList.add('visible');
+    editLabelInput.focus();
+    editLabelInput.select();
+
+    document.getElementById('edit-change-color').onclick = () => {
+      editColorsEl.classList.toggle('visible');
+    };
+
+    function finish(ok) {
+      editOverlay.classList.remove('visible');
+      if (ok) {
+        node.name = (editLabelInput.value && editLabelInput.value.trim()) ? editLabelInput.value.trim() : getNodeName(node);
+        node.color = chosenColor;
+        saveTree();
+        render(false);
+      }
+    }
+
+    function doDelete() {
+      const pair = findParent(tree, node.id);
+      if (pair) {
+        const idx = pair.parent.children.indexOf(pair.node);
+        if (idx !== -1) pair.parent.children.splice(idx, 1);
+        editOverlay.classList.remove('visible');
+        saveTree();
+        render();
+        fitToScreen();
+      }
+    }
+
+    document.getElementById('edit-ok').onclick = () => finish(true);
+    document.getElementById('edit-cancel').onclick = () => finish(false);
+    deleteBtn.onclick = () => doDelete();
+    editLabelInput.onkeydown = (e) => {
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    };
+  }
+
+  const commentOverlay = document.getElementById('comment-overlay');
+  const commentTitleEl = document.getElementById('comment-title');
+  const commentDescriptionEl = document.getElementById('comment-description');
+  const commentSourceEl = document.getElementById('comment-source');
+  const commentDateEl = document.getElementById('comment-date');
+  const commentTimeEl = document.getElementById('comment-time');
+  const commentEvidenceEl = document.getElementById('comment-evidence');
+  const commentColorsEl = document.getElementById('comment-colors');
+  let commentPopupNode = null;
+  let commentChosenColor = null;
+
+  function persistCommentToNode(node) {
+    if (!node) return;
+    const desc = (commentDescriptionEl.value && commentDescriptionEl.value.trim()) ? commentDescriptionEl.value.trim() : '';
+    const src = (commentSourceEl.value && commentSourceEl.value.trim()) ? commentSourceEl.value.trim() : '';
+    const dt = (commentDateEl.value && commentDateEl.value.trim()) ? commentDateEl.value.trim() : '';
+    const tm = (commentTimeEl.value && commentTimeEl.value.trim()) ? commentTimeEl.value.trim() : '';
+    const evidence = commentEvidenceEl && commentEvidenceEl.checked ? 'Yes' : '';
+    if (desc) node.description = desc; else delete node.description;
+    if (src) node.source = src; else delete node.source;
+    if (dt) node.date = dt; else delete node.date;
+    if (tm) node.time = tm; else delete node.time;
+    node.evidence = evidence;
+    if (commentChosenColor != null) node.color = commentChosenColor;
+    saveTree();
+  }
+
+  function openCommentPopup(node) {
+    if (commentPopupNode && commentPopupNode.id !== node.id) {
+      persistCommentToNode(commentPopupNode);
+    }
+    commentPopupNode = node;
+    commentChosenColor = node.color || NODE_COLORS[0];
+    commentTitleEl.textContent = getNodeName(node) || 'Comment';
+    commentDescriptionEl.value = node.description || '';
+    commentSourceEl.value = node.source || '';
+    commentDateEl.value = node.date || '';
+    commentTimeEl.value = node.time || '';
+    if (commentEvidenceEl) commentEvidenceEl.checked = node.evidence === 'Yes';
+    var evidencePopover = document.getElementById('comment-evidence-info-popover');
+    if (evidencePopover) evidencePopover.classList.remove('visible');
+    commentColorsEl.innerHTML = '';
+    commentColorsEl.classList.remove('visible');
+    NODE_COLORS.forEach((hex) => {
+      const swatch = document.createElement('button');
+      swatch.type = 'button';
+      swatch.className = 'color-swatch' + (hex === commentChosenColor ? ' selected' : '');
+      swatch.style.background = hex;
+      swatch.dataset.color = hex;
+      swatch.addEventListener('click', () => {
+        commentColorsEl.querySelectorAll('.color-swatch').forEach((s) => s.classList.remove('selected'));
+        swatch.classList.add('selected');
+        commentChosenColor = hex;
+      });
+      commentColorsEl.appendChild(swatch);
+    });
+    const commentDeleteBtn = document.getElementById('comment-delete');
+    if (node.id === tree.id) {
+      if (commentDeleteBtn) commentDeleteBtn.classList.add('hidden');
+    } else {
+      if (commentDeleteBtn) commentDeleteBtn.classList.remove('hidden');
+    }
+    commentOverlay.classList.add('visible');
+    commentDescriptionEl.focus();
+  }
+
+  function closeCommentPopup() {
+    if (commentPopupNode) {
+      persistCommentToNode(commentPopupNode);
+      commentPopupNode = null;
+    }
+    var kwBox = document.getElementById('keywords-box');
+    var kwSlot = document.getElementById('comment-keywords-slot');
+    var kwOverlay = document.getElementById('keywords-overlay');
+    if (kwSlot && kwBox && kwBox.parentNode === kwSlot) {
+      kwSlot.removeChild(kwBox);
+      kwOverlay.appendChild(kwBox);
+    }
+    var evidencePopover = document.getElementById('comment-evidence-info-popover');
+    if (evidencePopover) evidencePopover.classList.remove('visible');
+    commentOverlay.classList.remove('visible');
+  }
+
+  (function setupEvidenceInfoPopover() {
+    var btn = document.getElementById('comment-evidence-info-btn');
+    var popover = document.getElementById('comment-evidence-info-popover');
+    if (!btn || !popover) return;
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var isOpen = popover.classList.toggle('visible');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      popover.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    });
+    document.addEventListener('click', function (e) {
+      if (!popover.classList.contains('visible')) return;
+      if (e.target !== btn && e.target !== popover && !popover.contains(e.target) && !btn.contains(e.target)) {
+        popover.classList.remove('visible');
+        btn.setAttribute('aria-expanded', 'false');
+        popover.setAttribute('aria-hidden', 'true');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && popover.classList.contains('visible')) {
+        popover.classList.remove('visible');
+        btn.setAttribute('aria-expanded', 'false');
+        popover.setAttribute('aria-hidden', 'true');
+        e.stopPropagation();
+      }
+    });
+  })();
+
+  document.getElementById('comment-change-color').addEventListener('click', () => {
+    commentColorsEl.classList.toggle('visible');
+  });
+
+  document.getElementById('comment-close').addEventListener('click', closeCommentPopup);
+  commentOverlay.addEventListener('click', (e) => {
+    if (e.target === commentOverlay) closeCommentPopup();
+  });
+  commentDescriptionEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCommentPopup();
+  });
+  commentSourceEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCommentPopup();
+  });
+  commentDateEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCommentPopup();
+  });
+  commentTimeEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeCommentPopup();
+  });
+
+  document.getElementById('comment-save-close').addEventListener('click', closeCommentPopup);
+
+  document.getElementById('comment-delete').addEventListener('click', () => {
+    const node = commentPopupNode;
+    if (!node || node.id === tree.id) return;
+    const pair = findParent(tree, node.id);
+    if (pair) {
+      const idx = pair.parent.children.indexOf(pair.node);
+      if (idx !== -1) pair.parent.children.splice(idx, 1);
+      commentPopupNode = null;
+      commentOverlay.classList.remove('visible');
+      selectedNodeId = null;
+      saveTree();
+      render();
+    }
+  });
+
+  const KEYWORDS_STORAGE_KEY = 'osamuuttuja_keywords';
+  const KEYWORD_ENTITIES = ['What', 'Who', 'When', 'Where', 'Why', 'How'];
+
+  function getKeywordsFromStorage() {
+    try {
+      const s = localStorage.getItem(KEYWORDS_STORAGE_KEY);
+      if (!s) return Object.fromEntries(KEYWORD_ENTITIES.map((e) => [e, []]));
+      const data = JSON.parse(s);
+      const out = {};
+      KEYWORD_ENTITIES.forEach((e) => {
+        out[e] = Array.isArray(data[e]) ? data[e] : [];
+      });
+      return out;
+    } catch (_) {
+      return Object.fromEntries(KEYWORD_ENTITIES.map((e) => [e, []]));
+    }
+  }
+
+  function saveKeywordsToStorage(data) {
+    try {
+      localStorage.setItem(KEYWORDS_STORAGE_KEY, JSON.stringify(data));
+    } catch (_) {}
+  }
+
+  function parseKeywordInput(val) {
+    if (!val || typeof val !== 'string') return [];
+    return val.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+
+  function buildKeywordsTextFile(data) {
+    const lines = [];
+    KEYWORD_ENTITIES.forEach((entity) => {
+      const items = data[entity];
+      if (items.length === 0) return;
+      lines.push(entity + '?');
+      items.forEach((item) => lines.push('- ' + item));
+      lines.push('');
+    });
+    return lines.join('\n').trimEnd() || 'No indicators yet.';
+  }
+
+  function formDataToRecord(fromForm) {
+    return {
+      createdAt: new Date().toISOString(),
+      what: (fromForm.What || []).slice(),
+      who: (fromForm.Who || []).slice(),
+      when: (fromForm.When || []).slice(),
+      where: (fromForm.Where || []).slice(),
+      why: (fromForm.Why || []).slice(),
+      how: (fromForm.How || []).slice()
+    };
+  }
+
+  const keywordsOverlay = document.getElementById('keywords-overlay');
+  const keywordsBox = document.getElementById('keywords-box');
+  const commentKeywordsSlot = document.getElementById('comment-keywords-slot');
+
+  function resetKeywordEntitiesToSingleRow() {
+    keywordsBox.querySelectorAll('.keyword-entity').forEach((entityEl) => {
+      const rows = entityEl.querySelector('.keyword-rows');
+      if (!rows) return;
+      const rowEls = rows.querySelectorAll('.keyword-row');
+      const addBtn = rows.querySelector('.keyword-add-row');
+      const firstRow = rowEls[0];
+      if (!firstRow || !addBtn) return;
+      for (let i = 1; i < rowEls.length; i++) rowEls[i].remove();
+      const input = firstRow.querySelector('input');
+      if (input) input.value = '';
+    });
+  }
+
+  function collectKeywordInputsByEntity() {
+    const out = {};
+    KEYWORD_ENTITIES.forEach((e) => { out[e] = []; });
+    keywordsBox.querySelectorAll('.keyword-entity').forEach((entityEl) => {
+      const entity = entityEl.getAttribute('data-entity');
+      if (!entity || !KEYWORD_ENTITIES.includes(entity)) return;
+      entityEl.querySelectorAll('.keyword-row input').forEach((input) => {
+        parseKeywordInput(input.value).forEach((v) => out[entity].push(v));
+      });
+    });
+    return out;
+  }
+
+  function isKeywordsInCommentSlot() {
+    return commentKeywordsSlot && keywordsBox && keywordsBox.parentNode === commentKeywordsSlot;
+  }
+
+  function openKeywordsPopup(fromComment) {
+    resetKeywordEntitiesToSingleRow();
+    if (fromComment && commentOverlay && commentOverlay.classList.contains('visible')) {
+      if (keywordsBox.parentNode === keywordsOverlay) {
+        keywordsOverlay.removeChild(keywordsBox);
+        commentKeywordsSlot.appendChild(keywordsBox);
+      } else if (!commentKeywordsSlot.contains(keywordsBox)) {
+        commentKeywordsSlot.appendChild(keywordsBox);
+      }
+    } else {
+      if (keywordsBox.parentNode === commentKeywordsSlot) {
+        commentKeywordsSlot.removeChild(keywordsBox);
+        keywordsOverlay.appendChild(keywordsBox);
+      }
+      keywordsOverlay.classList.add('visible');
+    }
+    const firstInput = keywordsBox.querySelector('.keyword-row input');
+    if (firstInput) firstInput.focus();
+  }
+
+  function closeKeywordsPopup() {
+    if (isKeywordsInCommentSlot()) {
+      commentKeywordsSlot.removeChild(keywordsBox);
+      keywordsOverlay.appendChild(keywordsBox);
+    }
+    keywordsOverlay.classList.remove('visible');
+  }
+
+  document.getElementById('btn-keywords').addEventListener('click', () => {
+    openKeywordsPopup(false);
+  });
+
+  document.getElementById('comment-btn-keywords').addEventListener('click', () => {
+    openKeywordsPopup(true);
+  });
+
+  function showKeywordsInfoTip(e) {
+    e.preventDefault();
+    alert(
+      'If the evidence brings to mind important Who, What, When, Where, Why, or How details, ' +
+      'you can create hypothesis keywords here.\n\n' +
+      'The keywords will be processed in the Exploration phase of the analysis process.'
+    );
+  }
+  document.getElementById('indicators-tip-toolbar').addEventListener('click', showKeywordsInfoTip);
+  document.getElementById('indicators-tip-comment').addEventListener('click', showKeywordsInfoTip);
+
+  keywordsBox.addEventListener('click', (e) => {
+    if (!e.target.classList.contains('keyword-add-row')) return;
+    const btn = e.target;
+    const currentRow = btn.closest('.keyword-row');
+    const rows = btn.closest('.keyword-rows');
+    if (!rows || !currentRow) return;
+    const placeholder = currentRow.querySelector('input') && currentRow.querySelector('input').getAttribute('placeholder');
+    const newRow = document.createElement('div');
+    newRow.className = 'keyword-row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    if (placeholder) input.setAttribute('placeholder', placeholder);
+    const newBtn = document.createElement('button');
+    newBtn.type = 'button';
+    newBtn.className = 'keyword-add-row';
+    newBtn.setAttribute('aria-label', 'Add row');
+    newBtn.textContent = '+';
+    newRow.appendChild(input);
+    newRow.appendChild(newBtn);
+    rows.insertBefore(newRow, currentRow.nextSibling);
+  });
+
+  document.getElementById('keywords-close').addEventListener('click', closeKeywordsPopup);
+  keywordsOverlay.addEventListener('click', (e) => {
+    if (e.target === keywordsOverlay) closeKeywordsPopup();
+  });
+
+  document.getElementById('keywords-cancel').addEventListener('click', closeKeywordsPopup);
+
+  document.getElementById('keywords-create').addEventListener('click', async () => {
+    const fromForm = collectKeywordInputsByEntity();
+    closeKeywordsPopup();
+    const data = getKeywordsFromStorage();
+    KEYWORD_ENTITIES.forEach((entity) => {
+      (fromForm[entity] || []).forEach((v) => data[entity].push(v));
+    });
+    saveKeywordsToStorage(data);
+    const record = formDataToRecord(fromForm);
+    const line = JSON.stringify(record) + '\n';
+    try {
+      const r = await fetch('/api/save-indicators', {
+        method: 'POST',
+        body: JSON.stringify(record),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (r.ok) {
+        resetKeywordEntitiesToSingleRow();
+        return;
+      }
+    } catch (_) {}
+    const blob = new Blob([line], { type: 'application/x-ndjson; charset=utf-8' });
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
+    const now = new Date();
+    const dateTimeStr = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate()) + '_' + pad2(now.getHours()) + '-' + pad2(now.getMinutes()) + '-' + pad2(now.getSeconds());
+    const downloadFilename = 'hypothesis_keywords-' + dateTimeStr + '.jsonl';
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: downloadFilename,
+          types: [{ description: 'JSON Lines', accept: { 'application/x-ndjson': ['.jsonl'], 'text/plain': ['.jsonl'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = downloadFilename;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+      }
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = downloadFilename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    resetKeywordEntitiesToSingleRow();
+  });
+
+  const sidePickerOverlay = document.getElementById('side-picker-overlay');
+  function openSidePicker(onChoose) {
+    sidePickerOverlay.classList.add('visible');
+    const handler = (e) => {
+      const side = e.target.dataset.side;
+      if (!side || !SIDES.includes(side)) return;
+      sidePickerOverlay.classList.remove('visible');
+      document.querySelectorAll('#side-picker-box .side-btn').forEach((btn) => btn.removeEventListener('click', handler));
+      onChoose(side);
+    };
+    document.querySelectorAll('#side-picker-box .side-btn').forEach((btn) => {
+      btn.addEventListener('click', handler);
+    });
+    const cancel = () => {
+      sidePickerOverlay.classList.remove('visible');
+      document.querySelectorAll('#side-picker-box .side-btn').forEach((b) => b.removeEventListener('click', handler));
+    };
+    sidePickerOverlay.onclick = (e) => { if (e.target === sidePickerOverlay) cancel(); };
+  }
+
+  function findNode(node, id) {
+    if (node.id === id) return node;
+    for (const c of node.children) {
+      const found = findNode(c, id);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function findParent(root, nodeId) {
+    if (root.id === nodeId) return null;
+    for (const c of root.children) {
+      if (c.id === nodeId) return { parent: root, node: c };
+      const found = findParent(c, nodeId);
+      if (found) return found;
+    }
+    return null;
+  }
+
+  function ensureIds(node, isRoot, depth = 0) {
+    if (!node.id) node.id = generateId();
+    node.name = node.name != null ? node.name : (node.label != null ? node.label : 'Unnamed');
+    if (node.evidence !== 'Yes') node.evidence = '';
+    if (!Array.isArray(node.children)) node.children = [];
+    node.depth = isRoot ? 0 : depth;
+    const asRoot = isRoot === true;
+    node.children.forEach((c) => {
+      if (asRoot && (!c.side || !SIDES.includes(c.side))) c.side = 'down';
+      ensureIds(c, false, node.depth + 1);
+    });
+  }
+
+  function treeReplacer(key, value) {
+    if (key === 'label') return undefined;
+    if (key === 'description' || key === 'source' || key === 'date' || key === 'time') {
+      if (value == null || value === '') return undefined;
+    }
+    if (key === 'evidence') return value === 'Yes' ? 'Yes' : '';
+    return value;
+  }
+
+  function saveTree() {
+    try {
+      ensureDepths(tree, 0);
+      ensureEvidence(tree);
+      const json = JSON.stringify(tree, treeReplacer, 2);
+      localStorage.setItem(TREE_STORAGE_KEY, json);
+      fetch('/api/save-evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: json
+      }).catch(() => {});
+    } catch (_) {}
+  }
+
+  function restoreTree() {
+    try {
+      const s = localStorage.getItem(TREE_STORAGE_KEY);
+      if (!s) return false;
+      const data = JSON.parse(s);
+      if (!data || !data.id || !Array.isArray(data.children)) return false;
+      ensureIds(data, true, 0);
+      tree = data;
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function ensureDepths(node, depth) {
+    node.depth = depth;
+    node.children.forEach((c) => ensureDepths(c, depth + 1));
+  }
+
+  function ensureEvidence(node) {
+    node.evidence = node.evidence === 'Yes' ? 'Yes' : '';
+    node.children.forEach(ensureEvidence);
+  }
+
+  function doExport(filename) {
+    ensureDepths(tree, 0);
+    ensureEvidence(tree);
+    const json = JSON.stringify(tree, treeReplacer, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename || 'causal_map.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function doSaveWithPicker() {
+    ensureDepths(tree, 0);
+    ensureEvidence(tree);
+    const json = JSON.stringify(tree, treeReplacer, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const defaultName = 'causal_map.json';
+    if (typeof window.showSaveFilePicker === 'function') {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: defaultName,
+          types: [{ description: 'JSON file', accept: { 'application/json': ['.json'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+    doExport(defaultName);
+  }
+
+  document.getElementById('btn-export').addEventListener('click', async () => {
+    document.getElementById('dropdown-file').classList.remove('open');
+    ensureDepths(tree, 0);
+    ensureEvidence(tree);
+    const json = JSON.stringify(tree, treeReplacer, 2);
+    try {
+      const r = await fetch('/api/save-evidence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: json
+      });
+      if (r.ok) return;
+    } catch (_) {}
+    doSaveWithPicker();
+  });
+
+  document.getElementById('btn-download').addEventListener('click', () => {
+    document.getElementById('dropdown-file').classList.remove('open');
+    fetch('/data/evidence.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('not found');
+        return r.blob();
+      })
+      .then(function (blob) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'evidence.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      })
+      .catch(function () {
+        doExport('evidence.json');
+      });
+  });
+
+  document.getElementById('btn-import-trigger').addEventListener('click', () => {
+    document.getElementById('file-import').click();
+    document.getElementById('dropdown-file').classList.remove('open');
+  });
+
+  document.getElementById('btn-export-sample').addEventListener('click', () => {
+    document.getElementById('dropdown-file').classList.remove('open');
+    fetch('input/template.json')
+      .then((r) => {
+        if (!r.ok) throw new Error(r.statusText || 'Failed to load');
+        return r.blob();
+      })
+      .then((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'template.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      })
+      .catch(() => {
+        doExport('template.json');
+      });
+  });
+
+  document.getElementById('btn-load-example').addEventListener('click', () => {
+    document.getElementById('dropdown-file').classList.remove('open');
+    fetch('input/test-data.json')
+      .then((r) => {
+        if (!r.ok) throw new Error(r.statusText || 'Failed to load');
+        return r.json();
+      })
+      .then((data) => {
+        if (!data || !data.id || !Array.isArray(data.children)) throw new Error('Invalid example format');
+        ensureIds(data, true, 0);
+        tree = data;
+        saveTree();
+        selectedNodeId = null;
+        render();
+        fitToScreen();
+      })
+      .catch((err) => alert('Could not load test-data: ' + (err.message || err)));
+  });
+
+  document.getElementById('file-import').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        ensureIds(data, true, 0);
+        tree = data;
+        saveTree();
+        selectedNodeId = null;
+        render();
+        fitToScreen();
+      } catch (err) {
+        alert('Invalid JSON: ' + err.message);
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('btn-center-view').addEventListener('click', () => {
+    fitToScreen();
+    document.getElementById('dropdown-view').classList.remove('open');
+  });
+
+  const confirmOverlay = document.getElementById('confirm-overlay');
+  const confirmMessage = document.getElementById('confirm-message');
+  document.getElementById('btn-delete-view').addEventListener('click', () => {
+    document.getElementById('dropdown-view').classList.remove('open');
+    confirmMessage.textContent = 'Are you sure? This will remove everything and reset the map to the default.';
+    confirmOverlay.classList.add('visible');
+    let resolved = false;
+    const finish = (ok) => {
+      if (resolved) return;
+      resolved = true;
+      confirmOverlay.classList.remove('visible');
+      if (ok) {
+        tree = JSON.parse(JSON.stringify(defaultRoot));
+        visibleDepths = null;
+        saveTree();
+        selectedNodeId = null;
+        render();
+        fitToScreen();
+      }
+    };
+    document.getElementById('confirm-cancel').onclick = () => finish(false);
+    document.getElementById('confirm-ok').onclick = () => finish(true);
+    confirmOverlay.onclick = (e) => { if (e.target === confirmOverlay) finish(false); };
+  });
+
+  document.getElementById('btn-file').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('dropdown-file');
+    const other = document.getElementById('dropdown-view');
+    const otherF = document.getElementById('dropdown-filter');
+    other.classList.remove('open');
+    otherF.classList.remove('open');
+    dd.classList.toggle('open');
+  });
+
+  document.getElementById('btn-view').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('dropdown-view');
+    const other = document.getElementById('dropdown-file');
+    const otherF = document.getElementById('dropdown-filter');
+    other.classList.remove('open');
+    otherF.classList.remove('open');
+    dd.classList.toggle('open');
+  });
+
+  function buildFilterLevels() {
+    const depths = new Set();
+    getDepthsInTree(tree, depths);
+    const sorted = [...depths].sort((a, b) => a - b);
+    const container = document.getElementById('filter-levels');
+    container.innerHTML = '';
+    if (visibleDepths === null) visibleDepths = new Set(sorted);
+    sorted.forEach((d) => {
+      const row = document.createElement('label');
+      row.className = 'filter-row';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = visibleDepths.has(d);
+      cb.dataset.depth = String(d);
+      cb.addEventListener('change', () => {
+        if (cb.checked) visibleDepths.add(d);
+        else visibleDepths.delete(d);
+        render(false);
+      });
+      row.appendChild(cb);
+      row.appendChild(document.createTextNode('Level ' + d));
+      container.appendChild(row);
+    });
+  }
+
+  document.getElementById('btn-filter').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('dropdown-filter');
+    const other = document.getElementById('dropdown-file');
+    const otherV = document.getElementById('dropdown-view');
+    other.classList.remove('open');
+    otherV.classList.remove('open');
+    dd.classList.toggle('open');
+    if (dd.classList.contains('open')) buildFilterLevels();
+  });
+
+  document.getElementById('menu-file').addEventListener('click', (e) => e.stopPropagation());
+  document.getElementById('menu-view').addEventListener('click', (e) => e.stopPropagation());
+  document.getElementById('menu-filter').addEventListener('click', (e) => e.stopPropagation());
+
+  document.addEventListener('click', () => {
+    document.getElementById('dropdown-file').classList.remove('open');
+    document.getElementById('dropdown-view').classList.remove('open');
+    document.getElementById('dropdown-filter').classList.remove('open');
+  });
+
+  const btnFloat = document.getElementById('btn-float');
+  btnFloat.addEventListener('click', () => {
+    floatMode = !floatMode;
+    if (floatMode) {
+      startSimulation();
+      btnFloat.textContent = 'Float ON';
+    } else {
+      stopSimulation();
+      btnFloat.textContent = 'Float OFF';
+    }
+  });
+
+  function startApp() {
+    render();
+    setTimeout(function () {
+      if (!restoreView()) fitToScreen();
+    }, 50);
+  }
+
+  fetch('/data/evidence.json')
+    .then(function (r) {
+      if (!r.ok) return Promise.reject(new Error('not found'));
+      return r.json();
+    })
+    .then(function (data) {
+      if (data && data.id && Array.isArray(data.children)) {
+        ensureIds(data, true, 0);
+        tree = data;
+        try { localStorage.setItem(TREE_STORAGE_KEY, JSON.stringify(tree, treeReplacer, 2)); } catch (_) {}
+        startApp();
+      } else {
+        restoreTree();
+        startApp();
+      }
+    })
+    .catch(function () {
+      restoreTree();
+      startApp();
+    });
+})();
+  </script>
+</body>
+</html>

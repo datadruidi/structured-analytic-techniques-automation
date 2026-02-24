@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depth Event Map — Structured Analysis of Leaders</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #212d3d;
+      --border: #2d3a4d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-dim: rgba(88, 166, 255, 0.15);
+      --danger: #f85149;
+      --radius: 8px;
+      --outskirt: #252f3f;
+      --lane-width: 260px;
+      --node-min-h: 44px;
+      --node-v-gap: 40px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .toolbar .toolbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .toolbar label { font-size: 0.85rem; color: var(--text-muted); }
+    .toolbar input[type="file"] { display: none; }
+    .btn {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .btn-primary:hover { background: rgba(88, 166, 255, 0.25); }
+    .toolbar a.btn { text-decoration: none; }
+    .toolbar .icon-home {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .toolbar .icon-home svg { display: block; }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+    .viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      cursor: grab;
+    }
+    .viewport.panning { cursor: grabbing; }
+    .viewport .world {
+      position: absolute;
+      will-change: transform;
+      transform-origin: 0 0;
+    }
+    .viewport svg.world {
+      display: block;
+      pointer-events: none;
+    }
+    .viewport .world .nodes-layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
+    .viewport .world .nodes-layer > * {
+      pointer-events: auto;
+    }
+
+    .node-box {
+      position: absolute;
+      min-width: 140px;
+      min-height: var(--node-min-h);
+      background: var(--surface);
+      border: 3px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: stretch;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .node-box .node-outskirt {
+      position: absolute;
+      left: -6px;
+      top: -6px;
+      right: -6px;
+      bottom: -6px;
+      z-index: -1;
+      background: var(--outskirt);
+      border-radius: calc(var(--radius) + 4px);
+      pointer-events: none;
+    }
+    .node-box.root .node-outskirt { background: #e67e22; }
+    .node-box.above-root .node-outskirt {
+      background: repeating-linear-gradient(
+        -45deg,
+        #f4d03f,
+        #f4d03f 6px,
+        #1a1a1a 6px,
+        #1a1a1a 12px
+      );
+    }
+    .node-box.depth-1[data-side="left"] .node-outskirt { background: #1e3a5f; }
+    .node-box.depth-1[data-side="right"] .node-outskirt { background: #c0392b; }
+    .node-box.depth-2 .node-outskirt { background: #4a5568; }
+    .node-box.depth-3 .node-outskirt { background: #d4a017; }
+    .node-box.depth-4 .node-outskirt { background: #4a5568; }
+    .node-box .top-event-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 4px 8px 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .node-box .top-event-header .help-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      vertical-align: middle;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .node-box .top-event-header .help-mark:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+    .top-event-infobox {
+      position: fixed;
+      z-index: 1000;
+      max-width: 280px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.4;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: none;
+    }
+    .top-event-infobox.visible { display: block; }
+    .hazard-infobox { position: fixed; z-index: 1000; max-width: 280px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.8rem; color: var(--text); line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: none; }
+    .hazard-infobox.visible { display: block; }
+    .node-box.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-dim);
+    }
+    .node-box .node-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .node-box .node-inner .textarea-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      min-width: 0;
+    }
+    .node-box textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      line-height: 1.3;
+      padding: 4px 8px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.65rem;
+      resize: none;
+      outline: none;
+      overflow-y: auto;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .node-box textarea::placeholder { color: var(--text-muted); }
+    .node-box .add-btn {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--accent);
+      background: var(--surface2);
+      color: var(--accent);
+      border-radius: 4px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 50%;
+      transition: background 0.15s, color 0.15s;
+    }
+    .node-box .add-btn.left { left: -3px; transform: translate(-50%, -50%); }
+    .node-box .add-btn.right { right: -3px; transform: translate(50%, -50%); }
+    .node-box .add-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .node-box.root { min-height: 56px; }
+
+    .node-box .remove-btn {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--danger);
+      background: var(--surface2);
+      color: var(--danger);
+      border-radius: 4px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 50%;
+      transition: background 0.15s, color 0.15s;
+    }
+    .node-box .remove-btn.left { left: -3px; transform: translate(-50%, -50%); }
+    .node-box .remove-btn.right { right: -3px; transform: translate(50%, -50%); }
+    .node-box .remove-btn:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .node-box.depth-1 {
+      min-width: 100px;
+      min-height: 52px;
+    }
+    .node-box.depth-1 textarea {
+      font-size: 0.65rem;
+      padding: 4px 8px;
+    }
+    .node-box.depth-1 .add-btn { width: 20px; height: 20px; font-size: 14px; }
+    .node-box.depth-1 .remove-btn { width: 20px; height: 20px; font-size: 14px; }
+
+    .node-box.depth-2 {
+      min-width: 100px;
+      min-height: 52px;
+    }
+    .node-box.depth-2 textarea {
+      font-size: 0.65rem;
+      padding: 4px 8px;
+    }
+    .node-box.depth-2 .add-btn { width: 20px; height: 20px; font-size: 14px; }
+    .node-box.depth-2 .remove-btn { width: 20px; height: 20px; font-size: 14px; }
+
+    .node-box.depth-3 {
+      min-width: 96px;
+      min-height: 52px;
+    }
+    .node-box.depth-3 textarea {
+      font-size: 0.65rem;
+      padding: 4px 8px;
+    }
+    .node-box.depth-3 .add-btn { width: 18px; height: 18px; font-size: 12px; }
+    .node-box.depth-3 .remove-btn { width: 18px; height: 18px; font-size: 12px; }
+
+    .file-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .file-dropdown .file-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      min-width: 140px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 100;
+      padding: 4px 0;
+    }
+    .file-dropdown.open .file-menu { display: block; }
+    .file-dropdown .file-menu button {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .file-dropdown .file-menu button:hover {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .lane-header {
+      position: absolute;
+      top: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .lane-headers-layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .lane-headers-layer .lane-label {
+      position: absolute;
+      top: 24px;
+      transform: translate(-50%, -50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      pointer-events: auto;
+    }
+    .lane-headers-layer .lane-label .help-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .lane-headers-layer .lane-label .help-mark:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="../structured-cone-of-plausibilities/index.html" class="btn"><span class="icon-home" aria-hidden="true"><svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor" aria-hidden="true"><path d="M7 1L1 5.5V11h4V7h4v4h4V5.5L7 1z"/></svg></span> Back to Main Screen</a>
+    <div class="file-dropdown" id="fileDropdown">
+      <button type="button" class="btn" id="fileBtn">File</button>
+      <div class="file-menu" id="fileMenu">
+        <button type="button" id="importBtn">Import JSON</button>
+        <button type="button" id="downloadJsonBtn">Download JSON</button>
+      </div>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display: none">
+    <span class="toolbar-title">Bowtie Analysis for Structured Analytic Techniques</span>
+  </div>
+  <div class="main">
+    <div class="viewport" id="viewport">
+      <div class="world" id="world">
+        <svg class="world" id="svgLayer"></svg>
+        <div class="lane-headers-layer" id="laneHeadersLayer"></div>
+        <div class="nodes-layer" id="nodesLayer"></div>
+      </div>
+    </div>
+  </div>
+  <div id="top-event-infobox" class="top-event-infobox" role="tooltip">
+    The moment control over the hazard is first lost and the hazard's harmful potential is released. No damage must have happened yet (e.g., "loss of control over the car").
+  </div>
+  <div id="hazard-infobox" class="hazard-infobox" role="tooltip">
+    The starting point of a Bowtie. An operation, activity, or condition with the potential to cause harm (e.g., "driving a car").
+  </div>
+  <div id="threat-infobox" class="hazard-infobox" role="tooltip">
+    A cause or scenario that can trigger the Top Event. Threats sit on the left side (e.g., intoxicated driving, slippery road).
+  </div>
+  <div id="consequence-infobox" class="hazard-infobox" role="tooltip">
+    An unwanted outcome that can occur after the Top Event and leads to harm or damage. Consequences sit on the right side (e.g., hitting a pedestrian, crashing into another vehicle).
+  </div>
+  <div id="preventive-barrier-infobox" class="hazard-infobox" role="tooltip">
+    A control placed between a Threat and the Top Event that eliminates the threat or reduces the likelihood of the Top Event occurring (e.g., ignition interlock, lane-departure warning).
+  </div>
+  <div id="recovery-barrier-infobox" class="hazard-infobox" role="tooltip">
+    A control placed between the Top Event and Consequences that helps regain control or reduce the severity of outcomes after the Top Event has occurred (e.g., seat belt, airbags).
+  </div>
+  <div id="escalation-factor-infobox" class="hazard-infobox" role="tooltip">
+    A weakness, defect, condition, or failure that reduces a barrier's effectiveness or defeats it (e.g., refusing to wear a seat belt undermines the seat belt barrier).
+  </div>
+  <div id="escalation-factor-barrier-infobox" class="hazard-infobox" role="tooltip">
+    A control that prevents an escalation factor from happening or reduces its impact, helping the main barrier remain effective (e.g., seat belt reminder alarms reduce "forgetting/refusing" to wear it).
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  // --- Dev requirements (layout) ---
+  // • Anchor: Root screen position is fixed; reflow around Root, never move Root for layout.
+  // • Centroid: Depth-1 (and every level) column vertical center aligns with parent Y; siblings above and below.
+  // • Insertion: New children can spawn above (top insertion: newest = id desc = first slot = above).
+  // • Reflow: On add, siblings shift to stay centered on parent; Root stays fixed.
+  // • Local centering: At every depth, a parent’s children are vertically centered on that parent’s Y.
+  // • Visual check: 3 left + 2 right → Root’s horizontal line through middle of each Depth-1 stack; ≥1 node above Root per side with >1 node.
+
+  const LANE_WIDTH = 260;
+  const LANE_WIDTH_DEPTH3 = 170;
+  const LANE_1TO2_BASE = 140;
+  const LANE_1TO2_PER_NODE = 20;
+  const NODE_MIN_HEIGHT = 44;
+  const ROOT_MIN_HEIGHT = 56;
+  const NODE_V_GAP = 40;
+  const DEPTH1_V_GAP = 100; /* 25% more than 80 */
+  const DEPTH2_V_GAP = 28; /* 15% more than 24 (24 * 1.15) */
+  const DEPTH3_V_GAP = 12; /* 15% more than 10 (same % increase as depth 2) */
+  const NODE_MIN_WIDTH = 140;
+  const ROOT_BOX_WIDTH = Math.round(NODE_MIN_WIDTH * 1.25);
+  const ROOT_ID = 'root';
+  const ABOVE_ROOT_ID = 'above-root';
+  const HAZARD_TO_TOP_EVENT_GAP = 28;
+  const WORLD_PADDING = 80;
+  const MAX_DEPTH = 4;
+  // Depth 1 and 2: same size; Depth 3 and 4: slightly wider
+  function nodeWidthForDepth(depth) {
+    if (depth <= 0) return NODE_MIN_WIDTH;
+    if (depth <= 2) return 112;
+    return 102;
+  }
+  function nodeHeightForDepth(depth) {
+    if (depth <= 0) return ROOT_MIN_HEIGHT;
+    if (depth <= 2) return 52;
+    return 52;
+  }
+
+  // --- State ---
+  let nodes = []; // flat: { id, parentId, side, text }
+  let layout = {}; // id -> { x, y, width, height, depth }
+  let selectedId = null;
+  let scale = 1, translateX = 0, translateY = 0;
+  let worldWidth = 800, worldHeight = 600;
+  let panStart = null;
+
+  function ensureRoot() {
+    if (!nodes.find(n => n.id === ROOT_ID)) {
+      nodes = [{ id: ROOT_ID, parentId: null, side: 'root', text: 'Root event' }];
+    }
+  }
+
+  function getChildren(id) {
+    return nodes.filter(n => n.parentId === id);
+  }
+
+  function getDepth(id) {
+    const n = nodes.find(x => x.id === id);
+    if (!n || !n.parentId) return 0;
+    return 1 + getDepth(n.parentId);
+  }
+
+  function getSide(id) {
+    const n = nodes.find(x => x.id === id);
+    return n ? n.side : 'root';
+  }
+
+  function laneWidth1To2(depth1Count) {
+    return LANE_1TO2_BASE + depth1Count * LANE_1TO2_PER_NODE;
+  }
+
+  const ROOT_TO_DEPTH1_FACTOR = 1.25;
+  const DEPTH_1_TO_2_FACTOR = 0.9;
+  function offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count) {
+    if (depth <= 0) return 0;
+    const count = side === 'left' ? leftDepth1Count : rightDepth1Count;
+    const w1to2 = laneWidth1To2(count);
+    if (depth === 1) return ROOT_TO_DEPTH1_FACTOR * w1to2;
+    const depth2Offset = ROOT_TO_DEPTH1_FACTOR * w1to2 + DEPTH_1_TO_2_FACTOR * w1to2;
+    if (depth === 2) return depth2Offset;
+    return depth2Offset + (depth - 2) * (DEPTH_1_TO_2_FACTOR * w1to2);
+  }
+
+  function generateId() {
+    let i = 0;
+    while (nodes.some(n => n.id === 'n' + i)) i++;
+    return 'n' + i;
+  }
+
+  // --- Layout (requirements) ---
+  // 1) Root anchor: Root screen position is fixed; layout reflows around it.
+  // 2) Depth-1 centroid: Each side's Depth-1 column is vertically centered on Root's Y (nodes above and below Root).
+  // 3) Insertion: New children can appear above existing (we use id-desc sort so newest = top slot).
+  // 4) Reflow: Adding a child shifts siblings to keep group centered on parent; Root does not move.
+  // 5) Local centering: Every parent's children are vertically centered around that parent's Y.
+  function gapForDepth(depth) {
+    if (depth <= 0) return nodeHeightForDepth(depth) + NODE_V_GAP;
+    if (depth === 1) return nodeHeightForDepth(depth) + DEPTH1_V_GAP;
+    if (depth === 2) return nodeHeightForDepth(depth) + DEPTH2_V_GAP;
+    if (depth === 3) return nodeHeightForDepth(depth) + DEPTH3_V_GAP;
+    return nodeHeightForDepth(depth) + 24;
+  }
+  const GAP = NODE_MIN_HEIGHT + NODE_V_GAP;
+
+  function buildLayout() {
+    layout = {};
+    ensureRoot();
+    const root = nodes.find(n => n.id === ROOT_ID);
+    if (!root) return;
+
+    const leftRoots = getChildren(ROOT_ID).filter(n => n.side === 'left');
+    const rightRoots = getChildren(ROOT_ID).filter(n => n.side === 'right');
+    const leftDepth1Count = leftRoots.length;
+    const rightDepth1Count = rightRoots.length;
+    const maxDepthLeft = leftRoots.length ? Math.max(...leftRoots.map(c => maxDepthUnder(c.id))) : 0;
+    const maxDepthRight = rightRoots.length ? Math.max(...rightRoots.map(c => maxDepthUnder(c.id))) : 0;
+    const totalLanesLeft = maxDepthLeft;
+    const totalLanesRight = maxDepthRight;
+    const w1to2Left = laneWidth1To2(leftDepth1Count);
+    const rootX = WORLD_PADDING + offsetFromRoot(totalLanesLeft, 'left', leftDepth1Count, rightDepth1Count) + (ROOT_TO_DEPTH1_FACTOR * w1to2Left) / 2;
+
+    function maxDepthUnder(id) {
+      const children = getChildren(id);
+      if (children.length === 0) return 1;
+      return 1 + Math.max(...children.map(c => maxDepthUnder(c.id)));
+    }
+
+    // Local Y: root at 0; Depth-1 columns centered on 0 independently per side (so left and right mirror for same N).
+    layout[ROOT_ID] = { x: rootX, y: 0, width: ROOT_BOX_WIDTH, height: ROOT_MIN_HEIGHT, depth: 0 };
+    layout[ABOVE_ROOT_ID] = { x: rootX, y: -ROOT_MIN_HEIGHT - NODE_V_GAP - HAZARD_TO_TOP_EVENT_GAP, width: ROOT_BOX_WIDTH, height: ROOT_MIN_HEIGHT, depth: -1 };
+
+    // Depth 1: place left and right separately, each centered on Root's Y (0), so same N => same spacing on both sides.
+    const depth1Gap = gapForDepth(1);
+    [leftRoots, rightRoots].forEach((sideChildren) => {
+      const sorted = sideChildren.slice().sort((a, b) => {
+        const na = /^n(\d+)$/.test(a.id) ? parseInt(a.id.slice(1), 10) : 0;
+        const nb = /^n(\d+)$/.test(b.id) ? parseInt(b.id.slice(1), 10) : 0;
+        return nb - na;
+      });
+      sorted.forEach((child, k) => {
+        const n = sorted.length;
+        const offset = k - (n - 1) / 2;
+        const childY = 0 + offset * depth1Gap;
+        const depth = 1;
+        const side = child.side;
+        const childX = side === 'left' ? rootX - offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count) : rootX + offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count);
+        layout[child.id] = { x: childX, y: childY, width: nodeWidthForDepth(depth), height: nodeHeightForDepth(depth), depth };
+      });
+    });
+
+    // BFS for depth 2+: assign Y centered on each parent's Y.
+    const queue = [...leftRoots.map(c => c.id), ...rightRoots.map(c => c.id)];
+    while (queue.length) {
+      const parentId = queue.shift();
+      const parent = layout[parentId];
+      const children = getChildren(parentId).sort((a, b) => {
+        const na = /^n(\d+)$/.test(a.id) ? parseInt(a.id.slice(1), 10) : 0;
+        const nb = /^n(\d+)$/.test(b.id) ? parseInt(b.id.slice(1), 10) : 0;
+        return nb - na;
+      });
+      const n = children.length;
+      if (n === 0) continue;
+      const parentY = parent.y;
+      const depth = getDepth(children[0].id);
+      const gap = gapForDepth(depth);
+      for (let k = 0; k < n; k++) {
+        const child = children[k];
+        const side = child.side;
+        const offset = k - (n - 1) / 2;
+        const childY = parentY + offset * gap;
+        const childX = side === 'left' ? rootX - offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count) : rootX + offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count);
+        layout[child.id] = { x: childX, y: childY, width: nodeWidthForDepth(depth), height: nodeHeightForDepth(depth), depth };
+        queue.push(child.id);
+      }
+    }
+
+    // No overlap at later depths: per (side, depth) enforce minimum vertical gap by scaling spread
+    const bySideDepth = {};
+    Object.keys(layout).forEach(id => {
+      if (id === ROOT_ID || id === ABOVE_ROOT_ID) return;
+      const l = layout[id];
+      const side = getSide(id);
+      const key = side + '-' + l.depth;
+      if (!bySideDepth[key]) bySideDepth[key] = [];
+      bySideDepth[key].push({ id, y: l.y, ...l });
+    });
+    Object.keys(bySideDepth).forEach(key => {
+      const list = bySideDepth[key].sort((a, b) => a.y - b.y);
+      const n = list.length;
+      if (n < 2) return;
+      const depth = list[0].depth;
+      const minNodeGap = gapForDepth(depth);
+      const requiredSpan = (n - 1) * minNodeGap;
+      const minY = list[0].y;
+      const maxY = list[n - 1].y;
+      const currentSpan = Math.max(maxY - minY, 1e-6);
+      if (currentSpan >= requiredSpan) return;
+      const centroid = (minY + maxY) / 2;
+      const scale = requiredSpan / currentSpan;
+      list.forEach((item, i) => {
+        const newY = centroid + (item.y - centroid) * scale;
+        layout[item.id].y = newY;
+      });
+    });
+
+    // World size; root stays at vertical center (anchor)
+    const minX = Math.min(...Object.values(layout).map(l => l.x - l.width / 2));
+    const maxX = Math.max(...Object.values(layout).map(l => l.x + l.width / 2));
+    const minY = Math.min(...Object.values(layout).map(l => l.y - l.height / 2));
+    const maxY = Math.max(...Object.values(layout).map(l => l.y + l.height / 2));
+    const contentW = maxX - minX + WORLD_PADDING * 2;
+    const contentH = maxY - minY + WORLD_PADDING * 2;
+    worldWidth = Math.max(800, contentW);
+    worldHeight = Math.max(400, contentH);
+    const rootCenterY = worldHeight / 2;
+    const offsetY = rootCenterY - layout[ROOT_ID].y;
+    Object.keys(layout).forEach(id => {
+      layout[id].y += offsetY;
+    });
+    const centerX = (minX + maxX) / 2;
+    const offsetX = worldWidth / 2 - centerX;
+    Object.keys(layout).forEach(id => {
+      layout[id].x += offsetX;
+    });
+  }
+
+  // --- Nested export ---
+  function toNested() {
+    ensureRoot();
+    function nodeToNested(id) {
+      const n = nodes.find(x => x.id === id);
+      if (!n) return null;
+      const children = getChildren(id).map(c => nodeToNested(c.id)).filter(Boolean);
+      const out = { id: n.id, text: n.text || '', children };
+      if (n.side !== 'root') out.side = n.side;
+      return out;
+    }
+    return { version: 1, hazard: { id: 'hazard', text: hazardText || '' }, root: nodeToNested(ROOT_ID), exportedAt: new Date().toISOString() };
+  }
+
+  function exportJsonString() {
+    return JSON.stringify(toNested(), null, 2);
+  }
+
+  // --- Import validation ---
+  function validateAndParse(data) {
+    if (data == null || typeof data !== 'object') return { ok: false, error: 'Invalid JSON or structure.' };
+    if (data.version !== 1) return { ok: false, error: 'Unsupported version. Only version 1 is supported.' };
+    if (!data.root || typeof data.root !== 'object') return { ok: false, error: 'Missing or invalid root.' };
+    if (data.root.id !== ROOT_ID && data.root.id !== 'topEvent') return { ok: false, error: 'Root must have id "root" or "topEvent".' };
+    if (data.root.id === 'topEvent') data.root.id = ROOT_ID;
+    const ids = new Set();
+    function check(node, depth) {
+      if (!node || typeof node !== 'object') return { ok: false, error: 'Invalid node.' };
+      const id = node.id;
+      if (typeof id !== 'string') return { ok: false, error: 'Node missing or invalid id.' };
+      if (ids.has(id)) return { ok: false, error: 'Duplicate id: ' + id };
+      ids.add(id);
+      const children = node.children;
+      if (children !== undefined && !Array.isArray(children)) return { ok: false, error: 'children must be an array.' };
+      const side = node.side;
+      if (depth >= 1) {
+        if (side !== 'left' && side !== 'right') return { ok: false, error: 'Non-root node must have side "left" or "right".' };
+      }
+      const list = Array.isArray(children) ? children : [];
+      for (let i = 0; i < list.length; i++) {
+        const r = check(list[i], depth + 1);
+        if (!r.ok) return r;
+      }
+      return { ok: true };
+    }
+    const r = check(data.root, 0);
+    if (!r.ok) return r;
+    return { ok: true, data };
+  }
+
+  function nestedToFlat(node, parentId, sideFromParent) {
+    const rawId = node.id;
+    const id = (parentId === null) ? ROOT_ID : (String(rawId) === 'topEvent' ? ROOT_ID : rawId);
+    const side = node.side != null ? node.side : (parentId === null ? 'root' : sideFromParent);
+    const text = typeof node.text === 'string' ? node.text : '';
+    const flat = [{ id, parentId, side, text }];
+    const children = Array.isArray(node.children) ? node.children : [];
+    children.forEach(child => {
+      flat.push(...nestedToFlat(child, id, child.side || side));
+    });
+    return flat;
+  }
+
+  let hazardText = '';
+
+  function importFromParsed(data) {
+    if (!data || !data.root) return;
+    if (String(data.root.id) === 'topEvent') data.root.id = ROOT_ID;
+    const flat = nestedToFlat(data.root, null, null);
+    if (!flat.length || flat[0].id !== ROOT_ID) return;
+    nodes = flat;
+    hazardText = (data.hazard && typeof data.hazard.text === 'string') ? data.hazard.text : '';
+    try {
+      buildLayout();
+      render();
+      fitToView();
+      applyTransform();
+      requestAnimationFrame(function () {
+        fitToView();
+        applyTransform();
+      });
+    } catch (err) {
+      console.error('Import render failed', err);
+    }
+  }
+
+  // --- Add / Delete ---
+  function addChild(parentId, side) {
+    ensureRoot();
+    const parent = nodes.find(n => n.id === parentId);
+    if (!parent) return;
+    const parentDepth = getDepth(parentId);
+    if (parentDepth >= MAX_DEPTH) return;
+    const childSide = parent.side === 'root' ? side : parent.side;
+    const id = generateId();
+    nodes.push({ id, parentId, side: childSide, text: '' });
+    buildLayout();
+    render();
+    setTimeout(() => {
+      const ta = document.querySelector(`[data-node-id="${id}"] textarea`);
+      if (ta) { ta.focus(); ta.select(); }
+    }, 50);
+  }
+
+  function deleteNode(id) {
+    if (id === ROOT_ID) return;
+    const toRemove = new Set();
+    function collect(nid) {
+      toRemove.add(nid);
+      getChildren(nid).forEach(c => collect(c.id));
+    }
+    collect(id);
+    nodes = nodes.filter(n => !toRemove.has(n.id));
+    if (selectedId && toRemove.has(selectedId)) selectedId = null;
+    buildLayout();
+    render();
+  }
+
+  // --- Edge drawing (from 01-getting-organized/structured-analytic-causal-map): straight lines box-to-box ---
+  const EDGE_PAD = 4;
+
+  function clampToBox(px, py, cx, cy, halfW, halfH) {
+    halfW = halfW ?? NODE_MIN_WIDTH / 2;
+    halfH = halfH ?? NODE_MIN_HEIGHT / 2;
+    const dx = cx - px;
+    const dy = cy - py;
+    if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) return { x: px + (dx >= 0 ? halfW : -halfW), y: py };
+    const tx = Math.abs(dx) > 1e-6 ? halfW / Math.abs(dx) : 1;
+    const ty = Math.abs(dy) > 1e-6 ? halfH / Math.abs(dy) : 1;
+    const t = Math.min(tx, ty, 1);
+    return { x: px + dx * t, y: py + dy * t };
+  }
+
+  function renderLink(parentPos, childPos, parentW, parentH, childW, childH, childSide) {
+    const hwP = (parentW ?? NODE_MIN_WIDTH) / 2;
+    const hwC = (childW ?? NODE_MIN_WIDTH) / 2;
+    const hhP = (parentH ?? NODE_MIN_HEIGHT) / 2;
+    const hhC = (childH ?? NODE_MIN_HEIGHT) / 2;
+    let start, end;
+    if (childSide === 'left' || childSide === 'right') {
+      // Start at parent's + (edge center on child's side), end at child's − (edge facing parent). Clean + to −.
+      if (childSide === 'left') {
+        start = { x: parentPos.x - hwP, y: parentPos.y };
+        end = { x: childPos.x + hwC, y: childPos.y };
+      } else {
+        start = { x: parentPos.x + hwP, y: parentPos.y };
+        end = { x: childPos.x - hwC, y: childPos.y };
+      }
+    } else {
+      // Fallback (e.g. Hazard→Root): box edge to box edge
+      start = clampToBox(parentPos.x, parentPos.y, childPos.x, childPos.y, hwP, hhP);
+      end = clampToBox(childPos.x, childPos.y, parentPos.x, parentPos.y, hwC, hhC);
+    }
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 0.1;
+    const inset = Math.min(EDGE_PAD, dist / 2);
+    const s = { x: start.x + (dx / dist) * inset, y: start.y + (dy / dist) * inset };
+    const e = { x: end.x - (dx / dist) * inset, y: end.y - (dy / dist) * inset };
+    return `M ${s.x} ${s.y} L ${e.x} ${e.y}`;
+  }
+
+  // --- Render ---
+  function render() {
+    ensureRoot();
+    buildLayout();
+    const world = document.getElementById('world');
+    const svgLayer = document.getElementById('svgLayer');
+    const nodesLayer = document.getElementById('nodesLayer');
+
+    world.style.width = worldWidth + 'px';
+    world.style.height = worldHeight + 'px';
+    svgLayer.setAttribute('width', worldWidth);
+    svgLayer.setAttribute('height', worldHeight);
+    nodesLayer.style.width = worldWidth + 'px';
+    nodesLayer.style.height = worldHeight + 'px';
+
+    // Lane headers and edges
+    let depthLanes = new Set();
+    nodes.forEach(n => {
+      if (n.id === ROOT_ID) return;
+      const d = layout[n.id];
+      if (d) depthLanes.add(JSON.stringify({ side: n.side, depth: d.depth }));
+    });
+    const rootX = layout[ROOT_ID] ? layout[ROOT_ID].x : worldWidth / 2;
+    const leftDepth1Count = nodes.filter(n => n.parentId === ROOT_ID && n.side === 'left').length;
+    const rightDepth1Count = nodes.filter(n => n.parentId === ROOT_ID && n.side === 'right').length;
+    const lanes = [];
+    depthLanes.forEach(s => {
+      const { side, depth } = JSON.parse(s);
+      const x = side === 'left' ? rootX - offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count) : rootX + offsetFromRoot(depth, side, leftDepth1Count, rightDepth1Count);
+      lanes.push({ side, depth, x });
+    });
+
+    const laneHeadersLayer = document.getElementById('laneHeadersLayer');
+    if (laneHeadersLayer) {
+      laneHeadersLayer.style.width = worldWidth + 'px';
+      laneHeadersLayer.style.height = worldHeight + 'px';
+      laneHeadersLayer.innerHTML = '';
+      const threatInfobox = document.getElementById('threat-infobox');
+      const consequenceInfobox = document.getElementById('consequence-infobox');
+      const preventiveBarrierInfobox = document.getElementById('preventive-barrier-infobox');
+      const recoveryBarrierInfobox = document.getElementById('recovery-barrier-infobox');
+      const escalationFactorInfobox = document.getElementById('escalation-factor-infobox');
+      const escalationFactorBarrierInfobox = document.getElementById('escalation-factor-barrier-infobox');
+      lanes.forEach(({ side, depth, x }) => {
+        const div = document.createElement('div');
+        div.className = 'lane-label';
+        div.style.left = x + 'px';
+        if (side === 'left' && depth === 1) {
+          div.innerHTML = '<span>Threat</span><span class="help-mark" aria-label="Help" title="What is a Threat?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && threatInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = threatInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  threatInfobox.style.left = (r.left + r.width / 2 - threatInfobox.offsetWidth / 2) + 'px';
+                  threatInfobox.style.top = (r.top - threatInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!threatInfobox.contains(e.target) && !div.contains(e.target)) {
+                    threatInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else if (side === 'right' && depth === 1) {
+          div.innerHTML = '<span>Consequence</span><span class="help-mark" aria-label="Help" title="What is a Consequence?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && consequenceInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = consequenceInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  consequenceInfobox.style.left = (r.left + r.width / 2 - consequenceInfobox.offsetWidth / 2) + 'px';
+                  consequenceInfobox.style.top = (r.top - consequenceInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!consequenceInfobox.contains(e.target) && !div.contains(e.target)) {
+                    consequenceInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else if (side === 'left' && depth === 2) {
+          div.innerHTML = '<span>Preventive Barrier</span><span class="help-mark" aria-label="Help" title="What is a Preventive Barrier?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && preventiveBarrierInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = preventiveBarrierInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  preventiveBarrierInfobox.style.left = (r.left + r.width / 2 - preventiveBarrierInfobox.offsetWidth / 2) + 'px';
+                  preventiveBarrierInfobox.style.top = (r.top - preventiveBarrierInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!preventiveBarrierInfobox.contains(e.target) && !div.contains(e.target)) {
+                    preventiveBarrierInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else if (side === 'right' && depth === 2) {
+          div.innerHTML = '<span>Recovery Barrier</span><span class="help-mark" aria-label="Help" title="What is a Recovery Barrier?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && recoveryBarrierInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = recoveryBarrierInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  recoveryBarrierInfobox.style.left = (r.left + r.width / 2 - recoveryBarrierInfobox.offsetWidth / 2) + 'px';
+                  recoveryBarrierInfobox.style.top = (r.top - recoveryBarrierInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!recoveryBarrierInfobox.contains(e.target) && !div.contains(e.target)) {
+                    recoveryBarrierInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else if (depth === 3) {
+          div.innerHTML = '<span>Escalation Factor</span><span class="help-mark" aria-label="Help" title="What is an Escalation Factor?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && escalationFactorInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = escalationFactorInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  escalationFactorInfobox.style.left = (r.left + r.width / 2 - escalationFactorInfobox.offsetWidth / 2) + 'px';
+                  escalationFactorInfobox.style.top = (r.top - escalationFactorInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!escalationFactorInfobox.contains(e.target) && !div.contains(e.target)) {
+                    escalationFactorInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else if (depth === 4) {
+          div.innerHTML = '<span>Escalation Factor Barrier</span><span class="help-mark" aria-label="Help" title="What is an Escalation Factor Barrier?">?</span>';
+          const helpMark = div.querySelector('.help-mark');
+          if (helpMark && escalationFactorBarrierInfobox) {
+            helpMark.addEventListener('click', function (e) {
+              e.stopPropagation();
+              const on = escalationFactorBarrierInfobox.classList.toggle('visible');
+              if (on) {
+                requestAnimationFrame(function () {
+                  const r = helpMark.getBoundingClientRect();
+                  escalationFactorBarrierInfobox.style.left = (r.left + r.width / 2 - escalationFactorBarrierInfobox.offsetWidth / 2) + 'px';
+                  escalationFactorBarrierInfobox.style.top = (r.top - escalationFactorBarrierInfobox.offsetHeight - 8) + 'px';
+                });
+                var closeOnOutside = function (e) {
+                  if (!escalationFactorBarrierInfobox.contains(e.target) && !div.contains(e.target)) {
+                    escalationFactorBarrierInfobox.classList.remove('visible');
+                    document.removeEventListener('click', closeOnOutside);
+                  }
+                };
+                setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+              }
+            });
+          }
+        } else {
+          div.textContent = 'Depth ' + depth;
+        }
+        laneHeadersLayer.appendChild(div);
+      });
+    }
+
+    let svg = '';
+    // All edges: straight line from parent box edge to child box edge (same as causal map)
+    nodes.forEach(n => {
+      if (!n.parentId) return;
+      const p = layout[n.parentId];
+      const c = layout[n.id];
+      if (!p || !c) return;
+      const parentPos = { x: p.x, y: p.y };
+      const childPos = { x: c.x, y: c.y };
+      const d = renderLink(parentPos, childPos, p.width, p.height, c.width, c.height, n.side);
+      svg += `<path d="${d}" fill="none" stroke="#2d3a4d" stroke-width="2"/>`;
+    });
+    const aboveLayout = layout[ABOVE_ROOT_ID];
+    if (aboveLayout && layout[ROOT_ID]) {
+      const rootLayout = layout[ROOT_ID];
+      const d = `M ${aboveLayout.x} ${aboveLayout.y} L ${rootLayout.x} ${rootLayout.y}`;
+      svg += `<path d="${d}" fill="none" stroke="#2d3a4d" stroke-width="2"/>`;
+    }
+    svgLayer.innerHTML = svg;
+
+    nodesLayer.innerHTML = '';
+    if (aboveLayout) {
+      const ad = document.createElement('div');
+      ad.className = 'node-box root above-root';
+      ad.setAttribute('data-node-id', ABOVE_ROOT_ID);
+      ad.style.left = (aboveLayout.x - aboveLayout.width / 2) + 'px';
+      ad.style.top = (aboveLayout.y - aboveLayout.height / 2) + 'px';
+      ad.style.width = aboveLayout.width + 'px';
+      ad.style.height = aboveLayout.height + 'px';
+      ad.style.minHeight = aboveLayout.height + 'px';
+      ad.innerHTML = `
+        <div class="node-outskirt"></div>
+        <div class="node-inner">
+          <div class="top-event-header">
+            <span>Hazard</span>
+            <span class="help-mark" aria-label="Help" title="What is Hazard?">?</span>
+          </div>
+          <div class="textarea-wrap">
+            <textarea placeholder="Add Hazard" rows="1">${escapeHtml(hazardText)}</textarea>
+          </div>
+        </div>
+      `;
+      const hazardHelpMark = ad.querySelector('.help-mark');
+      const hazardInfobox = document.getElementById('hazard-infobox');
+      if (hazardHelpMark && hazardInfobox) {
+        hazardHelpMark.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const on = hazardInfobox.classList.toggle('visible');
+          if (on) {
+            requestAnimationFrame(function () {
+              const r = hazardHelpMark.getBoundingClientRect();
+              hazardInfobox.style.left = (r.left + r.width / 2 - hazardInfobox.offsetWidth / 2) + 'px';
+              hazardInfobox.style.top = (r.top - hazardInfobox.offsetHeight - 8) + 'px';
+            });
+            var closeOnOutside = function (e) {
+              if (!hazardInfobox.contains(e.target) && !ad.contains(e.target)) {
+                hazardInfobox.classList.remove('visible');
+                document.removeEventListener('click', closeOnOutside);
+              }
+            };
+            setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+          }
+        });
+      }
+      const aboveTa = ad.querySelector('textarea');
+      aboveTa.addEventListener('blur', function () {
+        hazardText = this.value;
+        buildLayout();
+        render();
+      });
+      nodesLayer.appendChild(ad);
+    }
+    nodes.forEach(n => {
+      const l = layout[n.id];
+      if (!l) return;
+      const side = n.side;
+      const isRoot = n.id === ROOT_ID;
+      const div = document.createElement('div');
+      let depthClass = '';
+      if (l.depth === 1) depthClass = ' depth-1';
+      else if (l.depth === 2) depthClass = ' depth-2';
+      else if (l.depth === 3) depthClass = ' depth-3';
+      else if (l.depth >= 4) depthClass = ' depth-3 depth-4';
+      div.className = 'node-box' + (isRoot ? ' root' : '') + depthClass + (selectedId === n.id ? ' selected' : '');
+      div.setAttribute('data-side', side);
+      div.setAttribute('data-node-id', n.id);
+      div.style.left = (l.x - l.width / 2) + 'px';
+      div.style.top = (l.y - l.height / 2) + 'px';
+      div.style.width = l.width + 'px';
+      div.style.minHeight = l.height + 'px';
+
+      let addBtnLeft = '';
+      let addBtnRight = '';
+      let removeBtnLeft = '';
+      let removeBtnRight = '';
+      const canAddChild = l.depth < MAX_DEPTH;
+      if (canAddChild) {
+        if (isRoot) {
+          addBtnLeft = '<button type="button" class="add-btn left" aria-label="Add left">+</button>';
+          addBtnRight = '<button type="button" class="add-btn right" aria-label="Add right">+</button>';
+        } else if (side === 'left') {
+          addBtnLeft = '<button type="button" class="add-btn left" aria-label="Add child">+</button>';
+        } else {
+          addBtnRight = '<button type="button" class="add-btn right" aria-label="Add child">+</button>';
+        }
+      }
+      if (!isRoot && l.depth >= 1 && l.depth <= MAX_DEPTH) {
+        if (side === 'left') removeBtnRight = '<button type="button" class="remove-btn right" aria-label="Remove">−</button>';
+        else removeBtnLeft = '<button type="button" class="remove-btn left" aria-label="Remove">−</button>';
+      }
+
+      const rootHeader = isRoot ? `
+        <div class="top-event-header">
+          <span>Top Event</span>
+          <span class="help-mark" aria-label="Help" title="What is Top Event?">?</span>
+        </div>
+      ` : '';
+      let placeholder = 'Event...';
+      if (isRoot) placeholder = 'Add Top Event';
+      else if (l.depth === 1) placeholder = side === 'left' ? 'Add Threats' : 'Add Consequences';
+      else if (l.depth === 2) placeholder = 'Add Barriers';
+      else if (l.depth === 3) placeholder = 'Add Escalation Factor';
+      else if (l.depth >= 4) placeholder = 'Add Escalation Factor Barrier';
+      div.innerHTML = `
+        <div class="node-outskirt"></div>
+        ${removeBtnLeft}
+        ${addBtnLeft}
+        <div class="node-inner">
+          ${rootHeader}
+          <div class="textarea-wrap">
+            <textarea placeholder="${placeholder}" rows="1">${escapeHtml(n.text)}</textarea>
+          </div>
+        </div>
+        ${addBtnRight}
+        ${removeBtnRight}
+      `;
+
+      if (isRoot) {
+        const helpMark = div.querySelector('.help-mark');
+        const infobox = document.getElementById('top-event-infobox');
+        if (helpMark && infobox) {
+          helpMark.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const on = infobox.classList.toggle('visible');
+            if (on) {
+              requestAnimationFrame(function () {
+                const r = helpMark.getBoundingClientRect();
+                infobox.style.left = (r.left + r.width / 2 - infobox.offsetWidth / 2) + 'px';
+                infobox.style.top = (r.top - infobox.offsetHeight - 8) + 'px';
+              });
+              var closeOnOutside = function (e) {
+                if (!infobox.contains(e.target) && !div.contains(e.target)) {
+                  infobox.classList.remove('visible');
+                  document.removeEventListener('click', closeOnOutside);
+                }
+              };
+              setTimeout(function () { document.addEventListener('click', closeOnOutside); }, 0);
+            }
+          });
+        }
+      }
+
+      const ta = div.querySelector('textarea');
+      ta.addEventListener('input', () => {
+        n.text = ta.value;
+      });
+      ta.addEventListener('blur', () => {
+        n.text = ta.value;
+        buildLayout();
+        render();
+      });
+      ta.addEventListener('click', e => e.stopPropagation());
+      ta.addEventListener('keydown', e => {
+        e.stopPropagation();
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+          if (n.id !== ROOT_ID && !ta.selectionStart && ta.selectionEnd === 0) {
+            e.preventDefault();
+            tryDelete(n.id);
+          }
+        }
+      });
+
+      div.addEventListener('click', e => {
+        if (e.target.classList.contains('add-btn') || e.target.classList.contains('remove-btn')) return;
+        if (e.target.tagName === 'TEXTAREA') return;
+        selectNode(n.id);
+      });
+
+      div.querySelectorAll('.add-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          if (isRoot) addChild(ROOT_ID, btn.classList.contains('left') ? 'left' : 'right');
+          else addChild(n.id, side);
+        });
+      });
+      div.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          tryDelete(n.id);
+        });
+      });
+
+      nodesLayer.appendChild(div);
+    });
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function selectNode(id) {
+    selectedId = id;
+    render();
+  }
+
+  function tryDelete(id) {
+    if (id === ROOT_ID) return;
+    const children = getChildren(id);
+    const msg = children.length > 0
+      ? `Delete this event and ${children.length} descendant(s)?`
+      : 'Delete this event?';
+    if (confirm(msg)) deleteNode(id);
+  }
+
+  // --- Pan / Zoom (scale around root so root stays in place) ---
+  function applyTransform() {
+    const world = document.getElementById('world');
+    const rootX = layout[ROOT_ID] ? layout[ROOT_ID].x : worldWidth / 2;
+    const rootY = layout[ROOT_ID] ? layout[ROOT_ID].y : worldHeight / 2;
+    world.style.transformOrigin = `${rootX}px ${rootY}px`;
+    world.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  function centerOnRoot() {
+    const vp = document.getElementById('viewport');
+    const rootX = layout[ROOT_ID] ? layout[ROOT_ID].x : worldWidth / 2;
+    const rootY = layout[ROOT_ID] ? layout[ROOT_ID].y : worldHeight / 2;
+    translateX = vp.clientWidth / 2 - rootX * scale;
+    translateY = vp.clientHeight / 2 - rootY * scale;
+    applyTransform();
+  }
+
+  function fitToView() {
+    const vp = document.getElementById('viewport');
+    const padding = 40;
+    const sx = (vp.clientWidth - padding) / worldWidth;
+    const sy = (vp.clientHeight - padding) / worldHeight;
+    scale = Math.min(sx, sy, 1.2);
+    translateX = (vp.clientWidth - worldWidth * scale) / 2;
+    translateY = (vp.clientHeight - worldHeight * scale) / 2;
+    applyTransform();
+  }
+
+  const viewport = document.getElementById('viewport');
+  viewport.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+    scale = Math.min(Math.max(scale * factor, 0.2), 4);
+    // transform-origin is set to root in applyTransform, so root stays fixed and depth boxes scale around it
+    applyTransform();
+  }, { passive: false });
+
+  viewport.addEventListener('mousedown', e => {
+    if (e.target.closest('.node-box') || e.target.closest('.add-btn')) return;
+    panStart = { x: e.clientX - translateX, y: e.clientY - translateY };
+    viewport.classList.add('panning');
+  });
+  viewport.addEventListener('mousemove', e => {
+    if (panStart) {
+      translateX = e.clientX - panStart.x;
+      translateY = e.clientY - panStart.y;
+      applyTransform();
+    }
+  });
+  viewport.addEventListener('mouseup', () => {
+    panStart = null;
+    viewport.classList.remove('panning');
+  });
+  viewport.addEventListener('mouseleave', () => {
+    panStart = null;
+    viewport.classList.remove('panning');
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (selectedId && selectedId !== ROOT_ID && !e.target.matches('textarea, input')) {
+        e.preventDefault();
+        tryDelete(selectedId);
+      }
+    }
+  });
+
+  document.getElementById('fileBtn').addEventListener('click', () => {
+    document.getElementById('fileDropdown').classList.toggle('open');
+  });
+  document.body.addEventListener('click', (e) => {
+    if (!document.getElementById('fileDropdown').contains(e.target)) {
+      document.getElementById('fileDropdown').classList.remove('open');
+    }
+  });
+  document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+    document.getElementById('fileDropdown').classList.remove('open');
+    const a = document.createElement('a');
+    a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(exportJsonString());
+    a.download = 'depth-event-map.json';
+    a.click();
+  });
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('fileDropdown').classList.remove('open');
+    document.getElementById('importFile').click();
+  });
+  document.getElementById('importFile').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try { data = JSON.parse(reader.result); } catch (err) {
+        alert('Invalid JSON: ' + err.message);
+        return;
+      }
+      const result = validateAndParse(data);
+      if (!result.ok) {
+        alert('Import failed: ' + result.error);
+        return;
+      }
+      importFromParsed(result.data);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // --- Init ---
+  ensureRoot();
+  buildLayout();
+  render();
+  fitToView();
+  applyTransform();
+})();
+  </script>
+</body>
+</html>

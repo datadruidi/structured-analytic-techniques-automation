@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Hypothesis Generation — Structured Analytic Techniques</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="hypothesis-app">
+    <div class="app-toolbar">
+      <a href="http://localhost:3000/" target="_self" class="btn-back-to-hub" aria-label="Back to main screen" title="Back to SAT Tools hub">
+        <svg class="btn-back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
+        Back to Main Screen
+      </a>
+    </div>
+    <div class="page-switcher">
+      <button type="button" class="page-switcher-btn is-active" id="btn-page-generation" aria-pressed="true">Hypothesis Generation</button>
+      <button type="button" class="page-switcher-btn" id="btn-page-ranking" aria-pressed="false">Hypothesis Ranking</button>
+    </div>
+
+    <div id="page-generation" class="app-page" aria-hidden="false">
+      <header class="app-header">
+        <h1 class="app-title">Multiple Hypothesis Generation</h1>
+        <p class="app-subtitle">Click Generate on a source item and choose Who, What, or Why to build the tree. The tree grows left to right. The source list is loaded from <strong>input/Multiple_Hypothesis_Generation.txt</strong> in this folder.</p>
+        <div class="intelligence-requirement-bar">
+          <label for="intelligence-requirement-input-generation">Intelligence requirement</label>
+          <input type="text" id="intelligence-requirement-input-generation" placeholder="Brief title of the analysis" aria-label="Intelligence requirement">
+          <button type="button" class="btn-save-ach-bar" id="btn-save-ach-generation" aria-label="Save intelligence requirement to hypothesis.json">Save to ACH</button>
+        </div>
+      </header>
+
+      <div class="app-body">
+      <!-- Left panel: source list -->
+      <aside class="source-panel" aria-label="Added for Hypothesis Generation">
+        <h2 class="source-panel-title">Added for Hypothesis Generation</h2>
+        <div class="source-list-wrap">
+          <ul class="source-list" id="source-list" role="list">
+            <!-- Items loaded from Multiple_Hypothesis_Generation.txt + manual adds -->
+          </ul>
+          <div class="source-panel-actions">
+            <button type="button" class="btn-update-source" id="btn-update-source" aria-label="Re-read file and add new items">Update</button>
+            <button type="button" class="btn-clear-source" id="btn-clear-source" aria-label="Clear the source list (does not write to file)">Clear</button>
+            <button type="button" class="btn-add-source" id="btn-add-source" aria-label="Add new source item">Add +</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main workspace: Tree view (Who → What → Why → Permutation) -->
+      <div class="workspace-right">
+        <section class="tree-workspace" aria-label="Tree view">
+          <div class="tree-workspace-toolbar">
+            <div class="tree-workspace-toolbar-left">
+              <button type="button" class="btn-clear-tree" id="btn-clear-tree" aria-label="Clear tree view">Clear view</button>
+              <button type="button" class="btn-update-tree" id="btn-update-tree" aria-label="Add same What and Why to Who branches created later">Update</button>
+            </div>
+            <div class="tree-workspace-toolbar-right">
+              <button type="button" class="btn-clear-hypothesis-json" id="btn-clear-hypothesis-json" aria-label="Wipe hypothesis.json (permutations and H1–H5) so you can start from a blank file">Clear Hypothesis JSON</button>
+              <a href="https://chatgpt.com/g/g-6992157cb5dc81919a58f9c6cb27baf3-hypothesis-permutation-generator" target="_blank" rel="noopener noreferrer" class="btn-toolbar-link btn-hypothesis-permutation-generator" aria-label="Open Hypothesis Permutation Generator (ChatGPT)">Hypothesis Permutation Generator</a>
+            </div>
+          </div>
+          <div class="tree-viewport" id="tree-viewport">
+            <div class="tree-content" id="tree-content"></div>
+            <svg class="tree-arrows" id="tree-arrows" aria-hidden="true"></svg>
+          </div>
+          <p class="tree-empty-hint" id="tree-empty-hint" aria-live="polite">Generate items from the left panel to build the tree. Choose Who, What, or Why for each item.</p>
+        </section>
+      </div>
+    </div>
+    </div>
+
+    <div id="page-ranking" class="app-page app-page--hidden" aria-hidden="true">
+      <header class="app-header">
+        <h1 class="app-title">Hypothesis Ranking</h1>
+        <p class="app-subtitle">Saved permutations from Hypotheses.txt. Use Update to re-read the file.</p>
+        <div class="intelligence-requirement-bar">
+          <label for="intelligence-requirement-input-ranking">Intelligence requirement</label>
+          <input type="text" id="intelligence-requirement-input-ranking" placeholder="Brief title of the analysis" aria-label="Intelligence requirement">
+          <button type="button" class="btn-save-ach-bar" id="btn-save-ach-ranking" aria-label="Save intelligence requirement to hypothesis.json">Save to ACH</button>
+        </div>
+      </header>
+      <div class="ranking-body">
+        <div class="ranking-left">
+          <div class="ranking-toolbar">
+            <button type="button" class="btn-ranking-update" id="btn-ranking-update" aria-label="Re-read Hypotheses.txt">Update</button>
+            <button type="button" class="btn-ranking-clear" id="btn-ranking-clear" aria-label="Clear the page (does not write to file); use Update to load from Hypotheses.txt">Clear</button>
+          </div>
+          <ul class="ranking-list" id="ranking-list" role="list">
+            <!-- Filled by JS from Hypotheses.txt -->
+          </ul>
+        </div>
+        <div class="ranking-right">
+          <div class="hypothesis-cards-container" id="hypothesis-cards-container">
+            <div class="hypothesis-card is-collapsed" data-hypothesis-id="H1">
+              <div class="hypothesis-card-header">
+                <h2 class="hypothesis-card-heading">Hypothesis 1</h2>
+                <span class="hypothesis-card-title-preview" aria-hidden="true"></span>
+                <button type="button" class="hypothesis-card-toggle" aria-label="Show hypothesis" aria-expanded="false">Show</button>
+              </div>
+              <div class="hypothesis-card-body">
+                <div class="hypothesis-card-field">
+                  <span class="hypothesis-card-label">Title</span>
+                  <div class="hypothesis-card-list-wrap">
+                    <ul class="hypothesis-card-list ranking-list" role="list" aria-label="Dropped hypotheses for this card"></ul>
+                    <p class="hypothesis-card-list-placeholder">Drag a hypothesis here from the left.</p>
+                  </div>
+                </div>
+                <div class="hypothesis-card-field">
+                  <label class="hypothesis-card-label">Description</label>
+                  <textarea class="hypothesis-card-description" placeholder="Create a description for your hypothesis." rows="6" aria-label="Hypothesis description"></textarea>
+                </div>
+                <div class="hypothesis-card-actions">
+                  <button type="button" class="btn-save-ach" aria-label="Save this hypothesis as hypothesis.json for ACH">Save Hypothesis for ACH</button>
+                </div>
+              </div>
+            </div>
+            <div class="hypothesis-card is-collapsed" data-hypothesis-id="H2">
+              <div class="hypothesis-card-header">
+                <h2 class="hypothesis-card-heading">Hypothesis 2</h2>
+                <span class="hypothesis-card-title-preview" aria-hidden="true"></span>
+                <button type="button" class="hypothesis-card-toggle" aria-label="Show hypothesis" aria-expanded="false">Show</button>
+              </div>
+              <div class="hypothesis-card-body">
+                <div class="hypothesis-card-field">
+                  <span class="hypothesis-card-label">Title</span>
+                  <div class="hypothesis-card-list-wrap">
+                    <ul class="hypothesis-card-list ranking-list" role="list" aria-label="Dropped hypotheses for this card"></ul>
+                    <p class="hypothesis-card-list-placeholder">Drag a hypothesis here from the left.</p>
+                  </div>
+                </div>
+                <div class="hypothesis-card-field">
+                  <label class="hypothesis-card-label">Description</label>
+                  <textarea class="hypothesis-card-description" placeholder="Create a description for your hypothesis." rows="6" aria-label="Hypothesis description"></textarea>
+                </div>
+                <div class="hypothesis-card-actions">
+                  <button type="button" class="btn-save-ach" aria-label="Save this hypothesis as hypothesis.json for ACH">Save Hypothesis for ACH</button>
+                </div>
+              </div>
+            </div>
+            <div class="hypothesis-card is-collapsed" data-hypothesis-id="H3">
+              <div class="hypothesis-card-header">
+                <h2 class="hypothesis-card-heading">Hypothesis 3</h2>
+                <span class="hypothesis-card-title-preview" aria-hidden="true"></span>
+                <button type="button" class="hypothesis-card-toggle" aria-label="Show hypothesis" aria-expanded="false">Show</button>
+              </div>
+              <div class="hypothesis-card-body">
+                <div class="hypothesis-card-field">
+                  <span class="hypothesis-card-label">Title</span>
+                  <div class="hypothesis-card-list-wrap">
+                    <ul class="hypothesis-card-list ranking-list" role="list" aria-label="Dropped hypotheses for this card"></ul>
+                    <p class="hypothesis-card-list-placeholder">Drag a hypothesis here from the left.</p>
+                  </div>
+                </div>
+                <div class="hypothesis-card-field">
+                  <label class="hypothesis-card-label">Description</label>
+                  <textarea class="hypothesis-card-description" placeholder="Create a description for your hypothesis." rows="6" aria-label="Hypothesis description"></textarea>
+                </div>
+                <div class="hypothesis-card-actions">
+                  <button type="button" class="btn-save-ach" aria-label="Save this hypothesis as hypothesis.json for ACH">Save Hypothesis for ACH</button>
+                </div>
+              </div>
+            </div>
+            <div class="hypothesis-card is-collapsed" data-hypothesis-id="H4">
+              <div class="hypothesis-card-header">
+                <h2 class="hypothesis-card-heading">Hypothesis 4</h2>
+                <span class="hypothesis-card-title-preview" aria-hidden="true"></span>
+                <button type="button" class="hypothesis-card-toggle" aria-label="Show hypothesis" aria-expanded="false">Show</button>
+              </div>
+              <div class="hypothesis-card-body">
+                <div class="hypothesis-card-field">
+                  <span class="hypothesis-card-label">Title</span>
+                  <div class="hypothesis-card-list-wrap">
+                    <ul class="hypothesis-card-list ranking-list" role="list" aria-label="Dropped hypotheses for this card"></ul>
+                    <p class="hypothesis-card-list-placeholder">Drag a hypothesis here from the left.</p>
+                  </div>
+                </div>
+                <div class="hypothesis-card-field">
+                  <label class="hypothesis-card-label">Description</label>
+                  <textarea class="hypothesis-card-description" placeholder="Create a description for your hypothesis." rows="6" aria-label="Hypothesis description"></textarea>
+                </div>
+                <div class="hypothesis-card-actions">
+                  <button type="button" class="btn-save-ach" aria-label="Save this hypothesis as hypothesis.json for ACH">Save Hypothesis for ACH</button>
+                </div>
+              </div>
+            </div>
+            <div class="hypothesis-card is-collapsed" data-hypothesis-id="H5">
+              <div class="hypothesis-card-header">
+                <h2 class="hypothesis-card-heading">Hypothesis 5</h2>
+                <span class="hypothesis-card-title-preview" aria-hidden="true"></span>
+                <button type="button" class="hypothesis-card-toggle" aria-label="Show hypothesis" aria-expanded="false">Show</button>
+              </div>
+              <div class="hypothesis-card-body">
+                <div class="hypothesis-card-field">
+                  <span class="hypothesis-card-label">Title</span>
+                  <div class="hypothesis-card-list-wrap">
+                    <ul class="hypothesis-card-list ranking-list" role="list" aria-label="Dropped hypotheses for this card"></ul>
+                    <p class="hypothesis-card-list-placeholder">Drag a hypothesis here from the left.</p>
+                  </div>
+                </div>
+                <div class="hypothesis-card-field">
+                  <label class="hypothesis-card-label">Description</label>
+                  <textarea class="hypothesis-card-description" placeholder="Create a description for your hypothesis." rows="6" aria-label="Hypothesis description"></textarea>
+                </div>
+                <div class="hypothesis-card-actions">
+                  <button type="button" class="btn-save-ach" aria-label="Save this hypothesis as hypothesis.json for ACH">Save Hypothesis for ACH</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Destination popup (shown when user clicks Generate) -->
+    <div id="destination-popup" class="destination-popup" role="dialog" aria-modal="true" aria-labelledby="destination-popup-title" hidden>
+      <div class="destination-popup-backdrop" id="destination-popup-backdrop"></div>
+      <div class="destination-popup-box">
+        <h2 id="destination-popup-title" class="destination-popup-title">Place in column</h2>
+        <p class="destination-popup-item" id="destination-popup-item-preview"></p>
+        <div class="destination-options">
+          <button type="button" class="destination-option" data-destination="who" id="dest-who" onclick="window.__hypothesisPlace('who')">Who?</button>
+          <button type="button" class="destination-option" data-destination="what" id="dest-what" onclick="window.__hypothesisPlace('what')">What?</button>
+          <button type="button" class="destination-option" data-destination="why" id="dest-why" onclick="window.__hypothesisPlace('why')">Why?</button>
+        </div>
+        <button type="button" class="destination-popup-cancel" id="destination-popup-cancel">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Add new source item (inline or modal) -->
+    <div id="add-source-modal" class="add-source-modal" role="dialog" aria-modal="true" aria-labelledby="add-source-modal-title" hidden>
+      <div class="add-source-modal-backdrop" id="add-source-modal-backdrop"></div>
+      <div class="add-source-modal-box">
+        <h2 id="add-source-modal-title" class="add-source-modal-title">New source item</h2>
+        <label for="add-source-input" class="add-source-label">Statement</label>
+        <input type="text" id="add-source-input" class="add-source-input" placeholder="e.g. Kremlin johto" autocomplete="off" />
+        <div class="add-source-actions">
+          <button type="button" class="add-source-cancel" id="add-source-cancel">Cancel</button>
+          <button type="button" class="add-source-add" id="add-source-add">Add</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
