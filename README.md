@@ -1,5 +1,6 @@
 ﻿# Structured Analytic Techniques
 ![Analysis](assets/img/mainpage.png)
+
 *Structured Analytic Techniques for Intelligence Analysis - Heuer Jr., Pherson*
 
 A collection of lightweight, analyst-focused tools for Structured Analytic Techniques (SAT). All tools run in the browser and work offline where applicable.
