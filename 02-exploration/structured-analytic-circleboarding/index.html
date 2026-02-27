@@ -15,12 +15,21 @@
           Back to Main Screen
         </a>
         <div class="dashboard-header-title-wrap">
-          <h1 class="dashboard-title">Circleboarding for Structured Analysis Techniques</h1>
+          <h1 class="dashboard-title">Circleboarding for Structured Analytic Techniques</h1>
           <p class="dashboard-subtitle">Drag items to reorder or into So what? to build your synthesis. Data is stored in CircleboardData.txt (and this browser); use Refresh to add new items from hypothesis_keywords.jsonl.</p>
         </div>
-        <button type="button" id="btn-clean" class="btn-clean" aria-label="Clean all boxes (does not change files)">Clean</button>
+        <div class="file-menu-wrap">
+          <button type="button" id="btn-file" class="btn-file" aria-haspopup="true" aria-expanded="false" aria-label="File options">File</button>
+          <div class="file-menu" id="file-menu" role="menu" aria-label="File options">
+            <button type="button" class="file-menu-item" id="file-update-btn" role="menuitem">Update from File</button>
+            <button type="button" class="file-menu-item" id="file-import-btn" role="menuitem">Import</button>
+            <button type="button" class="file-menu-item" id="file-export-btn" role="menuitem">Export</button>
+            <button type="button" class="file-menu-item" id="file-clear-btn" role="menuitem">Clear</button>
+          </div>
+        </div>
         <button type="button" id="btn-refresh" class="btn-refresh" aria-label="Refresh: merge new items from hypothesis_keywords.jsonl into current data">Refresh from hypothesis_keywords.jsonl</button>
       </div>
+      <input type="file" id="file-import-input" accept=".json,application/json" hidden>
     </header>
 
     <section class="categories-zone" aria-label="Category boxes">

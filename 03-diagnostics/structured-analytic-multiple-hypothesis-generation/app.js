@@ -41,11 +41,24 @@
   const treeEmptyHint = $('#tree-empty-hint');
   const btnClearTree = $('#btn-clear-tree');
   const btnUpdateTree = $('#btn-update-tree');
+  const fileMenuWrap = $('#file-menu-wrap');
+  const btnFileMenu = $('#btn-file-menu');
+  const fileMenuDropdown = $('#file-menu-dropdown');
+  const btnFileImport = $('#btn-file-import');
+  const btnFileExport = $('#btn-file-export');
+  const fileImportInput = $('#file-import-input');
+
+  let importedRankingItemsOverride = null;
+  let importedRankingIntelligenceRequirement = null;
 
   function newId() {
     return typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
+  function deepClone(value) {
+    return JSON.parse(JSON.stringify(value));
   }
 
   /** Deep clone a Who and regenerate all IDs. No shared references. */
@@ -850,6 +863,17 @@
   function loadHypothesesFile() {
     var listEl = document.getElementById('ranking-list');
     if (!listEl) return;
+    if (Array.isArray(importedRankingItemsOverride)) {
+      renderRankingList(importedRankingItemsOverride);
+      restoreRankingState();
+      var importedIr = document.getElementById('intelligence-requirement-input-ranking');
+      if (importedIr && importedRankingIntelligenceRequirement != null) {
+        importedIr.value = String(importedRankingIntelligenceRequirement);
+      }
+      importedRankingItemsOverride = null;
+      importedRankingIntelligenceRequirement = null;
+      return;
+    }
     fetch('/api/hypothesis-ach')
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('Could not load')); })
       .then(function (data) {
@@ -1308,6 +1332,173 @@
     });
   }
 
+  function getCurrentPageId() {
+    var rankingPage = document.getElementById('page-ranking');
+    if (rankingPage && !rankingPage.classList.contains('app-page--hidden')) return 'page-ranking';
+    return 'page-generation';
+  }
+
+  function getRankingListItems() {
+    var listEl = document.getElementById('ranking-list');
+    if (!listEl) return [];
+    return Array.from(listEl.querySelectorAll('.ranking-list-item')).map(function (li) {
+      var span = li.querySelector('.ranking-list-text');
+      return {
+        title: span ? span.textContent : '',
+        hypothesisId: li.dataset.hypothesisId || ''
+      };
+    });
+  }
+
+  function downloadJsonFile(payload, filename) {
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCurrentView() {
+    var currentPage = getCurrentPageId();
+    var payload = {
+      app: 'multiple-hypothesis-generation',
+      version: 1,
+      page: currentPage,
+      exportedAt: new Date().toISOString()
+    };
+
+    if (currentPage === 'page-generation') {
+      var irGen = document.getElementById('intelligence-requirement-input-generation');
+      payload.generation = {
+        sourceItems: deepClone(sourceItems),
+        groups: deepClone(groups),
+        treeColumnWidths: deepClone(treeColumnWidths),
+        intelligenceRequirement: irGen ? irGen.value : ''
+      };
+    } else {
+      var irRank = document.getElementById('intelligence-requirement-input-ranking');
+      payload.ranking = {
+        listItems: getRankingListItems(),
+        cards: getRankingState() ? getRankingState().cards : {},
+        intelligenceRequirement: irRank ? irRank.value : ''
+      };
+    }
+
+    downloadJsonFile(payload, 'multiple-hypothesis-generation-export.json');
+  }
+
+  function normalizeGenerationImport(data) {
+    sourceItems = Array.isArray(data.sourceItems)
+      ? data.sourceItems.map(function (s) { return String(s || '').trim(); }).filter(Boolean)
+      : [];
+    groups = Array.isArray(data.groups) ? data.groups : [];
+    if (data.treeColumnWidths && typeof data.treeColumnWidths === 'object') {
+      var w = Number(data.treeColumnWidths.who);
+      var wt = Number(data.treeColumnWidths.what);
+      var wy = Number(data.treeColumnWidths.why);
+      if (!Number.isNaN(w) && !Number.isNaN(wt) && !Number.isNaN(wy)) {
+        treeColumnWidths = {
+          who: Math.max(TREE_COLUMN_MIN, w),
+          what: Math.max(TREE_COLUMN_MIN, wt),
+          why: Math.max(TREE_COLUMN_MIN, wy)
+        };
+      }
+    }
+    var irGen = document.getElementById('intelligence-requirement-input-generation');
+    if (irGen && data.intelligenceRequirement != null) irGen.value = String(data.intelligenceRequirement);
+    renderSourceList();
+    buildTreeView();
+    saveGenerationState();
+  }
+
+  function normalizeRankingImport(data) {
+    var items = Array.isArray(data.listItems)
+      ? data.listItems.map(function (item) {
+          if (typeof item === 'string') return { title: item, hypothesisId: '' };
+          if (!item || typeof item !== 'object') return { title: '', hypothesisId: '' };
+          return { title: String(item.title || ''), hypothesisId: String(item.hypothesisId || '') };
+        }).filter(function (item) { return item.title.trim() !== ''; })
+      : [];
+
+    importedRankingItemsOverride = items;
+    importedRankingIntelligenceRequirement = data.intelligenceRequirement != null ? String(data.intelligenceRequirement) : '';
+    try {
+      localStorage.setItem(STORAGE_KEY_RANKING, JSON.stringify({ cards: data.cards && typeof data.cards === 'object' ? data.cards : {} }));
+    } catch (e) {}
+    showPage('page-ranking');
+    saveRankingState();
+  }
+
+  function importViewFromJson(parsed) {
+    if (!parsed || typeof parsed !== 'object') throw new Error('Expected JSON object');
+    if (parsed.page === 'page-ranking' && parsed.ranking) {
+      normalizeRankingImport(parsed.ranking);
+      return;
+    }
+    if (parsed.page === 'page-generation' && parsed.generation) {
+      showPage('page-generation');
+      normalizeGenerationImport(parsed.generation);
+      return;
+    }
+    if (parsed.generation) {
+      showPage('page-generation');
+      normalizeGenerationImport(parsed.generation);
+      return;
+    }
+    if (parsed.ranking) {
+      normalizeRankingImport(parsed.ranking);
+      return;
+    }
+    throw new Error('Import file does not contain generation or ranking data.');
+  }
+
+  function initFileMenu() {
+    if (!fileMenuWrap || !btnFileMenu || !fileMenuDropdown) return;
+    btnFileMenu.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = fileMenuWrap.classList.toggle('open');
+      btnFileMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!fileMenuWrap.contains(e.target)) {
+        fileMenuWrap.classList.remove('open');
+        btnFileMenu.setAttribute('aria-expanded', 'false');
+      }
+    });
+    fileMenuDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
+    if (btnFileExport) {
+      btnFileExport.addEventListener('click', function () {
+        fileMenuWrap.classList.remove('open');
+        btnFileMenu.setAttribute('aria-expanded', 'false');
+        exportCurrentView();
+      });
+    }
+    if (btnFileImport && fileImportInput) {
+      btnFileImport.addEventListener('click', function () {
+        fileMenuWrap.classList.remove('open');
+        btnFileMenu.setAttribute('aria-expanded', 'false');
+        fileImportInput.value = '';
+        fileImportInput.click();
+      });
+      fileImportInput.addEventListener('change', function () {
+        var file = fileImportInput.files && fileImportInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var parsed = JSON.parse(reader.result);
+            importViewFromJson(parsed);
+          } catch (err) {
+            alert('Import failed: ' + (err && err.message ? err.message : err));
+          }
+        };
+        reader.readAsText(file, 'utf8');
+      });
+    }
+  }
+
   function initPageSwitcher() {
     var btnGen = document.getElementById('btn-page-generation');
     var btnRank = document.getElementById('btn-page-ranking');
@@ -1324,6 +1515,7 @@
     loadSourceFile();
     initDestinationPopup();
     initPageSwitcher();
+    initFileMenu();
     setupHypothesisCardList();
     initSaveHypothesisAch();
     initSaveAchGeneration();

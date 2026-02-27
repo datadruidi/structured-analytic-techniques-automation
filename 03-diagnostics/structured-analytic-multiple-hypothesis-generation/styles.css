@@ -26,9 +26,70 @@ body {
 }
 
 .app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   flex-shrink: 0;
   padding-right: 12rem;
   margin-bottom: 0.5rem;
+}
+.app-toolbar-file {
+  position: relative;
+}
+.btn-file-menu {
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #5c5c5c;
+  background: transparent;
+  border: 1px solid #c5c2bd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.btn-file-menu:hover {
+  color: #1a1a1a;
+  border-color: #6b9bd1;
+  background: #f0f6fc;
+}
+.file-menu-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 130px;
+  background: #fff;
+  border: 1px solid #c5c2bd;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 30;
+  padding: 0.25rem 0;
+}
+.app-toolbar-file.open .file-menu-dropdown {
+  display: block;
+}
+.file-menu-dropdown button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #2a2a2a;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+}
+.file-menu-dropdown button:hover {
+  background: #f0f6fc;
+  color: #1a1a1a;
+}
+.app-toolbar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3c4b5f;
 }
 
 .btn-back-to-hub {

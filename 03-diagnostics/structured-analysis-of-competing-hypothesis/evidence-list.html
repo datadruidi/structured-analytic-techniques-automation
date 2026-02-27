@@ -83,7 +83,7 @@
       text-decoration: underline;
     }
     .link-btn:hover { color: #9ed4f0; }
-    .dropdown-wrap { position: relative; display: inline-block; }
+    .dropdown-wrap { position: relative; display: inline-flex; }
     .dropdown-menu {
       display: none;
       position: absolute;
@@ -143,6 +143,11 @@
     }
     .ach-evidence-header-label { margin-right: 0.25rem; }
     .ach-evidence-import-btn { padding: 0.25rem 0.5rem; font-size: 0.8rem; white-space: nowrap; }
+    .ach-evidence-file-wrap .dropdown-menu {
+      left: auto;
+      right: 0;
+      min-width: 190px;
+    }
     .ach-matrix td.ach-cell-event { vertical-align: top; min-width: 280px; padding: 0.5rem 0.6rem; }
     .ach-matrix td.ach-cell-event:has(.evidence-item.collapsed) { padding-top: 0.25rem; padding-bottom: 0.25rem; }
     .ach-matrix td.ach-cell-event .evidence-item { margin: 0; border: none; padding: 0.35rem 0; }
@@ -445,6 +450,7 @@
       background: #252525;
       border: 1px solid #444;
       border-radius: 6px;
+      overflow: visible;
     }
     .counter-box {
       padding: 0.75rem;
@@ -475,6 +481,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 0.5rem;
+      overflow: visible;
     }
     .hypothesis-box h2 {
       margin: 0 0 0.5rem 0;
@@ -785,7 +792,7 @@
           Back to Main Screen
         </a>
       </div>
-      <h2 class="events-title">Analysis of Competing Hypothesis for Structured Analysis Techniques</h2>
+      <h2 class="events-title">Competing Hypothesis for Structured Analytic Techniques</h2>
     </div>
     <div class="hypothesis-and-counters">
       <div class="intelligence-requirement-box">
@@ -799,8 +806,15 @@
       <div class="hypothesis-box" id="hypothesis-box">
         <div class="hypothesis-box-header">
           <h2>Hypothesis</h2>
-          <button type="button" class="btn hypothesis-update-btn" id="hypothesis-update-btn" aria-label="Update from file" title="Update from data/hypothesis.json">Update</button>
-          <button type="button" class="btn hypothesis-clear-btn" id="hypothesis-clear-btn" aria-label="Clear hypothesis list" title="Clear the list (does not save)">Clear hypothesis</button>
+          <div class="dropdown-wrap">
+            <button type="button" class="btn hypothesis-update-btn" id="hypothesis-file-btn" aria-label="Hypothesis file options">File</button>
+            <div class="dropdown-menu" id="hypothesis-file-menu">
+              <button type="button" id="hypothesis-update-btn" aria-label="Update from file" title="Update from data/hypothesis.json">Update from File</button>
+              <button type="button" id="import-hypothesis-btn">Import Hypothesis</button>
+              <button type="button" id="export-hypothesis-btn">Export Hypothesis</button>
+              <button type="button" id="hypothesis-clear-btn" aria-label="Clear hypothesis list" title="Clear the list (does not save)">Clear Hypothesis</button>
+            </div>
+          </div>
           <button type="button" class="hypothesis-toggle-btn" id="hypothesis-toggle-btn" aria-label="Hide hypothesis" title="Hide hypothesis">▼ Hide</button>
         </div>
         <div class="hypothesis-box-content" id="hypothesis-box-content">
@@ -848,7 +862,19 @@
       <table class="ach-matrix" id="ach-matrix">
         <thead>
           <tr>
-            <th class="ach-th ach-event"><span class="ach-evidence-header"><span class="ach-evidence-header-label">Evidence</span><button type="button" class="btn ach-evidence-import-btn" id="evidence-header-read-btn">Read Evidence from File</button></span></th>
+            <th class="ach-th ach-event">
+              <span class="ach-evidence-header">
+                <span class="ach-evidence-header-label">Evidence</span>
+                <div class="dropdown-wrap ach-evidence-file-wrap">
+                  <button type="button" class="btn ach-evidence-import-btn" id="evidence-file-btn">File</button>
+                  <div class="dropdown-menu" id="evidence-file-menu">
+                    <button type="button" id="evidence-header-read-btn">Update from File</button>
+                    <button type="button" id="import-evidence-btn">Import Evidence</button>
+                    <button type="button" id="export-evidence-btn">Export Evidence</button>
+                  </div>
+                </div>
+              </span>
+            </th>
             <th class="ach-th ach-h1" id="ach-th-h1">H1</th>
             <th class="ach-th ach-h2" id="ach-th-h2">H2</th>
             <th class="ach-th ach-h3" id="ach-th-h3">H3</th>
@@ -891,6 +917,10 @@
       const exportDropdown = document.getElementById('export-dropdown');
       const filterBtn = document.getElementById('filter-btn');
       const filterPanel = document.getElementById('filter-panel');
+      const hypothesisFileBtn = document.getElementById('hypothesis-file-btn');
+      const hypothesisFileMenu = document.getElementById('hypothesis-file-menu');
+      const evidenceFileBtn = document.getElementById('evidence-file-btn');
+      const evidenceFileMenu = document.getElementById('evidence-file-menu');
       const hypothesisListEl = document.getElementById('hypothesis-list');
       const hypothesisStatusEl = document.getElementById('hypothesis-status');
       const hypothesisModal = document.getElementById('hypothesis-modal');
@@ -1323,7 +1353,8 @@
       var exportEvidenceBtn = document.getElementById('export-evidence-btn');
       if (exportEvidenceBtn) {
         exportEvidenceBtn.addEventListener('click', function () {
-          exportDropdown.classList.remove('open');
+          if (exportDropdown) exportDropdown.classList.remove('open');
+          if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
           if (!currentRoot) {
             statusEl.textContent = 'No data to export.';
             statusEl.classList.add('error');
@@ -1346,7 +1377,8 @@
       var exportHypothesisBtn = document.getElementById('export-hypothesis-btn');
       if (exportHypothesisBtn) {
         exportHypothesisBtn.addEventListener('click', function () {
-          exportDropdown.classList.remove('open');
+          if (exportDropdown) exportDropdown.classList.remove('open');
+          if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
           var payload = {};
           hypothesisData.forEach(function (h) {
             payload[h.id] = { id: h.id, title: h.title || '', description: h.description || '' };
@@ -1429,27 +1461,46 @@
       if (importBtn && importDropdown) {
         importBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          exportDropdown.classList.remove('open');
+          if (exportDropdown) exportDropdown.classList.remove('open');
           importDropdown.classList.toggle('open');
         });
       }
       if (exportBtn && exportDropdown) {
         exportBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          importDropdown.classList.remove('open');
+          if (importDropdown) importDropdown.classList.remove('open');
           exportDropdown.classList.toggle('open');
+        });
+      }
+      if (hypothesisFileBtn && hypothesisFileMenu) {
+        hypothesisFileBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
+          hypothesisFileMenu.classList.toggle('open');
+        });
+      }
+      if (evidenceFileBtn && evidenceFileMenu) {
+        evidenceFileBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
+          evidenceFileMenu.classList.toggle('open');
         });
       }
       document.addEventListener('click', function () {
         if (importDropdown) importDropdown.classList.remove('open');
         if (exportDropdown) exportDropdown.classList.remove('open');
+        if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
+        if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
       });
       if (importDropdown) importDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
       if (exportDropdown) exportDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
+      if (hypothesisFileMenu) hypothesisFileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+      if (evidenceFileMenu) evidenceFileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
       var importEvidenceBtn = document.getElementById('import-evidence-btn');
       if (importEvidenceBtn && importJsonInput) {
         importEvidenceBtn.addEventListener('click', function () {
-          importDropdown.classList.remove('open');
+          if (importDropdown) importDropdown.classList.remove('open');
+          if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
           importJsonInput.value = '';
           importJsonInput.click();
         });
@@ -1457,6 +1508,7 @@
       var evidenceHeaderReadBtn = document.getElementById('evidence-header-read-btn');
       if (evidenceHeaderReadBtn) {
         evidenceHeaderReadBtn.addEventListener('click', function () {
+          if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
           statusEl.textContent = 'Reading evidence from file…';
           statusEl.classList.remove('error');
           loadAndRender(true);
@@ -1483,7 +1535,8 @@
       var importHypothesisBtn = document.getElementById('import-hypothesis-btn');
       if (importHypothesisBtn && importHypothesisInput) {
         importHypothesisBtn.addEventListener('click', function () {
-          importDropdown.classList.remove('open');
+          if (importDropdown) importDropdown.classList.remove('open');
+          if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
           importHypothesisInput.value = '';
           importHypothesisInput.click();
         });
@@ -2041,6 +2094,7 @@
       var hypothesisUpdateBtn = document.getElementById('hypothesis-update-btn');
       if (hypothesisUpdateBtn) {
         hypothesisUpdateBtn.addEventListener('click', function () {
+          if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
           if (!hypothesisListEl || !hypothesisStatusEl) return;
           hypothesisStatusEl.textContent = 'Updating…';
           fetch('api/hypothesis?t=' + Date.now(), { cache: 'no-store' })
@@ -2064,6 +2118,7 @@
       var hypothesisClearBtn = document.getElementById('hypothesis-clear-btn');
       if (hypothesisClearBtn) {
         hypothesisClearBtn.addEventListener('click', function () {
+          if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
           applyHypothesisData({});
           if (hypothesisStatusEl) hypothesisStatusEl.textContent = 'Cleared. Click Update to load from file.';
           statusEl.textContent = 'Intelligence Requirement and hypothesis list cleared. Click Update to load from file.';

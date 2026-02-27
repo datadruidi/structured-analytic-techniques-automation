@@ -1,49 +1,71 @@
-# Bowtie Analysis Tool (Structured Analytic Techniques)
+﻿# Bowtie Analysis Tool
 
-This is a lightweight, browser-based **Bowtie Analysis** builder for structured analysis. It helps you map a **Top Event** (loss of control) and connect it to **Threats** (causes) on the left and **Consequences** (outcomes) on the right—then deepen the analysis with **Barriers**, **Escalation Factors**, and **Escalation Factor Barriers**.
+Lightweight browser tool for building a Bowtie structure around a **Top Event** with:
 
-![Bowtie Analysis UI](assets\img\bowtie-ui.png)
+- **Threats** on the left
+- **Consequences** on the right
+- **Barriers**, **Escalation Factors**, and **Escalation Factor Barriers** at deeper levels
+
+![Bowtie Analysis UI](assets/img/bowtie-ui.png)
+
+## Verified status
+
+A runtime smoke test was run against the current implementation:
+
+- server started on `http://localhost:8085`
+- main page loaded (`200 OK`)
+- expected UI controls exist (`File`, `Import JSON`, `Download JSON`)
+
+## Run
+
+From this folder:
+
+```bash
+node server.js
+```
+
+Open:
+
+- `http://localhost:8085`
+
+Or run from repo root:
+
+```bash
+node start-all.js
+```
+
+and open the hub at `http://localhost:3000`.
 
 ## What it does
 
-- **Creates a nested Bowtie structure** around a fixed root **Top Event**.
-- Lets you build both sides of the bowtie:
-  - **Left side (prevention chain):** Threat → Preventive Barrier → Escalation Factor → Escalation Factor Barrier
-  - **Right side (mitigation chain):** Consequence → Recovery Barrier → Escalation Factor → Escalation Factor Barrier
-- Includes a **Hazard** node above the Top Event to describe the risky activity or context.
-- Automatically **centers and reflows** children around their parent so the diagram stays readable as it grows.
-- Draws connectors between nodes to show relationships.
-- Provides **“?” info tooltips** for each lane/type (Hazard, Threat, Consequence, barriers, escalation factors).
+- Creates a nested Bowtie structure around a fixed root Top Event
+- Supports both Bowtie sides:
+  - Left: Threat -> Preventive Barrier -> Escalation Factor -> Escalation Factor Barrier
+  - Right: Consequence -> Recovery Barrier -> Escalation Factor -> Escalation Factor Barrier
+- Includes a Hazard node above the Top Event
+- Auto-reflows node layout as children are added
+- Supports pan/zoom and direct text editing
+- Provides lane/type help tooltips
 
-## How to use
+## File menu
 
-- **Add nodes:** click the **+** buttons on a node to add children on the appropriate side.
-- **Edit text:** click into a node and type.
-- **Delete nodes:** use the **−** button (deletes the node and its descendants).
-- **Navigate:** pan by dragging the background; zoom with the mouse wheel.
+- **Import JSON**: Load a saved Bowtie JSON file
+- **Download JSON**: Export current Bowtie structure as JSON
 
-## Import / Export
+## Screenshot file reference
 
-Use the **File** menu:
-- **Download JSON** exports the current bowtie as a nested JSON file.
-- **Import JSON** loads a previously exported JSON file and recreates the diagram.
+Use this filename for the README screenshot:
 
-## Data model (high level)
+- **`bowtie-ui.png`**
 
-The diagram is stored as a nested tree:
-- Root is the **Top Event** (`root`)
-- Children branch left/right using `side: "left" | "right"`
-- Deeper levels represent barriers and escalation structures
+Place it at:
 
-A separate `hazard` field stores the Hazard text shown above the Top Event.
+- `06-decision-support/structured-bowtie-analysis/assets/img/bowtie-ui.png`
 
-## Run locally
+## Files in this folder
 
-Open the HTML file in a browser (no build step required):
-
-- Double-click the `.html` file, or
-- Serve the folder with any static server (optional)
-
-```bash
-# example (optional)
-python -m http.server 8000
+| File | Purpose |
+|---|---|
+| `index.html` | Main Bowtie app (UI + logic) |
+| `server.js` | Local static server on port 8085 |
+| `assets/img/bowtie-ui.png` | README screenshot image |

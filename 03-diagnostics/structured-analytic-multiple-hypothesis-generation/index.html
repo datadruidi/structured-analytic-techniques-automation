@@ -13,6 +13,15 @@
         <svg class="btn-back-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg>
         Back to Main Screen
       </a>
+      <div class="app-toolbar-file" id="file-menu-wrap">
+        <button type="button" class="btn-file-menu" id="btn-file-menu" aria-haspopup="true" aria-expanded="false">File</button>
+        <div class="file-menu-dropdown" id="file-menu-dropdown" role="menu">
+          <button type="button" id="btn-file-import" role="menuitem">Import</button>
+          <button type="button" id="btn-file-export" role="menuitem">Export</button>
+        </div>
+      </div>
+      <span class="app-toolbar-title">Multiple Hypothesis Generation for Structured Analytic Techniques</span>
+      <input type="file" id="file-import-input" accept=".json,application/json" hidden>
     </div>
     <div class="page-switcher">
       <button type="button" class="page-switcher-btn is-active" id="btn-page-generation" aria-pressed="true">Hypothesis Generation</button>

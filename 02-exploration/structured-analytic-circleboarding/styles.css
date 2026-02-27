@@ -102,6 +102,63 @@ body {
   cursor: not-allowed;
 }
 
+.file-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.btn-file {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #f5f5f5;
+  border: 1px solid #c5c2bd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.btn-file:hover {
+  border-color: #888;
+  background: #ebebeb;
+}
+
+.file-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #c5c2bd;
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  padding: 0.25rem 0;
+  z-index: 20;
+}
+
+.file-menu.open {
+  display: block;
+}
+
+.file-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.file-menu-item:hover {
+  background: #f0f6fc;
+}
+
 .btn-clean {
   flex-shrink: 0;
   padding: 0.5rem 1rem;
@@ -962,6 +1019,31 @@ body {
   .btn-clean:hover {
     border-color: #5a5a5e;
     background: #3a3a3e;
+  }
+
+  .btn-file {
+    color: #e4e4e4;
+    background: #2d2d31;
+    border-color: #3a3a3e;
+  }
+
+  .btn-file:hover {
+    border-color: #5a5a5e;
+    background: #3a3a3e;
+  }
+
+  .file-menu {
+    background: #2d2d31;
+    border-color: #3a3a3e;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .file-menu-item {
+    color: #e4e4e4;
+  }
+
+  .file-menu-item:hover {
+    background: #1e2a3a;
   }
 
   .category-box {

@@ -61,7 +61,7 @@ This tool’s server uses **port 8082** (see repo root `HUB-PAGE-INSTRUCTIONS.md
 **Export (save):**
 
 1. **CircleboardData.txt** — Same JSON shape as import (full state: categories + soWhatLanes + trashLanes). Written by the app on save when the server is running.
-2. **Save for Hypothesis Generation** — Writes **Multiple_Hypothesis_Generation.txt** in `03-diagnostics/structured-analytic-multiple-hypothesis-generation/`: plain text with a `So What?` header and `- item` lines (one per “So what?” item).
+2. **Save for Hypothesis Generation** — Writes **Multiple_Hypothesis_Generation.txt** in `03-diagnostics/structured-analytic-multiple-hypothesis-generation/input/`: plain text with a `So What?` header and `- item` lines (one per “So what?” item).
 
 **Example hypothesis_keywords.jsonl (one line):**
 

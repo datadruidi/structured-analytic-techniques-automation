@@ -774,6 +774,114 @@
     setupDragAndDrop(state);
   };
 
+  function applyState(state, shouldSave) {
+    var normalized = normalizeState(state);
+    if (shouldSave) doSave(normalized);
+    render(normalized);
+    setupDragAndDrop(normalized);
+  }
+
+  window.updateBoardFromFile = function () {
+    fetch(CIRCLEBOARD_DATA_FILE + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Could not load ' + CIRCLEBOARD_DATA_FILE);
+        return r.text();
+      })
+      .then(function (text) {
+        var parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (e) {
+          throw new Error('Invalid JSON in ' + CIRCLEBOARD_DATA_FILE);
+        }
+        applyState(parsed, true);
+      })
+      .catch(function (err) {
+        alert((err && err.message) ? err.message : 'Could not update from file.');
+      });
+  };
+
+  window.exportBoard = function () {
+    var state = normalizeState(getStateFromDOM());
+    var json = JSON.stringify(state, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'circleboard_export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  function setupFileMenu() {
+    var fileBtn = document.getElementById('btn-file');
+    var fileMenu = document.getElementById('file-menu');
+    var updateBtn = document.getElementById('file-update-btn');
+    var importBtn = document.getElementById('file-import-btn');
+    var exportBtn = document.getElementById('file-export-btn');
+    var clearBtn = document.getElementById('file-clear-btn');
+    var importInput = document.getElementById('file-import-input');
+
+    if (!fileBtn || !fileMenu) return;
+
+    function closeFileMenu() {
+      fileMenu.classList.remove('open');
+      fileBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    fileBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var isOpen = fileMenu.classList.toggle('open');
+      fileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    fileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+    document.addEventListener('click', closeFileMenu);
+
+    if (updateBtn) {
+      updateBtn.addEventListener('click', function () {
+        closeFileMenu();
+        window.updateBoardFromFile();
+      });
+    }
+
+    if (importBtn && importInput) {
+      importBtn.addEventListener('click', function () {
+        closeFileMenu();
+        importInput.value = '';
+        importInput.click();
+      });
+      importInput.addEventListener('change', function () {
+        var file = importInput.files && importInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var parsed = JSON.parse(reader.result);
+            applyState(parsed, true);
+          } catch (e) {
+            alert('Invalid JSON file.');
+          }
+        };
+        reader.readAsText(file, 'utf8');
+      });
+    }
+
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function () {
+        closeFileMenu();
+        window.exportBoard();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        closeFileMenu();
+        window.cleanBoard();
+      });
+    }
+  }
+
   window.refreshFromIndicators = function () {
     var btn = document.getElementById('btn-refresh');
     if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
@@ -802,8 +910,6 @@
       setupDragAndDrop(state);
       var btn = document.getElementById('btn-refresh');
       if (btn) btn.addEventListener('click', window.refreshFromIndicators);
-      var btnClean = document.getElementById('btn-clean');
-      if (btnClean) btnClean.addEventListener('click', window.cleanBoard);
       return;
     }
 
@@ -814,8 +920,6 @@
       setupDragAndDrop(s);
       var btn = document.getElementById('btn-refresh');
       if (btn) btn.addEventListener('click', window.refreshFromIndicators);
-      var btnClean = document.getElementById('btn-clean');
-      if (btnClean) btnClean.addEventListener('click', window.cleanBoard);
     }
 
     fetch(CIRCLEBOARD_DATA_FILE)
@@ -951,12 +1055,14 @@
       setupHideShowButtons();
       setupAddButtons();
       setupSaveHypothesisButton();
+      setupFileMenu();
       init();
     });
   } else {
     setupHideShowButtons();
     setupAddButtons();
     setupSaveHypothesisButton();
+    setupFileMenu();
     init();
   }
 })();

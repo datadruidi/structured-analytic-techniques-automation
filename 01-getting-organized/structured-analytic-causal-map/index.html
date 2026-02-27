@@ -41,7 +41,7 @@
       cursor: pointer;
       font-size: 13px;
     }
-    #btn-file, #btn-view, #btn-filter, #btn-float {
+    #btn-file, #btn-filter, #btn-float {
       width: 88px;
       min-width: 88px;
       box-sizing: border-box;
@@ -933,12 +933,6 @@
     #edit-ok { background: #2563eb; color: #fff; }
     #edit-ok:hover { background: #3b82f6; }
     #edit-cancel:hover { background: #404654; }
-    .btn-delete-view {
-      background: #4a2525;
-      border-color: #6a3535;
-      color: #e4e6eb;
-    }
-    .btn-delete-view:hover { background: #5a3030; border-color: #7a4545; }
     #confirm-overlay {
       display: none;
       position: fixed;
@@ -1002,15 +996,7 @@
           <button type="button" id="btn-export">Save</button>
           <button type="button" id="btn-download">Download Evidence</button>
           <button type="button" id="btn-import-trigger">Import JSON</button>
-          <button type="button" id="btn-load-example">Load test-data JSON</button>
-          <button type="button" id="btn-export-sample">Download template JSON</button>
-        </div>
-      </div>
-      <div class="toolbar-dropdown" id="dropdown-view">
-        <button type="button" class="toolbar-menu-btn" id="btn-view">View</button>
-        <div class="dropdown-menu" id="menu-view">
-          <button type="button" id="btn-center-view" class="primary">Center View</button>
-          <button type="button" id="btn-delete-view" class="btn-delete-view">Reset Map</button>
+          <button type="button" id="btn-reset-map" class="danger">Reset Map</button>
         </div>
       </div>
       <div class="toolbar-dropdown" id="dropdown-filter">
@@ -2594,44 +2580,6 @@
     document.getElementById('dropdown-file').classList.remove('open');
   });
 
-  document.getElementById('btn-export-sample').addEventListener('click', () => {
-    document.getElementById('dropdown-file').classList.remove('open');
-    fetch('input/template.json')
-      .then((r) => {
-        if (!r.ok) throw new Error(r.statusText || 'Failed to load');
-        return r.blob();
-      })
-      .then((blob) => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'template.json';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch(() => {
-        doExport('template.json');
-      });
-  });
-
-  document.getElementById('btn-load-example').addEventListener('click', () => {
-    document.getElementById('dropdown-file').classList.remove('open');
-    fetch('input/test-data.json')
-      .then((r) => {
-        if (!r.ok) throw new Error(r.statusText || 'Failed to load');
-        return r.json();
-      })
-      .then((data) => {
-        if (!data || !data.id || !Array.isArray(data.children)) throw new Error('Invalid example format');
-        ensureIds(data, true, 0);
-        tree = data;
-        saveTree();
-        selectedNodeId = null;
-        render();
-        fitToScreen();
-      })
-      .catch((err) => alert('Could not load test-data: ' + (err.message || err)));
-  });
-
   document.getElementById('file-import').addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -2653,15 +2601,10 @@
     reader.readAsText(file);
   });
 
-  document.getElementById('btn-center-view').addEventListener('click', () => {
-    fitToScreen();
-    document.getElementById('dropdown-view').classList.remove('open');
-  });
-
   const confirmOverlay = document.getElementById('confirm-overlay');
   const confirmMessage = document.getElementById('confirm-message');
-  document.getElementById('btn-delete-view').addEventListener('click', () => {
-    document.getElementById('dropdown-view').classList.remove('open');
+  document.getElementById('btn-reset-map').addEventListener('click', () => {
+    document.getElementById('dropdown-file').classList.remove('open');
     confirmMessage.textContent = 'Are you sure? This will remove everything and reset the map to the default.';
     confirmOverlay.classList.add('visible');
     let resolved = false;
@@ -2686,19 +2629,7 @@
   document.getElementById('btn-file').addEventListener('click', (e) => {
     e.stopPropagation();
     const dd = document.getElementById('dropdown-file');
-    const other = document.getElementById('dropdown-view');
     const otherF = document.getElementById('dropdown-filter');
-    other.classList.remove('open');
-    otherF.classList.remove('open');
-    dd.classList.toggle('open');
-  });
-
-  document.getElementById('btn-view').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const dd = document.getElementById('dropdown-view');
-    const other = document.getElementById('dropdown-file');
-    const otherF = document.getElementById('dropdown-filter');
-    other.classList.remove('open');
     otherF.classList.remove('open');
     dd.classList.toggle('open');
   });
@@ -2732,20 +2663,16 @@
     e.stopPropagation();
     const dd = document.getElementById('dropdown-filter');
     const other = document.getElementById('dropdown-file');
-    const otherV = document.getElementById('dropdown-view');
     other.classList.remove('open');
-    otherV.classList.remove('open');
     dd.classList.toggle('open');
     if (dd.classList.contains('open')) buildFilterLevels();
   });
 
   document.getElementById('menu-file').addEventListener('click', (e) => e.stopPropagation());
-  document.getElementById('menu-view').addEventListener('click', (e) => e.stopPropagation());
   document.getElementById('menu-filter').addEventListener('click', (e) => e.stopPropagation());
 
   document.addEventListener('click', () => {
     document.getElementById('dropdown-file').classList.remove('open');
-    document.getElementById('dropdown-view').classList.remove('open');
     document.getElementById('dropdown-filter').classList.remove('open');
   });
 

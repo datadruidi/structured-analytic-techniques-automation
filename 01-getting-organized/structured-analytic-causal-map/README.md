@@ -87,8 +87,7 @@ If you open the app without the server (e.g. by double-clicking `index.html`), t
 
 ## 📋 Workflow tips
 
-- **Load test-data** — Use **File → Load test-data JSON** to load the sample file (`input/test-data.json`) and explore the map. This helps you understand how nodes, evidence, and comments work.
-- **Download template** — The main way of working is **bottom‑up**: you start from a blank map and build it node by node yourself. Alternatively, you can use **File → Download template JSON** to get the expected JSON structure, then structure your data (e.g. with AI or in a spreadsheet) and **File → Import JSON** to load it in the correct format.
+- The main way of working is **bottom-up**: start from a blank map and build it node by node, or prepare your own JSON and use **File -> Import JSON**.
 - **Save and use in other tools** — When you finish your project, use **File → Save** to export your map as JSON. You can upload that JSON into the next analysis tool: the same format is supported in **Timeline** and **ACH** (Analysis of Competing Hypotheses). If you have used **Generate Hypothesis Keywords**, the keywords are appended to `data/hypothesis_keywords.jsonl` in the **repo root**; you can upload or use that file from the circleboarding tool’s UI.
 
 ---
@@ -174,4 +173,3 @@ The app loads and saves a **hierarchical node tree** with:
 ```
 
 ---
-
