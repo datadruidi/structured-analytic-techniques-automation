@@ -83,3 +83,6 @@ The hub is grouped by workflow phase. Some buttons open local tools, and some op
 | Multiple Hypothesis | 8083 | `03-diagnostics/structured-analytic-multiple-hypothesis-generation` |
 | Competing Hypothesis (ACH) | 8084 | `03-diagnostics/structured-analysis-of-competing-hypothesis` |
 | Bowtie Analysis | 8085 | `06-decision-support/structured-bowtie-analysis` |
+
+---------------
+
