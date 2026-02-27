@@ -115,21 +115,21 @@ const SERVERS = [
   { name: 'Circleboarding', dir: '02-exploration/structured-analytic-circleboarding', port: 8082 },
   { name: 'Multiple Hypothesis Generation', dir: '03-diagnostics/structured-analytic-multiple-hypothesis-generation', port: 8083 },
   { name: 'Competing Hypothesis', dir: '03-diagnostics/structured-analysis-of-competing-hypothesis', port: 8084 },
-  { name: 'Bowtie Analysis', dir: '06-decision-support/structured-bowtie-analysis', port: 8085, vite: true },
+  { name: 'Bowtie Analysis', dir: '06-decision-support/structured-bowtie-analysis', port: 8085 },
 ];
 
 function run(entry) {
   if (!entry.dir) return null;
   const cwd = path.join(ROOT, entry.dir);
-  const cmd = entry.vite ? 'npm' : process.execPath;
-  const args = entry.vite
-    ? ['run', 'dev', '--', '--port', String(entry.port)]
-    : ['server.js'];
+  const cmd = process.execPath;
+  const args = ['server.js'];
   const child = spawn(cmd, args, {
     cwd,
     stdio: ['ignore', 'ignore', 'inherit'],
   });
-  child.on('error', (err) => console.error(`[${entry.name}] error:`, err));
+  child.on('error', (err) => {
+    console.error(`[${entry.name}] failed to start (${err.code || 'unknown'})`);
+  });
   child.on('exit', (code) => {
     if (code !== null && code !== 0) console.error(`[${entry.name}] exited with ${code}`);
   });
@@ -137,8 +137,7 @@ function run(entry) {
 }
 
 hubServer.listen(HUB_PORT, () => {
-  SERVERS.forEach((s) => console.log(`${s.name} server: http://localhost:${s.port}`));
-  console.log('Press Ctrl+C to stop all.\n');
+  SERVERS.forEach((s) => console.log(`${s.name} http://localhost:${s.port}`));
 });
 
 const children = SERVERS.filter((s) => s.dir).map((entry) => run(entry));

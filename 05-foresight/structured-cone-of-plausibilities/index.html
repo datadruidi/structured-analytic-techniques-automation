@@ -22,14 +22,33 @@
       min-height: 100vh;
       padding: 32px 40px;
     }
-    .back-link {
-      display: inline-block;
-      margin-bottom: 1.25rem;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.84rem;
       text-decoration: none;
-      font-size: 0.85rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
     }
-    .back-link:hover { color: var(--accent); }
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .icon-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 12px;
+    }
+    .icon-home svg { display: block; }
 
     .columns-header {
       display: grid;
@@ -196,24 +215,90 @@
       gap: 12px;
       margin-bottom: 1.25rem;
     }
-    .btn-import {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 16px;
+    .file-dropdown {
+      position: relative;
+    }
+    .file-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 170px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.84rem;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s;
+      border-radius: 8px;
+      padding: 4px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      display: none;
+      z-index: 30;
     }
-    .btn-import:hover {
-      border-color: var(--accent);
+    .file-dropdown.open .file-menu { display: block; }
+    .file-menu > button,
+    .file-menu .file-menu-action {
+      width: 100%;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: transparent;
+      color: var(--text-muted);
+      text-align: left;
+      font-family: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .file-menu > button:hover,
+    .file-menu .file-menu-action:hover {
+      background: rgba(88, 166, 255, 0.12);
       color: var(--text);
     }
+    .file-menu-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+    }
+    .file-help-btn {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: rgba(88, 166, 255, 0.16);
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-right: 2px;
+    }
+    .file-help-btn:hover {
+      border-color: var(--accent);
+      color: #ffffff;
+      background: rgba(88, 166, 255, 0.32);
+    }
+    .file-help-tip {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 10px);
+      transform: translateY(-50%);
+      width: 260px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #232d3f;
+      color: var(--text);
+      font-size: 0.76rem;
+      line-height: 1.4;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      display: none;
+      z-index: 40;
+    }
+    .file-help-tip.show { display: block; }
     .btn-assist {
       display: inline-block;
       margin-left: 8px;
@@ -601,8 +686,20 @@
 </head>
 <body>
   <div class="toolbar">
-    <a class="back-link" href="http://localhost:3000" style="margin-bottom:0">&larr; Back to Main Screen</a>
-    <button class="btn-import" id="btnReadFile" type="button">&#8635; Read from File</button>
+    <a href="http://localhost:3000" class="btn"><span class="icon-home" aria-hidden="true"><svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor" aria-hidden="true"><path d="M7 1L1 5.5V11h4V7h4v4h4V5.5L7 1z"/></svg></span> Back to Main Screen</a>
+    <div class="file-dropdown" id="fileDropdown">
+      <button type="button" class="btn" id="fileBtn">File</button>
+      <div class="file-menu" id="fileMenu">
+        <div class="file-menu-row">
+          <button type="button" class="file-menu-action" id="btnReadFile">Read from File</button>
+          <button type="button" class="file-help-btn" id="btnReadFileHelp" aria-label="Read from File info">?</button>
+          <div class="file-help-tip" id="readFileTip">Reads evidence from <code>data/evidence.json</code> and scenarios from <code>data/scenarios.json</code> on the local hub server.</div>
+        </div>
+        <button type="button" id="btnImportJson" class="file-menu-action">Import JSON</button>
+        <button type="button" id="btnExportJson" class="file-menu-action">Export JSON</button>
+      </div>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" style="display:none">
   </div>
   <p class="loading" id="loadingMsg">Loading drivers and trends&hellip;</p>
 
@@ -711,7 +808,8 @@
       return fetch('/api/load-scenarios')
         .then(function (r) { return r.ok ? r.json() : []; })
         .then(function (arr) {
-          if (!Array.isArray(arr)) return;
+          if (!Array.isArray(arr)) return [];
+          scenariosByDriver = {};
           arr.forEach(function (driverObj) {
             if (driverObj.driver_id && driverObj.scenarios) {
               scenariosByDriver[driverObj.driver_id] = {
@@ -722,8 +820,9 @@
               };
             }
           });
+          return arr;
         })
-        .catch(function () {});
+        .catch(function () { return []; });
     }
 
     function buildOutputJson() {
@@ -969,13 +1068,8 @@
         if (span) span.textContent = n.name;
       }
 
-      if (currentRoot) {
-        fetch('/api/save-evidence', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(currentRoot, null, 2)
-        }).catch(function () {});
-      }
+      // Keep all edits in scenarios.json; do not write back to evidence.json.
+      persistToServer();
       closeModal();
     }
 
@@ -1056,18 +1150,9 @@
       if (e.target === this) this.classList.remove('open');
     });
 
-    function render(root) {
-      currentRoot = root;
+    function renderDrivers() {
       var rowsEl = document.getElementById('rows');
       rowsEl.innerHTML = '';
-
-      var drivers = (root.children || []).filter(function (c) { return c.depth === 1; });
-
-      driversData = drivers.map(function (driver) {
-        var maxD = getMaxDepth(driver);
-        var trends = collectAtDepth(driver, maxD);
-        return { id: driver.id, name: driver.name, trends: trends };
-      });
 
       driversData.forEach(function (driver) {
         var trends = driver.trends;
@@ -1124,37 +1209,169 @@
       refreshGeneratedScenarios();
     }
 
+    function render(root) {
+      currentRoot = root;
+      var drivers = (root.children || []).filter(function (c) { return c.depth === 1; });
+      driversData = drivers.map(function (driver) {
+        var maxD = getMaxDepth(driver);
+        var trends = collectAtDepth(driver, maxD);
+        return { id: driver.id, name: driver.name, trends: trends };
+      });
+      renderDrivers();
+    }
+
+    function importFromJsonPayload(payload) {
+      if (!Array.isArray(payload)) throw new Error('Expected an array of drivers.');
+      var importedDrivers = [];
+      var importedScenarios = {};
+      payload.forEach(function (driverObj, driverIndex) {
+        if (!driverObj || typeof driverObj !== 'object') return;
+        var driverId = String(driverObj.driver_id || driverObj.id || ('driver-' + (driverIndex + 1)));
+        var driverName = String(driverObj.driver_name || driverObj.name || ('Driver ' + (driverIndex + 1)));
+        var scenarios = (driverObj.scenarios && typeof driverObj.scenarios === 'object') ? driverObj.scenarios : {};
+        importedScenarios[driverId] = {
+          baseline: String(scenarios.baseline || ''),
+          plausible: String(scenarios.plausible || ''),
+          wildcard: String(scenarios.wildcard || ''),
+          preposterous: String(scenarios.preposterous || '')
+        };
+        var trends = Array.isArray(driverObj.trends) ? driverObj.trends : [];
+        var normalizedTrends = trends.map(function (trendObj, trendIndex) {
+          var trend = (trendObj && typeof trendObj === 'object') ? trendObj : {};
+          return {
+            id: String(trend.trend_id || trend.id || (driverId + '-trend-' + (trendIndex + 1))),
+            name: String(trend.trend_name || trend.name || ('Trend ' + (trendIndex + 1))),
+            description: trend.description || '',
+            source: trend.source || '',
+            date: trend.date || '',
+            evidence: trend.evidence || '',
+            H1: trend.H1 || '',
+            H2: trend.H2 || '',
+            H3: trend.H3 || '',
+            H4: trend.H4 || '',
+            H5: trend.H5 || '',
+            analysis_description: trend.analysis_description || ''
+          };
+        });
+        importedDrivers.push({ id: driverId, name: driverName, trends: normalizedTrends });
+      });
+      currentRoot = null;
+      scenariosByDriver = importedScenarios;
+      driversData = importedDrivers;
+      renderDrivers();
+    }
+
     document.addEventListener('click', function () {
       document.querySelectorAll('.help-btn.active').forEach(function (b) { b.classList.remove('active'); });
     });
 
-    function fetchAndRender() {
-      document.getElementById('loadingMsg').textContent = 'Loading drivers and trends\u2026';
-      document.getElementById('loadingMsg').style.display = '';
-      return loadSavedScenarios()
-        .then(function () { return fetch('/data/evidence.json'); })
+    function loadFromEvidenceAndSeedScenarios() {
+      return fetch('/data/evidence.json')
         .then(function (r) { return r.ok ? r.json() : Promise.reject('fetch failed'); })
-        .then(render)
-        .catch(function () {
-          document.getElementById('loadingMsg').textContent =
-            'Could not load data/evidence.json. Make sure the server is running.';
+        .then(function (evidenceRoot) {
+          render(evidenceRoot);
+          // Seed scenarios.json from evidence structure so future reads use scenarios file.
+          persistToServer();
         });
     }
 
-    document.getElementById('btnReadFile').addEventListener('click', function () {
+    function loadPreferredData() {
+      document.getElementById('loadingMsg').textContent = 'Loading drivers and trends\u2026';
+      document.getElementById('loadingMsg').style.display = '';
+      return loadSavedScenarios()
+        .then(function (savedScenarios) {
+          if (Array.isArray(savedScenarios) && savedScenarios.length > 0) {
+            importFromJsonPayload(savedScenarios);
+            return;
+          }
+          return loadFromEvidenceAndSeedScenarios();
+        })
+        .catch(function () {
+          document.getElementById('loadingMsg').textContent =
+            'Could not load scenarios.json or data/evidence.json. Make sure the server is running.';
+        });
+    }
+
+    function readFromFile() {
       scenariosByDriver = {};
       driversData = [];
-      fetchAndRender();
+      loadPreferredData();
+    }
+
+    function exportJsonFile() {
+      var payload = JSON.stringify(buildOutputJson(), null, 2);
+      var a = document.createElement('a');
+      a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(payload);
+      a.download = 'cone-of-plausibilities.json';
+      a.click();
+    }
+
+    var fileDropdown = document.getElementById('fileDropdown');
+    var fileBtn = document.getElementById('fileBtn');
+    var importFileEl = document.getElementById('importFile');
+    var btnReadFileHelp = document.getElementById('btnReadFileHelp');
+    var readFileTip = document.getElementById('readFileTip');
+
+    fileBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      fileDropdown.classList.toggle('open');
+      if (!fileDropdown.classList.contains('open')) readFileTip.classList.remove('show');
+    });
+    document.body.addEventListener('click', function (e) {
+      if (!fileDropdown.contains(e.target)) {
+        fileDropdown.classList.remove('open');
+        readFileTip.classList.remove('show');
+      }
+    });
+    btnReadFileHelp.addEventListener('click', function (e) {
+      e.stopPropagation();
+      readFileTip.classList.toggle('show');
     });
 
-    loadSavedScenarios()
-      .then(function () { return fetch('/data/evidence.json'); })
-      .then(function (r) { return r.ok ? r.json() : Promise.reject('fetch failed'); })
-      .then(render)
-      .catch(function () {
-        document.getElementById('loadingMsg').textContent =
-          'Could not load data/evidence.json. Make sure the server is running.';
-      });
+    document.getElementById('btnReadFile').addEventListener('click', function () {
+      fileDropdown.classList.remove('open');
+      readFileTip.classList.remove('show');
+      readFromFile();
+    });
+    document.getElementById('btnImportJson').addEventListener('click', function () {
+      fileDropdown.classList.remove('open');
+      readFileTip.classList.remove('show');
+      importFileEl.click();
+    });
+    document.getElementById('btnExportJson').addEventListener('click', function () {
+      fileDropdown.classList.remove('open');
+      readFileTip.classList.remove('show');
+      exportJsonFile();
+    });
+    importFileEl.addEventListener('change', function () {
+      var file = importFileEl.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var data = JSON.parse(reader.result);
+          if (Array.isArray(data)) {
+            // scenarios.json format
+            importFromJsonPayload(data);
+            persistToServer();
+          } else if (data && typeof data === 'object' && Array.isArray(data.children)) {
+            // evidence.json/root-tree format
+            scenariosByDriver = {};
+            driversData = [];
+            render(data);
+            persistToServer();
+          } else {
+            throw new Error('Expected scenarios array or evidence root object.');
+          }
+        } catch (err) {
+          alert('Import failed: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      importFileEl.value = '';
+    });
+
+    loadPreferredData();
   </script>
 </body>
 </html>

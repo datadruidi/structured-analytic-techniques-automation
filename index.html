@@ -100,8 +100,30 @@
       fill: currentColor;
     }
     .hub-btn svg[stroke] { fill: none; stroke: currentColor; }
-    .hub-btn.extra { opacity: 0.85; }
-    .hub-top-row { margin-bottom: 1.5rem; }
+    .hub-btn.chatgpt-btn { background: transparent; }
+    .hub-agent-icon {
+      width: 32px;
+      min-width: 32px;
+      height: 32px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.48rem;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.2px;
+      border: 1px solid currentColor;
+      border-radius: 6px;
+      padding: 2px;
+    }
+    .hub-btn-label {
+      display: inline-block;
+      line-height: 1.15;
+    }
+    .hub-top-row { margin-bottom: 3rem; }
+    .hub-bottom-row { margin-top: 3rem; }
   </style>
 </head>
 <body>
@@ -113,9 +135,9 @@
       <div class="hub-category-wrap">
         <div class="hub-category-title">Requirements</div>
         <div class="hub-buttons">
-          <a class="hub-btn" href="https://chatgpt.com/g/g-6991ef82e0dc8191b15286fe761777d5-intelligence-requirements-refiner" target="_blank" rel="noopener noreferrer" aria-label="Open PIR Refiner">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="m4.93 4.93 2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            PIR Refiner
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6991ef82e0dc8191b15286fe761777d5-intelligence-requirements-refiner" target="_blank" rel="noopener noreferrer" aria-label="Open PIR Refiner">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">PIR<br>Refiner</span>
           </a>
         </div>
       </div>
@@ -124,9 +146,9 @@
       <div class="hub-category-wrap">
         <div class="hub-category-title">Collection</div>
         <div class="hub-buttons">
-          <a class="hub-btn" href="https://chatgpt.com/g/g-6991cf0ff6ac8191965d9f137e68f239-osint-collection-agent" target="_blank" rel="noopener noreferrer" aria-label="Open OSINT Collection Agent">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            OSINT Collection
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6991cf0ff6ac8191965d9f137e68f239-osint-collection-agent" target="_blank" rel="noopener noreferrer" aria-label="Open OSINT Collection">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">OSINT<br>Collection</span>
           </a>
         </div>
       </div>
@@ -135,9 +157,9 @@
       <div class="hub-category-wrap">
         <div class="hub-category-title">Processing</div>
         <div class="hub-buttons">
-          <a class="hub-btn" href="https://chatgpt.com/g/g-6991d37345b08191aeb92a24be068a20-osint-processing-agent" target="_blank" rel="noopener noreferrer" aria-label="Open OSINT Processing Agent">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><path d="m4.93 4.93 2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/><circle cx="12" cy="12" r="3"/></svg>
-            OSINT Processing
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6991d37345b08191aeb92a24be068a20-osint-processing-agent" target="_blank" rel="noopener noreferrer" aria-label="Open OSINT Processing">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">OSINT<br>Processing</span>
           </a>
         </div>
       </div>
@@ -150,11 +172,11 @@
         <div class="hub-buttons">
         <a class="hub-btn" href="http://localhost:8765" aria-label="Open Causal Map (port 8765)">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7.2l5.5 3.2M14 10.2l-5 7.2M8.5 7.5L11 16"/></svg>
-          Causal Map
+          <span class="hub-btn-label">Causal<br>Map</span>
         </a>
         <a class="hub-btn" href="http://localhost:8080" aria-label="Open Timeline (port 8080)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-          Timeline
+          <span class="hub-btn-label">Timeline<br>Tool</span>
         </a>
         </div>
       </div>
@@ -165,7 +187,7 @@
         <div class="hub-buttons">
         <a class="hub-btn" href="http://localhost:8082" aria-label="Open Circleboarding (port 8082)">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>
-          Circleboarding
+          <span class="hub-btn-label">Circle<br>boarding</span>
         </a>
         </div>
       </div>
@@ -176,11 +198,15 @@
         <div class="hub-buttons">
         <a class="hub-btn" href="http://localhost:8083" aria-label="Open Multiple Hypothesis Generation (port 8083)">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4v16M4 8h4M4 12h3M4 16h5M16 8h4M16 12h3M16 16h4M8 4l2 4 2-4M8 20l2-4 2 4"/></svg>
-          Multiple Hypothesis
+          <span class="hub-btn-label">Multiple<br>Hypothesis</span>
+        </a>
+        <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6992157cb5dc81919a58f9c6cb27baf3-hypothesis-permutation-generator" target="_blank" rel="noopener noreferrer" aria-label="Open Permutation Generator">
+          <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+          <span class="hub-btn-label">Permutation<br>Generator</span>
         </a>
         <a class="hub-btn" href="http://localhost:8084" aria-label="Open Competing Hypothesis evidence list (port 8084)">
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-          Competing Hypothesis
+          <span class="hub-btn-label">Competing<br>Hypothesis</span>
         </a>
         </div>
       </div>
@@ -189,17 +215,17 @@
       <div class="hub-category-wrap">
         <div class="hub-category-title">Reframing</div>
         <div class="hub-buttons">
-          <a class="hub-btn" href="https://chatgpt.com/g/g-6994a86ec1308191a75feb4560559f55-structured-analogies-collection-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Analogies Collection">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="1.5" fill="currentColor"/><circle cx="16" cy="12" r="1.5" fill="currentColor"/><circle cx="10" cy="18" r="1.5" fill="currentColor"/></svg>
-            Analogies Collection
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6994a86ec1308191a75feb4560559f55-structured-analogies-collection-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Analogies Collection">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">Analogies<br>Collection</span>
           </a>
-          <a class="hub-btn" href="https://chatgpt.com/g/g-6994a1ae593c81918abf9c09e97a51f0-structured-analogies-procession-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Analogies Processor">
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/><path d="m4.93 4.93 2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/><circle cx="12" cy="12" r="3"/></svg>
-            Analogies Processor
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-6994a1ae593c81918abf9c09e97a51f0-structured-analogies-procession-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Analogies Processor">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">Analogies<br>Processor</span>
           </a>
           <a class="hub-btn" href="04-reframing/structured-analysis-of-analogies/index.html" aria-label="Open Structured Analogies">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4M6.5 10v4M17.5 10v4M10 17.5h4"/></svg>
-            Structured Analogies
+            <span class="hub-btn-label">Structured<br>Analogies</span>
           </a>
         </div>
       </div>
@@ -210,7 +236,11 @@
         <div class="hub-buttons">
           <a class="hub-btn" href="05-foresight/structured-cone-of-plausibilities/index.html" aria-label="Open Cone of Plausibilities">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 22h20L12 2z"/><path d="M12 8v6M12 17h.01"/></svg>
-            Cone of Plausibilities
+            <span class="hub-btn-label">Cone of<br>Plausibilities</span>
+          </a>
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-69963f07809c8191b528296b10d0f9eb-cone-of-plausibility-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Scenario Generator">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">Scenario<br>Generator</span>
           </a>
         </div>
       </div>
@@ -219,19 +249,25 @@
       <div class="hub-category-wrap">
         <div class="hub-category-title">Decision Support</div>
         <div class="hub-buttons">
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-69a16d8f8d18819185a4b86d46d6da88-bowtie-analysis-processor-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Bowtie Processor">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">Bowtie<br>Processor</span>
+          </a>
           <a class="hub-btn" href="06-decision-support/structured-bowtie-analysis/index.html" aria-label="Open Bowtie Analysis">
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 4v16M4 8l8-4 8 4-8 4-8-4zM4 16l8 4 8-4"/><path d="M4 12l8 4 8-4"/></svg>
-            Bowtie Analysis
+            <span class="hub-btn-label">Bowtie<br>Analysis</span>
           </a>
-          <a class="hub-btn" href="http://localhost:8085" aria-label="Bowtie (when using node server.js from repo root)">Bowtie (dev)</a>
         </div>
       </div>
     </section>
-    <section class="hub-category">
+    <section class="hub-category hub-bottom-row">
       <div class="hub-category-wrap">
+        <div class="hub-category-title">Dissemination</div>
         <div class="hub-buttons">
-        <a class="hub-btn extra" href="http://localhost:8085" aria-label="EXTRA 2 (port 8085)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg> EXTRA 2</a>
-        <a class="hub-btn extra" href="http://localhost:8086" aria-label="EXTRA 3 (port 8086)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg> EXTRA 3</a>
+          <a class="hub-btn chatgpt-btn" href="https://chatgpt.com/g/g-69a1780234108191ba3e559028bc92c0-intel-reporting-agent" target="_blank" rel="noopener noreferrer" aria-label="Open Structured Reporting">
+            <span class="hub-agent-icon" aria-hidden="true">AI AGENT</span>
+            <span class="hub-btn-label">Structured<br>Reporting</span>
+          </a>
         </div>
       </div>
     </section>
