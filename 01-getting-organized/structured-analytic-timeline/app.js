@@ -2163,6 +2163,13 @@
       alert(msg);
     });
   }
+  var fileUpdateTip = document.getElementById("file-update-tip");
+  if (fileUpdateTip) {
+    fileUpdateTip.addEventListener("click", function (e) {
+      e.stopPropagation();
+      alert("Reads from data/evidence.json on the local server.");
+    });
+  }
   var fileUpdateFromFile = document.getElementById("file-update-from-file");
   if (fileUpdateFromFile) {
     fileUpdateFromFile.addEventListener("click", function () {

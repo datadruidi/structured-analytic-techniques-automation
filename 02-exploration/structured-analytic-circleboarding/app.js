@@ -782,18 +782,13 @@
   }
 
   window.updateBoardFromFile = function () {
-    fetch(CIRCLEBOARD_DATA_FILE + '?t=' + Date.now(), { cache: 'no-store' })
+    fetch(INDICATORS_FILE + '?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) {
-        if (!r.ok) throw new Error('Could not load ' + CIRCLEBOARD_DATA_FILE);
+        if (!r.ok) throw new Error('Could not load ' + INDICATORS_FILE);
         return r.text();
       })
       .then(function (text) {
-        var parsed;
-        try {
-          parsed = JSON.parse(text);
-        } catch (e) {
-          throw new Error('Invalid JSON in ' + CIRCLEBOARD_DATA_FILE);
-        }
+        var parsed = parseJsonlIndicators(text);
         applyState(parsed, true);
       })
       .catch(function (err) {
@@ -821,6 +816,8 @@
     var exportBtn = document.getElementById('file-export-btn');
     var clearBtn = document.getElementById('file-clear-btn');
     var importInput = document.getElementById('file-import-input');
+    var updateHelpBtn = document.getElementById('file-update-help-btn');
+    var updateHelpTip = document.getElementById('file-update-help-tip');
 
     if (!fileBtn || !fileMenu) return;
 
@@ -833,10 +830,20 @@
       e.stopPropagation();
       var isOpen = fileMenu.classList.toggle('open');
       fileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (!isOpen && updateHelpTip) updateHelpTip.classList.remove('show');
     });
 
     fileMenu.addEventListener('click', function (e) { e.stopPropagation(); });
-    document.addEventListener('click', closeFileMenu);
+    if (updateHelpBtn && updateHelpTip) {
+      updateHelpBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        updateHelpTip.classList.toggle('show');
+      });
+    }
+    document.addEventListener('click', function () {
+      closeFileMenu();
+      if (updateHelpTip) updateHelpTip.classList.remove('show');
+    });
 
     if (updateBtn) {
       updateBtn.addEventListener('click', function () {

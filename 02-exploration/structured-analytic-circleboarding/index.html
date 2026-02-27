@@ -16,18 +16,21 @@
         </a>
         <div class="dashboard-header-title-wrap">
           <h1 class="dashboard-title">Circleboarding for Structured Analytic Techniques</h1>
-          <p class="dashboard-subtitle">Drag items to reorder or into So what? to build your synthesis. Data is stored in CircleboardData.txt (and this browser); use Refresh to add new items from hypothesis_keywords.jsonl.</p>
+          <p class="dashboard-subtitle">Drag items to reorder or into So what? to build your synthesis. Data is stored in CircleboardData.txt (and this browser).</p>
         </div>
         <div class="file-menu-wrap">
           <button type="button" id="btn-file" class="btn-file" aria-haspopup="true" aria-expanded="false" aria-label="File options">File</button>
           <div class="file-menu" id="file-menu" role="menu" aria-label="File options">
-            <button type="button" class="file-menu-item" id="file-update-btn" role="menuitem">Update from File</button>
+            <div class="file-menu-row">
+              <button type="button" class="file-menu-item file-menu-action" id="file-update-btn" role="menuitem">Update from File</button>
+              <button type="button" class="file-help-btn" id="file-update-help-btn" aria-label="Update from File info">?</button>
+              <div class="file-help-tip" id="file-update-help-tip">Reads from <code>data/hypothesis_keywords.jsonl</code> on the local server.</div>
+            </div>
             <button type="button" class="file-menu-item" id="file-import-btn" role="menuitem">Import</button>
             <button type="button" class="file-menu-item" id="file-export-btn" role="menuitem">Export</button>
             <button type="button" class="file-menu-item" id="file-clear-btn" role="menuitem">Clear</button>
           </div>
         </div>
-        <button type="button" id="btn-refresh" class="btn-refresh" aria-label="Refresh: merge new items from hypothesis_keywords.jsonl into current data">Refresh from hypothesis_keywords.jsonl</button>
       </div>
       <input type="file" id="file-import-input" accept=".json,application/json" hidden>
     </header>

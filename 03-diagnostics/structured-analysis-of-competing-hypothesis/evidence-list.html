@@ -95,7 +95,7 @@
       border: 1px solid #444;
       border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      z-index: 100;
+      z-index: 2000;
       padding: 0.25rem 0;
     }
     .dropdown-menu.open { display: block; }
@@ -111,6 +111,58 @@
       cursor: pointer;
     }
     .dropdown-menu button:hover { background: #333; color: #7eb8da; }
+    .dropdown-menu-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+    }
+    .dropdown-menu-row .dropdown-menu-action {
+      width: 100%;
+      text-align: left;
+    }
+    .dropdown-help-btn {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 1px solid #7eb8da;
+      background: rgba(126,184,218,0.16);
+      color: #7eb8da;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-right: 2px;
+    }
+    .dropdown-help-btn:hover {
+      color: #e0e0e0;
+      background: rgba(126,184,218,0.3);
+      border-color: #7eb8da;
+    }
+    .dropdown-help-tip {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 10px);
+      transform: translateY(-50%);
+      width: 260px;
+      padding: 8px 10px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      background: #252525;
+      color: #e0e0e0;
+      font-size: 0.76rem;
+      line-height: 1.4;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      display: none;
+      z-index: 3000;
+    }
+    .dropdown-help-tip.show { display: block; }
     .ach-matrix-wrap {
       overflow: auto;
       width: 100%;
@@ -133,6 +185,7 @@
       font-weight: 600;
       text-align: center;
       white-space: nowrap;
+      overflow: visible;
     }
     .ach-matrix .ach-th.ach-analysis { text-align: left; min-width: 180px; }
     .ach-matrix .ach-th.ach-event { text-align: left; min-width: 280px; }
@@ -750,6 +803,70 @@
     .ach-matrix tbody tr[draggable="true"] { cursor: grab; }
     .ach-matrix tbody tr[draggable="true"]:active { cursor: grabbing; }
     .ach-matrix tbody tr.ach-drag-over { background: #2a2a2a; }
+
+    /* Blue layout theme override */
+    body { background: #0f1419; color: #e6edf3; }
+    .events-header,
+    .filter-panel,
+    .intelligence-requirement-box,
+    .hypothesis-box,
+    .counter-box,
+    .ach-matrix th,
+    .dropdown-menu,
+    .hypothesis-modal-content,
+    .event-detail-content,
+    .row-edit-content {
+      background: #1a2332;
+      border-color: #2d3a4d;
+    }
+    .ach-matrix td,
+    .row-edit-modal .ach-cell-event,
+    .ach-inline-select {
+      background: #0f1419;
+      border-color: #2d3a4d;
+      color: #e6edf3;
+    }
+    .btn,
+    .hypothesis-toggle-btn,
+    .btn-back-to-hub,
+    .filter-option-btn,
+    .sort-bar select,
+    .intelligence-requirement-box input,
+    .ach-analysis-edit-wrap textarea,
+    .evidence-edit-input,
+    .evidence-edit-desc,
+    .event-detail-body input,
+    .event-detail-body textarea,
+    .event-detail-color-picker,
+    .row-edit-modal .ach-cell-h select,
+    .row-edit-modal .ach-cell-analysis textarea,
+    .evidence-rel,
+    .evidence-cred {
+      background: #212d3d;
+      border-color: #2d3a4d;
+      color: #e6edf3;
+    }
+    .btn:hover,
+    .hypothesis-toggle-btn:hover,
+    .btn-back-to-hub:hover,
+    .filter-option-btn:hover {
+      border-color: #58a6ff;
+      color: #e6edf3;
+      background: #263449;
+    }
+    .events-header .events-title,
+    .counter-box h2,
+    .hypothesis-box h2,
+    .ach-matrix th,
+    .sort-bar label,
+    .intelligence-requirement-box label {
+      color: #e6edf3;
+    }
+    .evidence-source-line,
+    .loading,
+    .ach-empty {
+      color: #8b949e;
+    }
   </style>
 </head>
 <body>
@@ -809,7 +926,11 @@
           <div class="dropdown-wrap">
             <button type="button" class="btn hypothesis-update-btn" id="hypothesis-file-btn" aria-label="Hypothesis file options">File</button>
             <div class="dropdown-menu" id="hypothesis-file-menu">
-              <button type="button" id="hypothesis-update-btn" aria-label="Update from file" title="Update from data/hypothesis.json">Update from File</button>
+              <div class="dropdown-menu-row">
+                <button type="button" class="dropdown-menu-action" id="hypothesis-update-btn" aria-label="Update from file" title="Update from data/hypothesis.json">Update from File</button>
+                <button type="button" class="dropdown-help-btn" id="hypothesis-update-help-btn" aria-label="Hypothesis update file info">?</button>
+                <div class="dropdown-help-tip" id="hypothesis-update-help-tip">Reads from <code>data/hypothesis.json</code> on the local hub server.</div>
+              </div>
               <button type="button" id="import-hypothesis-btn">Import Hypothesis</button>
               <button type="button" id="export-hypothesis-btn">Export Hypothesis</button>
               <button type="button" id="hypothesis-clear-btn" aria-label="Clear hypothesis list" title="Clear the list (does not save)">Clear Hypothesis</button>
@@ -863,17 +984,21 @@
         <thead>
           <tr>
             <th class="ach-th ach-event">
-              <span class="ach-evidence-header">
+              <div class="ach-evidence-header">
                 <span class="ach-evidence-header-label">Evidence</span>
                 <div class="dropdown-wrap ach-evidence-file-wrap">
                   <button type="button" class="btn ach-evidence-import-btn" id="evidence-file-btn">File</button>
                   <div class="dropdown-menu" id="evidence-file-menu">
-                    <button type="button" id="evidence-header-read-btn">Update from File</button>
+                    <div class="dropdown-menu-row">
+                      <button type="button" class="dropdown-menu-action" id="evidence-header-read-btn">Update from File</button>
+                      <button type="button" class="dropdown-help-btn" id="evidence-update-help-btn" aria-label="Evidence update file info">?</button>
+                      <div class="dropdown-help-tip" id="evidence-update-help-tip">Reads from <code>data/evidence.json</code> on the local hub server.</div>
+                    </div>
                     <button type="button" id="import-evidence-btn">Import Evidence</button>
                     <button type="button" id="export-evidence-btn">Export Evidence</button>
                   </div>
                 </div>
-              </span>
+              </div>
             </th>
             <th class="ach-th ach-h1" id="ach-th-h1">H1</th>
             <th class="ach-th ach-h2" id="ach-th-h2">H2</th>
@@ -919,8 +1044,12 @@
       const filterPanel = document.getElementById('filter-panel');
       const hypothesisFileBtn = document.getElementById('hypothesis-file-btn');
       const hypothesisFileMenu = document.getElementById('hypothesis-file-menu');
+      const hypothesisUpdateHelpBtn = document.getElementById('hypothesis-update-help-btn');
+      const hypothesisUpdateHelpTip = document.getElementById('hypothesis-update-help-tip');
       const evidenceFileBtn = document.getElementById('evidence-file-btn');
       const evidenceFileMenu = document.getElementById('evidence-file-menu');
+      const evidenceUpdateHelpBtn = document.getElementById('evidence-update-help-btn');
+      const evidenceUpdateHelpTip = document.getElementById('evidence-update-help-tip');
       const hypothesisListEl = document.getElementById('hypothesis-list');
       const hypothesisStatusEl = document.getElementById('hypothesis-status');
       const hypothesisModal = document.getElementById('hypothesis-modal');
@@ -1486,11 +1615,30 @@
           evidenceFileMenu.classList.toggle('open');
         });
       }
+      function closeFileHelpTips() {
+        if (hypothesisUpdateHelpTip) hypothesisUpdateHelpTip.classList.remove('show');
+        if (evidenceUpdateHelpTip) evidenceUpdateHelpTip.classList.remove('show');
+      }
+      if (hypothesisUpdateHelpBtn && hypothesisUpdateHelpTip) {
+        hypothesisUpdateHelpBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (evidenceUpdateHelpTip) evidenceUpdateHelpTip.classList.remove('show');
+          hypothesisUpdateHelpTip.classList.toggle('show');
+        });
+      }
+      if (evidenceUpdateHelpBtn && evidenceUpdateHelpTip) {
+        evidenceUpdateHelpBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (hypothesisUpdateHelpTip) hypothesisUpdateHelpTip.classList.remove('show');
+          evidenceUpdateHelpTip.classList.toggle('show');
+        });
+      }
       document.addEventListener('click', function () {
         if (importDropdown) importDropdown.classList.remove('open');
         if (exportDropdown) exportDropdown.classList.remove('open');
         if (hypothesisFileMenu) hypothesisFileMenu.classList.remove('open');
         if (evidenceFileMenu) evidenceFileMenu.classList.remove('open');
+        closeFileHelpTips();
       });
       if (importDropdown) importDropdown.addEventListener('click', function (e) { e.stopPropagation(); });
       if (exportDropdown) exportDropdown.addEventListener('click', function (e) { e.stopPropagation(); });

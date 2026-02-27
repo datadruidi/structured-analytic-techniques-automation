@@ -23,7 +23,7 @@ A lightweight, browser-based timeline tool for **Structured Analytic Techniques 
 
 ## Quick start
 
-**From repo root:** Run `node start-all.js` and open the hub at http://localhost:3000, then click **Timeline** (port 8080).
+**From repo root:** Run `node start-all.js` and open the hub at http://localhost:3000, then click **Timeline** (port 8081).
 
 ### Run locally (Option 1: simplest)
 1. Clone or download the repo  
@@ -36,7 +36,7 @@ Some browsers restrict certain features when opening files directly. If you run 
   ```bash
   node server.js
   ```
-  Then open http://localhost:8080
+  Then open http://localhost:8081
 
 - **Python**
   ```bash

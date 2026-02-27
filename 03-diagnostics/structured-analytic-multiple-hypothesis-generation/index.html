@@ -48,7 +48,11 @@
             <!-- Items loaded from Multiple_Hypothesis_Generation.txt + manual adds -->
           </ul>
           <div class="source-panel-actions">
-            <button type="button" class="btn-update-source" id="btn-update-source" aria-label="Re-read file and add new items">Update</button>
+            <div class="update-help-wrap">
+              <button type="button" class="btn-update-source" id="btn-update-source" aria-label="Re-read file and add new items">Update</button>
+              <button type="button" class="update-help-btn" id="btn-update-source-help" aria-label="Generation update file info">?</button>
+              <div class="update-help-tip" id="tip-update-source">Reads from <code>input/Multiple_Hypothesis_Generation.txt</code>.</div>
+            </div>
             <button type="button" class="btn-clear-source" id="btn-clear-source" aria-label="Clear the source list (does not write to file)">Clear</button>
             <button type="button" class="btn-add-source" id="btn-add-source" aria-label="Add new source item">Add +</button>
           </div>
@@ -91,7 +95,11 @@
       <div class="ranking-body">
         <div class="ranking-left">
           <div class="ranking-toolbar">
-            <button type="button" class="btn-ranking-update" id="btn-ranking-update" aria-label="Re-read Hypotheses.txt">Update</button>
+            <div class="update-help-wrap">
+              <button type="button" class="btn-ranking-update" id="btn-ranking-update" aria-label="Re-read hypotheses from file">Update</button>
+              <button type="button" class="update-help-btn" id="btn-ranking-update-help" aria-label="Ranking update file info">?</button>
+              <div class="update-help-tip" id="tip-ranking-update">Reads from <code>data/hypothesis.json</code> via the local API.</div>
+            </div>
             <button type="button" class="btn-ranking-clear" id="btn-ranking-clear" aria-label="Clear the page (does not write to file); use Update to load from Hypotheses.txt">Clear</button>
           </div>
           <ul class="ranking-list" id="ranking-list" role="list">

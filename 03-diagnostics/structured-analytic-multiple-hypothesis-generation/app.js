@@ -1510,11 +1510,42 @@
     if (btnRankingClear) btnRankingClear.addEventListener('click', clearRankingPage);
   }
 
+  function initUpdateHelpTips() {
+    var sourceHelpBtn = document.getElementById('btn-update-source-help');
+    var sourceHelpTip = document.getElementById('tip-update-source');
+    var rankingHelpBtn = document.getElementById('btn-ranking-update-help');
+    var rankingHelpTip = document.getElementById('tip-ranking-update');
+
+    function closeTips() {
+      if (sourceHelpTip) sourceHelpTip.classList.remove('show');
+      if (rankingHelpTip) rankingHelpTip.classList.remove('show');
+    }
+
+    if (sourceHelpBtn && sourceHelpTip) {
+      sourceHelpBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (rankingHelpTip) rankingHelpTip.classList.remove('show');
+        sourceHelpTip.classList.toggle('show');
+      });
+    }
+
+    if (rankingHelpBtn && rankingHelpTip) {
+      rankingHelpBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (sourceHelpTip) sourceHelpTip.classList.remove('show');
+        rankingHelpTip.classList.toggle('show');
+      });
+    }
+
+    document.addEventListener('click', closeTips);
+  }
+
   function init() {
     loadGenerationState();
     loadSourceFile();
     initDestinationPopup();
     initPageSwitcher();
+    initUpdateHelpTips();
     initFileMenu();
     setupHypothesisCardList();
     initSaveHypothesisAch();

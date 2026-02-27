@@ -3,13 +3,13 @@
  * data/evidence.json (the live database), and appends hypothesis-keyword
  * JSONL records to data/hypothesis_keywords.jsonl.
  * Run from this folder: node server.js
- * Then open http://localhost:8765 in the browser.
+ * Then open http://localhost:8080 in the browser.
  */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 8765;
+const PORT = 8080;
 const DATA_DIR = path.resolve(__dirname, '..', '..', 'data');
 const EVIDENCE_PATH = path.join(DATA_DIR, 'evidence.json');
 const JSONL_PATH = path.join(DATA_DIR, 'hypothesis_keywords.jsonl');

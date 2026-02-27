@@ -6,14 +6,14 @@
  *   POST /api/save-evidence   — overwrite the shared evidence tree
  *
  * Run: node server.js
- * Then open http://localhost:8080
+ * Then open http://localhost:8081
  */
 
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = 8080;
+const PORT = 8081;
 const ROOT = __dirname;
 const DATA_DIR = path.resolve(ROOT, "..", "..", "data");
 const JSONL_PATH = path.join(DATA_DIR, "hypothesis_keywords.jsonl");

@@ -51,7 +51,7 @@ Displays the fields for **Description** and **Source** that can be attached to a
 
 ## 🚀 Quick start
 
-**From repo root:** Run `node start-all.js` and open the hub at http://localhost:3000, then click **Causal Map** (port 8765).
+**From repo root:** Run `node start-all.js` and open the hub at http://localhost:3000, then click **Causal Map** (port 8080).
 
 ### Option 1: Open directly  
 1. Clone or download the repository  
@@ -78,7 +78,7 @@ node server.js
 ```
 
 Then open:  
-👉 http://localhost:8765  
+👉 http://localhost:8080  
 
 When you click **Create Keywords** (in the keywords popup), the record is appended to the JSONL file automatically (no prompt).  
 If you open the app without the server (e.g. by double-clicking `index.html`), the app will fall back to a download or save dialog.

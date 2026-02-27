@@ -84,6 +84,52 @@ body {
   background: #f0f6fc;
   color: #1a1a1a;
 }
+.update-help-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.update-help-btn {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 50%;
+  border: 1px solid #6b9bd1;
+  background: rgba(107,155,209,0.16);
+  color: #4a7ab5;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.update-help-btn:hover {
+  background: rgba(107,155,209,0.3);
+}
+.update-help-tip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
+  width: 260px;
+  padding: 8px 10px;
+  border: 1px solid #c5c2bd;
+  border-radius: 8px;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  display: none;
+  z-index: 60;
+}
+.update-help-tip.show {
+  display: block;
+}
 .app-toolbar-title {
   flex: 1;
   text-align: center;
@@ -196,6 +242,10 @@ body {
 
 .ranking-toolbar {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e8e6e2;
   background: #faf9f7;
@@ -1571,4 +1621,112 @@ body {
   height: 100%;
   pointer-events: none;
   overflow: visible;
+}
+
+/* Blue layout theme override */
+body {
+  background: #0f1419;
+  color: #e6edf3;
+}
+
+.hypothesis-app {
+  background: transparent;
+}
+
+.app-toolbar-title,
+.app-title {
+  color: #e6edf3;
+}
+
+.app-subtitle {
+  color: #8b949e;
+}
+
+.btn-back-to-hub,
+.btn-file-menu,
+.page-switcher-btn,
+.btn-update-source,
+.btn-clear-source,
+.btn-add-source,
+.btn-ranking-update,
+.btn-ranking-clear,
+.btn-clear-tree,
+.btn-update-tree,
+.btn-clear-hypothesis-json,
+.btn-save-ach-bar,
+.btn-save-ach {
+  border-color: #2d3a4d;
+}
+
+.btn-back-to-hub,
+.btn-file-menu,
+.page-switcher-btn,
+.btn-update-source,
+.btn-clear-source,
+.btn-add-source,
+.btn-ranking-update,
+.btn-ranking-clear {
+  background: #1a2332;
+  color: #8b949e;
+}
+
+.btn-back-to-hub:hover,
+.btn-file-menu:hover,
+.page-switcher-btn:hover,
+.btn-update-source:hover,
+.btn-clear-source:hover,
+.btn-add-source:hover,
+.btn-ranking-update:hover,
+.btn-ranking-clear:hover {
+  background: #212d3d;
+  color: #e6edf3;
+  border-color: #58a6ff;
+}
+
+.source-panel,
+.ranking-left,
+.tree-workspace,
+.hypothesis-card,
+.destination-popup-box,
+.add-source-modal-box {
+  background: #1a2332;
+  border-color: #2d3a4d;
+}
+
+.ranking-toolbar,
+.tree-workspace-toolbar,
+.source-panel-title,
+.tree-header {
+  background: #212d3d;
+  border-color: #2d3a4d;
+}
+
+.source-panel-title,
+.hypothesis-card-heading {
+  color: #e6edf3;
+}
+
+.file-menu-dropdown {
+  background: #1a2332;
+  border-color: #2d3a4d;
+}
+
+.file-menu-dropdown button {
+  color: #e6edf3;
+}
+
+.file-menu-dropdown button:hover {
+  background: #212d3d;
+  color: #e6edf3;
+}
+
+.source-item,
+.ranking-list-item,
+.tree-node,
+.tree-edit-row,
+.hypothesis-card-description,
+.intelligence-requirement-bar input {
+  background: #212d3d;
+  border-color: #2d3a4d;
+  color: #e6edf3;
 }

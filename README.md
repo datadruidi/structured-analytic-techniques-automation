@@ -6,15 +6,19 @@ A collection of lightweight, analyst-focused tools for Structured Analytic Techn
 
 ## Quick start
 
-From the repo root run:
+Windows (fastest):
+
+- Double-click **`Start-SAT-Tools.bat`** in the repo root.
+- It opens **http://localhost:3000/** and starts all tool servers.
+- Keep that terminal window open while using the tools. Press Ctrl+C (or close the window) to stop servers.
+
+Terminal option (any OS):
 
 ```bash
 node start-all.js
 ```
 
-Then open **http://localhost:3000** in your browser. The hub shows one button per tool; each opens the tool in a new tab. Press Ctrl+C in the terminal to stop all servers.
-
-Alternatively, run **`node server.js`** from the repo root for the same result.
+Then open **http://localhost:3000/** in your browser.
 
 **Note:** The folder structure supports only one information requirement task. To avoid collision between different analyses, it is suggested that once downloaded the whole repository is moved into a dedicated project folder (for example one folder per case or task).
 
@@ -41,8 +45,8 @@ The hub is grouped by workflow phase. Some buttons open local tools, and some op
 - **OSINT Processing** (ChatGPT agent): Supports processing and organization of collected material.
 
 ### Getting Organized
-- **Causal Map** (`http://localhost:8765`): Builds and edits a causal node-link map; supports annotations and JSON import/export.
-- **Timeline** (`http://localhost:8080`): Organizes events by time with metadata and export options.
+- **Causal Map** (`http://localhost:8080`): Builds and edits a causal node-link map; supports annotations and JSON import/export.
+- **Timeline** (`http://localhost:8081`): Organizes events by time with metadata and export options.
 
 ### Exploration
 - **Circleboarding** (`http://localhost:8082`): 5W+H ideation board with "So what?" lanes for exploratory synthesis.
@@ -72,11 +76,9 @@ The hub is grouped by workflow phase. Some buttons open local tools, and some op
 
 | Tool | Port | Folder |
 |------|------|--------|
-| Causal Map | 8765 | `01-getting-organized/structured-analytic-causal-map` |
-| Timeline | 8080 | `01-getting-organized/structured-analytic-timeline` |
+| Causal Map | 8080 | `01-getting-organized/structured-analytic-causal-map` |
+| Timeline | 8081 | `01-getting-organized/structured-analytic-timeline` |
 | Circleboarding | 8082 | `02-exploration/structured-analytic-circleboarding` |
 | Multiple Hypothesis | 8083 | `03-diagnostics/structured-analytic-multiple-hypothesis-generation` |
 | Competing Hypothesis (ACH) | 8084 | `03-diagnostics/structured-analysis-of-competing-hypothesis` |
 | Bowtie Analysis | 8085 | `06-decision-support/structured-bowtie-analysis` |
-
-Port details: [HUB-PAGE-INSTRUCTIONS.md](HUB-PAGE-INSTRUCTIONS.md).

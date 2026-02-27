@@ -29,6 +29,13 @@ This module has two main views, switched by the top buttons: **Hypothesis Genera
 | `../../data/hypothesis.json` | Primary hypothesis store | Used by ranking view and ACH handoff (`hypotheses[]`, `H1..H5`, `intelligence_requirement`). |
 | `../../data/hypothesis_keywords.jsonl` | Hypothesis keyword JSONL output target | Server prints this path on startup. |
 
+## File / Update button read sources
+
+- **Generation -> Update**: reads `input/Multiple_Hypothesis_Generation.txt`.
+- **Ranking -> Update**: reads `../../data/hypothesis.json` (via `/api/hypothesis-ach`).
+- **Top File -> Import**: reads user-selected local JSON file (generation/ranking export shape).
+- **Top File -> Export**: downloads current app state as JSON (does not read from disk).
+
 ## Current data flow
 
 1. Generation source items are loaded from `input/Multiple_Hypothesis_Generation.txt`.

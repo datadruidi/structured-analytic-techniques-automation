@@ -37,12 +37,15 @@ From repo root, you can also run `node start-all.js` and open the hub at `http:/
 
 ## Important behavior notes
 
-- **Read Evidence from File** uses default `data/evidence.json`.
+- **Evidence -> File -> Update from File** reads `../../data/evidence.json` by default.
+- **Evidence -> File -> Import Evidence** reads user-selected local evidence JSON.
+- **Evidence -> File -> Export Evidence** downloads current evidence JSON.
 - **Update from file** for evidence can load a user-entered JSON filename; that filename is remembered in `localStorage` (`ach-update-filename`).
 - **Saving evidence** writes to `../../data/evidence.json` and refreshes `evidence_list.jsonl`.
 - **Hypothesis initial load** reads `hypothesis_example.json`.
-- **Hypothesis Update button** reads `../../data/hypothesis.json` via `/api/hypothesis`.
-- **Import Hypothesis** currently saves to `hypothesis_example.json` via `/api/save-hypothesis`.
+- **Hypothesis -> File -> Update from File** reads `../../data/hypothesis.json` via `/api/hypothesis`.
+- **Hypothesis -> File -> Import Hypothesis** reads user-selected local hypothesis JSON, then writes to `hypothesis_example.json` via `/api/save-hypothesis`.
+- **Hypothesis -> File -> Export Hypothesis** downloads current hypothesis JSON.
 
 ## Server API (implemented)
 

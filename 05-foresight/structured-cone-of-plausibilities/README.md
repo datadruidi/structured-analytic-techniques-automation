@@ -47,7 +47,7 @@ Trend modal edits also persist through scenarios save flow (not back to evidence
 
 ## File menu behavior
 
-- **Read from File**: Reloads using the load-priority logic above.
+- **Read from File**: reads `data/scenarios.json` first (via `/api/load-scenarios`); if missing/empty, reads `data/evidence.json`.
 - **Import JSON** supports two formats:
   - scenarios array format (same as app export)
   - evidence root object format (object with `children`)

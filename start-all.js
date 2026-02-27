@@ -1,6 +1,6 @@
 /**
  * Start hub and all tools with reserved ports per HUB-PAGE-INSTRUCTIONS.md:
- * Hub 3000, Causal Map 8765, Timeline 8080, Circleboarding 8082,
+ * Hub 3000, Causal Map 8080, Timeline 8081, Circleboarding 8082,
  * Multiple Hypothesis 8083, Competing Hypothesis 8084, Bowtie Analysis 8085.
  * Reserved for future: 8086, 8087, 8088.
  * Run from repo root: node start-all.js
@@ -110,8 +110,8 @@ const hubServer = http.createServer((req, res) => {
 
 const SERVERS = [
   { name: 'Hub', dir: null, port: HUB_PORT },
-  { name: 'Causal map', dir: '01-getting-organized/structured-analytic-causal-map', port: 8765 },
-  { name: 'Timeline', dir: '01-getting-organized/structured-analytic-timeline', port: 8080 },
+  { name: 'Causal map', dir: '01-getting-organized/structured-analytic-causal-map', port: 8080 },
+  { name: 'Timeline', dir: '01-getting-organized/structured-analytic-timeline', port: 8081 },
   { name: 'Circleboarding', dir: '02-exploration/structured-analytic-circleboarding', port: 8082 },
   { name: 'Multiple Hypothesis Generation', dir: '03-diagnostics/structured-analytic-multiple-hypothesis-generation', port: 8083 },
   { name: 'Competing Hypothesis', dir: '03-diagnostics/structured-analysis-of-competing-hypothesis', port: 8084 },
