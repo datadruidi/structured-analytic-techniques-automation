@@ -45,32 +45,34 @@ The hub is grouped by workflow phase. Some buttons open local tools, and some op
 ### Processing
 - **OSINT Processing** (ChatGPT agent): Supports processing and organization of collected material.
 
-### Getting Organized
+### Analysis
+
+#### Getting Organized
 - **Causal Map** (`http://localhost:8080`): Builds and edits a causal node-link map; supports annotations and JSON import/export.
 - **Timeline** (`http://localhost:8081`): Organizes events by time with metadata and export options.
 
-### Exploration
+#### Exploration
 - **Circleboarding** (`http://localhost:8082`): 5W+H ideation board with "So what?" lanes for exploratory synthesis.
 
-### Diagnostics
+#### Diagnostics
 - **Multiple Hypothesis** (`http://localhost:8083`): Generates and structures alternative hypotheses.
 - **Permutation Generator** (ChatGPT agent): Produces hypothesis permutations and combinations.
 - **Competing Hypothesis** (`http://localhost:8084`): ACH evidence matrix and hypothesis comparison workflow.
 
-### Reframing
+#### Reframing
 - **Analogies Collection** (ChatGPT agent): Collects candidate analogies for the case.
 - **Analogies Processor** (ChatGPT agent): Processes and screens analogies before scoring.
 - **Structured Analogies** (`04-reframing/structured-analysis-of-analogies/index.html`): Scores and compares analogies in-tool.
 
-### Foresight
+#### Foresight
 - **Cone of Plausibilities** (`05-foresight/`): Builds baseline, plausible, wildcard, and preposterous scenarios.
 - **Scenario Generator** (ChatGPT agent): Supports drafting and refining scenario outputs.
 
-### Decision Support
+#### Decision Support
 - **Bowtie Processor** (ChatGPT agent): Assists preparation and processing for Bowtie analysis.
 - **Bowtie Analysis** (`06-decision-support/structured-bowtie-analysis/index.html`): Builds hazards, threats, barriers, and consequences in Bowtie form.
 
-### Dissemination
+#### Dissemination
 - **Structured Reporting** (ChatGPT agent): Converts analytical outputs into structured reporting.
 
 ## Local tool ports
